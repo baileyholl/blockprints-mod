@@ -1,8 +1,11 @@
 package com.hollingsworth.schematic.common.item;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.hollingsworth.schematic.common.util.ComponentUtil;
 import com.hollingsworth.schematic.common.util.MimeMultipartData;
 import com.hollingsworth.schematic.common.util.SchematicExport;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -13,6 +16,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -39,7 +43,7 @@ public class Schematic extends Item {
 
     @Override
     public InteractionResult useOn(UseOnContext pContext) {
-        if (pContext.getLevel().isClientSide) {
+        if (!pContext.getLevel().isClientSide) {
             return InteractionResult.SUCCESS;
         }
         ItemStack heldStack = pContext.getItemInHand();
@@ -62,7 +66,10 @@ public class Schematic extends Item {
                         .build();
                 var httpClient = HttpClient.newBuilder().build();
                 var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-                pContext.getPlayer().sendSystemMessage(Component.literal("Response: " + response.statusCode()));
+                JsonObject jsonObject = JsonParser.parseString(response.body()).getAsJsonObject();
+                String fileName = jsonObject.get("file").getAsString();
+                GLFW.glfwSetClipboardString(Minecraft.getInstance().getWindow().getWindow(), fileName);
+                pContext.getPlayer().sendSystemMessage(Component.literal("Response: " + fileName));
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -29,11 +29,7 @@ public class Networking {
                 SyncGameClient::toBytes,
                 SyncGameClient::new,
                 SyncGameClient::onMessage);
-        INSTANCE.registerMessage(nextID(),
-                OpenCreateScreen.class,
-                OpenCreateScreen::encode,
-                OpenCreateScreen::new,
-                MessageHandler::handle);
+
         INSTANCE.registerMessage(nextID(),
                 CreateColonyServer.class,
                 CreateColonyServer::encode,
@@ -50,9 +46,9 @@ public class Networking {
                 EditCafeServer::new,
                 MessageHandler::handle);
         INSTANCE.registerMessage(nextID(),
-                AssignColonistServer.class,
-                AssignColonistServer::encode,
-                AssignColonistServer::new,
+                DownloadSchematic.class,
+                DownloadSchematic::encode,
+                DownloadSchematic::new,
                 MessageHandler::handle);
     }
 

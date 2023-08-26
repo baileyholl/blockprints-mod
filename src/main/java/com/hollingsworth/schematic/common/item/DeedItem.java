@@ -1,7 +1,9 @@
 package com.hollingsworth.schematic.common.item;
 
 import com.hollingsworth.schematic.api.DeedData;
+import com.hollingsworth.schematic.client.gui.CreateCafeScreen;
 import com.hollingsworth.schematic.common.util.ModItem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -21,11 +23,9 @@ public class DeedItem extends ModItem {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
-        var deedData = new DeedData(pPlayer.getItemInHand(pUsedHand));
-//        if(pLevel instanceof ServerLevel serverLevel && deedData.getUuid() == null){
-//            deedData.setUuid(UUID.randomUUID());
-//            CafeSavedData.from(serverLevel).addCafe(new Cafe(deedData.getUuid()));
-//        }
+        if(pLevel.isClientSide){
+            Minecraft.getInstance().setScreen(new CreateCafeScreen());
+        }
         return super.use(pLevel, pPlayer, pUsedHand);
     }
 
