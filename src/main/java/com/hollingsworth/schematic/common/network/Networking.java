@@ -24,27 +24,7 @@ public class Networking {
     public static void registerMessages() {
         INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(SchematicMod.MODID, "network"), () -> "1.0", s -> true, s -> true);
 
-        INSTANCE.registerMessage(nextID(),
-                SyncGameClient.class,
-                SyncGameClient::toBytes,
-                SyncGameClient::new,
-                SyncGameClient::onMessage);
 
-        INSTANCE.registerMessage(nextID(),
-                CreateColonyServer.class,
-                CreateColonyServer::encode,
-                CreateColonyServer::new,
-                MessageHandler::handle);
-        INSTANCE.registerMessage(nextID(),
-                StartGameServer.class,
-                StartGameServer::encode,
-                StartGameServer::new,
-                MessageHandler::handle);
-        INSTANCE.registerMessage(nextID(),
-                EditCafeServer.class,
-                EditCafeServer::encode,
-                EditCafeServer::new,
-                MessageHandler::handle);
         INSTANCE.registerMessage(nextID(),
                 DownloadSchematic.class,
                 DownloadSchematic::encode,

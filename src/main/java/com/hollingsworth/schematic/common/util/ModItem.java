@@ -1,6 +1,5 @@
 package com.hollingsworth.schematic.common.util;
 
-import com.hollingsworth.schematic.common.item.CafeItems;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -20,10 +19,6 @@ public class ModItem extends Item {
 
     public ModItem(Properties properties) {
         super(properties);
-    }
-
-    public ModItem() {
-        this(CafeItems.defaultItemProperties());
     }
 
     public ModItem withTooltip(Component tip) {

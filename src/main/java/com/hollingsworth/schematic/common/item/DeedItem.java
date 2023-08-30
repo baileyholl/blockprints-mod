@@ -1,6 +1,5 @@
 package com.hollingsworth.schematic.common.item;
 
-import com.hollingsworth.schematic.api.DeedData;
 import com.hollingsworth.schematic.client.gui.CreateCafeScreen;
 import com.hollingsworth.schematic.common.util.ModItem;
 import net.minecraft.client.Minecraft;
@@ -32,7 +31,5 @@ public class DeedItem extends ModItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip2, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, tooltip2, flagIn);
-        var deedData = new DeedData(stack);
-        tooltip2.add(Component.literal("UUID " +  deedData.getUuid()));
     }
 }

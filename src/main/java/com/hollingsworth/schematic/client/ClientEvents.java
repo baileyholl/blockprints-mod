@@ -31,49 +31,6 @@ import static com.hollingsworth.schematic.client.RaycastHelper.rayTraceUntil;
 @OnlyIn(Dist.CLIENT)
 public class ClientEvents {
 
-//    @SubscribeEvent
-//    public static void renderLast(final RenderLevelStageEvent event) {
-//        if(event.getStage() == RenderLevelStageEvent.Stage.AFTER_SKY){
-//            BlockPos playerPos = Minecraft.getInstance().player.getOnPos();
-////            event.getPoseStack().translate(playerPos.getX(), playerPos.getY(), playerPos.getZ());
-//            BlockPos blockpos = new BlockPos(0,6, 0);
-//
-//            int size = 20;
-//            AABB aabb = new AABB(blockpos).inflate(size);
-//            ItemStack stack = Minecraft.getInstance().player.getMainHandItem();
-//            if(!(stack.getItem() instanceof Schematic) || !stack.hasTag())
-//                return;
-//            BlockPos firstPos = BlockPos.of(stack.getTag().getLong(Schematic.POS1));
-//            if(firstPos == null)
-//                return;
-//
-//            BlockPos secondPos = stack.getTag().contains(Schematic.POS2) ? BlockPos.of(stack.getTag().getLong(Schematic.POS2)) : null;
-//            if(secondPos == null){
-//                HitResult hitresult = Minecraft.getInstance().player.pick(20, event.getPartialTick(), false);
-//                if(hitresult == null || hitresult.getType() != HitResult.Type.BLOCK)
-//                    return;
-//                Vec3 hitVec = hitresult.getLocation();
-//                secondPos = new BlockPos(hitVec);
-//            }
-//            PoseStack poseStack = event.getPoseStack();
-//            poseStack.pushPose();
-//            Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera()
-//                    .getPosition();
-//
-//            AABB aabb1 = new AABB(Vec3.atLowerCornerOf(firstPos), Vec3.atLowerCornerOf(secondPos));
-//            boolean cameraInside = aabb1.contains(camera);
-//            float inflate = cameraInside ? -1 / 128f : 1 / 128f;
-//
-//            aabb1.move(camera.scale(-1));
-//            aabb1 = aabb1.move(-camera.x, -camera.y, -camera.z);
-//
-//            VertexConsumer vertexconsumer = CafeRenders.bufferSource.getBuffer(RenderType.lines());
-//            LevelRenderer.renderLineBox(poseStack, vertexconsumer, aabb1, 0.9F, 0.9F, 0.9F, 1.0f);
-//            CafeRenders.bufferSource.endBatch();
-//            poseStack.popPose();
-//        }
-//    }
-
     @SubscribeEvent
     public static void renderLast(final RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY) {
@@ -128,7 +85,7 @@ public class ClientEvents {
         }else {
             currentSelectionBox = new AABB(firstPos, secondPos).expandTowards(1, 1, 1);
         }
-//        System.out.println(currentSelectionBox);
+
         if(currentSelectionBox != null){
             Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera()
                     .getPosition();

@@ -29,15 +29,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static com.hollingsworth.schematic.common.item.CafeItems.defaultItemProperties;
-
 public class Schematic extends Item {
     public static String POS1 = "pos1";
     public static String POS2 = "pos2";
     public String buildingID;
 
     public Schematic(String buildingID) {
-        super(defaultItemProperties());
+        super(new Item.Properties());
         this.buildingID = buildingID;
     }
 

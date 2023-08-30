@@ -5,19 +5,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Matrix4f;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
-import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.GameType;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.client.gui.ScreenUtils;
@@ -37,76 +30,6 @@ public class GuiEntityInfoHUD {
 
     public static void renderOverlay(ForgeGui gui, PoseStack poseStack, float partialTicks, int width,
                                      int height) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.options.hideGui || mc.gameMode.getPlayerMode() == GameType.SPECTATOR)
-            return;
-
-        HitResult objectMouseOver = mc.hitResult;
-        List<Component> tooltip = new ArrayList<>();
-        Object hovering = null;
-        if(objectMouseOver instanceof BlockHitResult hitResult){
-            hovering = hitResult.getBlockPos();
-            if(mc.level.getBlockEntity(hitResult.getBlockPos()) instanceof ITooltipProvider iTooltipProvider){
-                iTooltipProvider.getTooltip(tooltip);
-            }
-        }else if(objectMouseOver instanceof EntityHitResult result){
-            if (result.getEntity() instanceof ITooltipProvider iTooltipProvider) {
-                iTooltipProvider.getTooltip(tooltip);
-            }
-            hovering = result.getEntity();
-        }
-
-        if (hovering == null || (lastHovered != null && !lastHovered.equals(hovering))) {
-            lastHovered = null;
-            hoverTicks = 0;
-        }
-
-        if (lastHovered == null || lastHovered.equals(hovering))
-            hoverTicks++;
-        else
-            hoverTicks = 0;
-        lastHovered = hovering;
-
-
-        if (tooltip.isEmpty()) {
-            return;
-        }
-        poseStack.pushPose();
-
-        int tooltipTextWidth = 0;
-        for (FormattedText textLine : tooltip) {
-            int textLineWidth = mc.font.width(textLine);
-            if (textLineWidth > tooltipTextWidth)
-                tooltipTextWidth = textLineWidth;
-        }
-
-        int tooltipHeight = 8;
-        if (tooltip.size() > 1) {
-            tooltipHeight += 2; // gap between title lines and next lines
-            tooltipHeight += (tooltip.size() - 1) * 10;
-        }
-        int xOffset = 0;
-        int posX = width / 2 + xOffset;
-        int posY = height / 2 + 0;
-
-        posX = Math.min(posX, width - tooltipTextWidth - 20);
-        posY = Math.min(posY, height - tooltipHeight - 20);
-
-        float fade = Mth.clamp((hoverTicks + partialTicks) / 12f, 0, 1);
-        Color colorBackground = VANILLA_TOOLTIP_BACKGROUND.scaleAlpha(.75f);
-        Color colorBorderTop = VANILLA_TOOLTIP_BORDER_1;
-        Color colorBorderBot = VANILLA_TOOLTIP_BORDER_2;
-
-        if (fade < 1) {
-            poseStack.translate((1 - fade) * Math.signum(xOffset + .5f) * 4, 0, 0);
-            colorBackground.scaleAlpha(fade);
-            colorBorderTop.scaleAlpha(fade);
-            colorBorderBot.scaleAlpha(fade);
-        }
-
-        drawHoveringText(ItemStack.EMPTY, poseStack, tooltip,  posX, posY, width, height, -1, colorBackground.getRGB(),
-                colorBorderTop.getRGB(), colorBorderBot.getRGB(), mc.font);
-        poseStack.popPose();
     }
     public static final Color VANILLA_TOOLTIP_BORDER_1 = new Color(0x50_5000ff, true);
     public static final Color VANILLA_TOOLTIP_BORDER_2 = new Color(0x50_28007f, true);
