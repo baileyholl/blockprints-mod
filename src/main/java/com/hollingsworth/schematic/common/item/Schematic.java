@@ -61,6 +61,7 @@ public class Schematic extends Item {
                         .header("Content-Type", mimeMultipartData.getContentType())
                         .POST(mimeMultipartData.getBodyPublisher())
                         .uri(URI.create("http://localhost:3000/test"))
+                        .header("authorization", "Bearer " + Minecraft.getInstance().getUser().getAccessToken())
                         .build();
                 var httpClient = HttpClient.newBuilder().build();
                 var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());

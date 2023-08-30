@@ -158,6 +158,9 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
     maven { url 'https://jitpack.io' }
+    maven {
+        url "https://cursemaven.com"
+    }
 }
 
 dependencies {
@@ -166,6 +169,7 @@ dependencies {
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:1.19.2-43.2.11'
     shade fg.deobf("com.github.LlamaLad7:MixinExtras:0.1.1")
+    implementation fg.deobf("curse.maven:oauth-513857:4518842")
     library fg.deobf("com.github.LlamaLad7:MixinExtras:0.1.1")
     annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
     annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
