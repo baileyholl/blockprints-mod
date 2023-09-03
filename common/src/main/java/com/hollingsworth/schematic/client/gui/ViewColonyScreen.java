@@ -1,6 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
-import com.hollingsworth.schematic.SchematicMod;
+import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.common.util.ComponentUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.Button;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class ViewColonyScreen extends ModScreen{
-    public static ResourceLocation background = new ResourceLocation(SchematicMod.MODID, "textures/gui/spell_book_template.png");
+    public static ResourceLocation background = new ResourceLocation(Constants.MOD_ID, "textures/gui/spell_book_template.png");
 
     List<ItemStack> menuItems;
     int numSeats;
