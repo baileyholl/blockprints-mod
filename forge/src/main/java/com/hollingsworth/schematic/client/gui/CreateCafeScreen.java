@@ -1,6 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
-import com.hollingsworth.schematic.SchematicMod;
+import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.common.network.DownloadSchematic;
 import com.hollingsworth.schematic.common.network.Networking;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -11,7 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class CreateCafeScreen extends ModScreen {
 
-    public static ResourceLocation background = new ResourceLocation(SchematicMod.MODID, "textures/gui/spell_book_template.png");
+    public static ResourceLocation background = new ResourceLocation(Constants.MOD_ID, "textures/gui/spell_book_template.png");
 
     public EditBox cafeName;
     public Button confirm;

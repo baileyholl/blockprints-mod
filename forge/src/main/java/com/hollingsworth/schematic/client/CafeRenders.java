@@ -1,6 +1,6 @@
 package com.hollingsworth.schematic.client;
 
-import com.hollingsworth.schematic.SchematicMod;
+import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.common.util.GuiEntityInfoHUD;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -11,7 +11,7 @@ import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = SchematicMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 @OnlyIn(Dist.CLIENT)
 public class CafeRenders {
 

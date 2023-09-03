@@ -1,6 +1,6 @@
 package com.hollingsworth.schematic.client;
 
-import com.hollingsworth.schematic.SchematicMod;
+import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.common.item.Schematic;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -27,7 +27,7 @@ import net.minecraftforge.fml.common.Mod;
 import static com.hollingsworth.schematic.client.RaycastHelper.rayTraceRange;
 import static com.hollingsworth.schematic.client.RaycastHelper.rayTraceUntil;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = SchematicMod.MODID)
+@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = Constants.MOD_ID)
 @OnlyIn(Dist.CLIENT)
 public class ClientEvents {
 

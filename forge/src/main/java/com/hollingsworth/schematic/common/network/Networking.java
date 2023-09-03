@@ -1,6 +1,6 @@
 package com.hollingsworth.schematic.common.network;
 
-import com.hollingsworth.schematic.SchematicMod;
+import com.hollingsworth.schematic.Constants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -22,7 +22,7 @@ public class Networking {
     }
 
     public static void registerMessages() {
-        INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(SchematicMod.MODID, "network"), () -> "1.0", s -> true, s -> true);
+        INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(Constants.MOD_ID, "network"), () -> "1.0", s -> true, s -> true);
 
 
         INSTANCE.registerMessage(nextID(),
