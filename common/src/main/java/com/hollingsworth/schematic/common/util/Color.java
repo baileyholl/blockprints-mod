@@ -2,10 +2,10 @@ package com.hollingsworth.schematic.common.util;
 
 
 import com.google.common.hash.Hashing;
-import com.mojang.math.Vector3f;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3f;
 
 import java.util.function.UnaryOperator;
 
