@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.common.util;
 
+import com.hollingsworth.schematic.platform.Services;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
@@ -7,7 +8,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import net.minecraftforge.fml.loading.FMLPaths;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -18,7 +18,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.Locale;
 
 public class SchematicExport {
-	public static final Path SCHEMATICS = FMLPaths.GAMEDIR.get().resolve("schematics");
+	public static final Path SCHEMATICS = Services.PLATFORM.getGameDirectory().resolve("schematics");
 
 	/**
 	 * Save a schematic to a file from a world.
