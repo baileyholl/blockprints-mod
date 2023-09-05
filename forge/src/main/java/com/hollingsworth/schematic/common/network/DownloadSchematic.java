@@ -6,9 +6,6 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -56,8 +53,8 @@ public class DownloadSchematic implements Message {
             try (DataInputStream stream = new DataInputStream(new BufferedInputStream(
                     new GZIPInputStream(Files.newInputStream(Paths.get("./schematics/test.nbt"),StandardOpenOption.READ))))) {
                 CompoundTag nbt = NbtIo.read(stream, new NbtAccounter(0x20000000L));
-                t.load(nbt);
-                t.placeInWorld((ServerLevelAccessor) player.level(), player.getOnPos(), player.getOnPos(), new StructurePlaceSettings(), player.getRandom(), Block.UPDATE_CLIENTS);
+//                t.load(nbt);
+//                t.placeInWorld((ServerLevelAccessor) player.level(), player.getOnPos(), player.getOnPos(), new StructurePlaceSettings(), player.getRandom(), Block.UPDATE_CLIENTS);
             } catch (IOException e) {
                 e.printStackTrace();
             }
