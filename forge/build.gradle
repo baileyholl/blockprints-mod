@@ -97,7 +97,7 @@ dependencies {
     implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.2.0-beta.11")) {
         jarJar.ranged(it, "[0.2.0-beta.11,)")
     }
-
+    implementation("org.bytedeco:ffmpeg-platform:6.0-1.5.9")
     implementation fg.deobf("curse.maven:oauth-513857:4518842")
 }
 

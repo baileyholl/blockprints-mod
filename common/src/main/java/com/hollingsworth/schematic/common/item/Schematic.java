@@ -88,8 +88,8 @@ public class Schematic extends Item {
 
     public static void writeAABB(ItemStack stack, AABB aabb) {
         CompoundTag tag = stack.getOrCreateTag();
-        BlockPos start = new BlockPos(aabb.minX, aabb.minY, aabb.minZ);
-        BlockPos end = new BlockPos(aabb.maxX, aabb.maxY, aabb.maxZ);
+        BlockPos start = BlockPos.containing(aabb.minX, aabb.minY, aabb.minZ);
+        BlockPos end = BlockPos.containing(aabb.maxX, aabb.maxY, aabb.maxZ);
         tag.putLong(POS1, start.asLong());
         tag.putLong(POS2, end.asLong());
     }

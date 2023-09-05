@@ -2,7 +2,7 @@ package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.client.RenderUtils;
 import com.hollingsworth.schematic.common.util.ITooltipProvider;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
@@ -19,17 +19,16 @@ public class HoverableItem extends AbstractWidget implements ITooltipProvider {
     }
 
     @Override
-    public void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
-        if(!this.visible) return;
-        RenderUtils.drawItemAsIcon(stack, pPoseStack, x, y, 16, false);
-    }
-
-    @Override
-    public void updateNarration(NarrationElementOutput pNarrationElementOutput) {
-
-    }
-
-    @Override
     public void getTooltip(List<Component> tooltip) {
+    }
+
+    @Override
+    protected void renderWidget(GuiGraphics guiGraphics, int x, int y, float v) {
+        RenderUtils.drawItemAsIcon(stack, guiGraphics.pose(), x, y, 16, false);
+    }
+
+    @Override
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+
     }
 }

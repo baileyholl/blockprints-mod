@@ -156,4 +156,6 @@ accessible field net/minecraft/client/renderer/texture/TextureAtlas sprites Ljav
 accessible method net/minecraft/client/renderer/texture/TextureAtlas getWidth ()I
 accessible method net/minecraft/client/renderer/texture/TextureAtlas getHeight ()I
 accessible method net/minecraft/client/renderer/texture/SpriteContents$AnimatedTexture uploadFrame (III)V
+accessible field net/minecraft/client/gui/components/AbstractWidget x I
+accessible field net/minecraft/client/gui/components/AbstractWidget y I
 
