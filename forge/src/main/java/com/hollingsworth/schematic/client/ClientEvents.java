@@ -44,11 +44,11 @@ public class ClientEvents {
             return;
         BlockPos selectedPos = null;
         LocalPlayer player = Minecraft.getInstance().player;
-        BlockHitResult trace = rayTraceRange(player.level, player, 75);
+        BlockHitResult trace = rayTraceRange(player.level(), player, 75);
         if (trace != null && trace.getType() == HitResult.Type.BLOCK) {
 
             BlockPos hit = trace.getBlockPos();
-            boolean replaceable = player.level.getBlockState(hit)
+            boolean replaceable = player.level().getBlockState(hit)
                     .canBeReplaced(new BlockPlaceContext(new UseOnContext(player, InteractionHand.MAIN_HAND, trace)));
             if (trace.getDirection()
                     .getAxis()

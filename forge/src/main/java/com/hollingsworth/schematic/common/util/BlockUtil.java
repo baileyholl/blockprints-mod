@@ -9,9 +9,9 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -35,15 +35,15 @@ public class BlockUtil {
      * Selects a solid position with air above
      */
     public static final BiPredicate<BlockGetter, BlockPos> SOLID_AIR_POS_SELECTOR = (world, pos) -> {
-        return (world.getBlockState(pos).canOcclude() || world.getBlockState(pos).getMaterial().isLiquid()) && world.getBlockState(
-                pos.above()).getMaterial() == Material.AIR && world.getBlockState(pos.above(2)).getMaterial() == Material.AIR;
+        return (world.getBlockState(pos).canOcclude() || !world.getBlockState(pos).getFluidState().isEmpty()) && world.getBlockState(
+                pos.above()).isAir() && world.getBlockState(pos.above(2)).isAir();
     };
 
     /**
      * Selects a double air position
      */
     public static final BiPredicate<BlockGetter, BlockPos> DOUBLE_AIR_POS_SELECTOR = (world, pos) -> {
-        return world.getBlockState(pos).getMaterial() == Material.AIR && world.getBlockState(pos.above(1)).getMaterial() == Material.AIR;
+        return world.getBlockState(pos).isAir() && world.getBlockState(pos.above(1)).isAir();
     };
 
     public static BlockPos getRandomSpawn(BlockPos calcCenter, Level level) {
@@ -142,11 +142,11 @@ public class BlockUtil {
 
         int validChunkCount = 0;
         for (int i = 0; i < 10; i++) {
-            if (isEntityBlockLoaded(level, new BlockPos(tempPos))) {
+            if (isEntityBlockLoaded(level, BlockPos.containing(tempPos))) {
                 tempPos = tempPos.add(16 * xzRatio.x, 0, 16 * xzRatio.z);
 
-                if (isEntityBlockLoaded(level, new BlockPos(tempPos))) {
-                    spawnPos = new BlockPos(tempPos);
+                if (isEntityBlockLoaded(level, BlockPos.containing(tempPos))) {
+                    spawnPos = BlockPos.containing(tempPos);
                     validChunkCount++;
                     if (validChunkCount > 5) {
                         return spawnPos;
@@ -378,9 +378,8 @@ public class BlockUtil {
      */
     public static boolean solidOrLiquid(@NotNull final Level world, @NotNull final BlockPos blockPos)
     {
-        final Material material = world.getBlockState(blockPos).getMaterial();
-        return material.isSolid()
-                || material.isLiquid();
+        BlockState bs = world.getBlockState(blockPos);
+        return bs.isSolid() || !bs.getFluidState().isEmpty();
     }
 
     public static double boxDistance(AABB box1, AABB box2) {
