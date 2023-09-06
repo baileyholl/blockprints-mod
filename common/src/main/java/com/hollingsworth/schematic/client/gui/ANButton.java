@@ -1,7 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.common.util.ITooltipProvider;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 
@@ -29,14 +28,21 @@ public class ANButton extends Button implements ITooltipProvider {
 //		return y;
 //	}
 
-//	public void setPosition(int x, int y) {
-//		set
-//		this.x = x;
-//		this.y = y;
-//	}
+	public void setY(int i) {
+		y = i;
+	}
 
-	public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
-		super.render(graphics, pMouseX, pMouseY, pPartialTick);
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public void setPosition(int x, int y) {
+		this.x = x;
+		this.y = y;
 	}
 
 	@Override

@@ -17,11 +17,9 @@ public class HoverableItem extends AbstractWidget implements ITooltipProvider {
         super(pX, pY, 16, 16, Component.empty());
         this.stack = stack;
     }
-
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
-        if(!this.visible) return;
-        RenderUtils.drawItemAsIcon(stack, guiGraphics.pose(), this.getX(), this.getY(), 16, false);
+    protected void renderWidget(GuiGraphics guiGraphics, int x, int y, float v) {
+        RenderUtils.drawItemAsIcon(stack, guiGraphics.pose(), x, y, 16, false);
     }
 
     @Override
@@ -31,5 +29,6 @@ public class HoverableItem extends AbstractWidget implements ITooltipProvider {
 
     @Override
     public void getTooltip(List<Component> tooltip) {
+
     }
 }

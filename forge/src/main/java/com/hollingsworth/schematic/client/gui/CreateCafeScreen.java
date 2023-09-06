@@ -36,27 +36,14 @@ public class CreateCafeScreen extends ModScreen {
         minecraft.setScreen(null);
     }
 
-
     @Override
     public void render(GuiGraphics pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
         super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
     }
 
     @Override
-    public void drawBackgroundElements(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        super.drawBackgroundElements(graphics, mouseX, mouseY, partialTicks);
-        int color = -8355712;
-        graphics.drawString(font, Component.literal("Structure").getString(), 50, 20, color, false);
-        graphics.drawString(font, Component.literal("ID").getString(), 20, 40, color, false);
-//        graphics.drawString(font, Component.translatable("cafetier.select_cafe"));
-
-//        graphics.drawString(font, Component.translatable("cafetier.menu").getString(), 200, 20, color, false);
-//        graphics.drawString(font, Component.translatable("cafetier.seats", numSeats).getString(), 155, bookTop + 75, color, false);
-//        graphics.drawString(font, Component.translatable("cafetier.spawners", numSpawners).getString(), 155, bookTop + 85, color, false);
-    }
-
-    @Override
     public ResourceLocation getBgTexture() {
         return background;
     }
+
 }

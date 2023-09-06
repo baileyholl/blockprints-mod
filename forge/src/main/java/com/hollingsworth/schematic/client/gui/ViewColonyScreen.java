@@ -35,15 +35,6 @@ public class ViewColonyScreen extends ModScreen{
     @Override
     public void init() {
         super.init();
-        for(int i = 0; i < Math.min(18, menuItems.size()); i++){
-            ItemStack stack = menuItems.get(i);
-            HoverableItem item = new HoverableItem(bookLeft + 155 + 20 * (i % 6), bookTop + 30 + (20 * (i / 6)), stack);
-            addRenderableWidget(item);
-        }
-        startGameButton = new ANButton(bookRight - 110, bookBottom - 40, 70, 20, Component.translatable(runningGameID != null ? "cafetier.cancel_game" : "cafetier.start_game"), this::startGame);
-        createCafeButton = new ANButton(bookLeft + 40, bookBottom - 40, 70, 20, Component.translatable("cafetier.change_cafe"), this::openCreate);
-        addRenderableWidget(createCafeButton);
-        addRenderableWidget(startGameButton);
     }
 
     public void openCreate(Button button){
@@ -97,7 +88,6 @@ public class ViewColonyScreen extends ModScreen{
         graphics.drawString(font, Component.translatable("cafetier.spawners", numSpawners).getString(), 155, bookTop + 85, color, false);
     }
 
-    @Override
     public ResourceLocation getBgTexture() {
         return background;
     }

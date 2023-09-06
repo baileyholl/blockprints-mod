@@ -43,16 +43,17 @@ public abstract class ModScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        PoseStack matrixStack = graphics.pose();
-        matrixStack.pushPose();
+    public void render(net.minecraft.client.gui.GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
+        PoseStack poseStack = matrixStack.pose();
+        poseStack.pushPose();
         if (scaleFactor != 1) {
-            matrixStack.scale(scaleFactor, scaleFactor, scaleFactor);
+            poseStack.scale(scaleFactor, scaleFactor, scaleFactor);
             mouseX /= scaleFactor;
             mouseY /= scaleFactor;
         }
         drawScreenAfterScale(graphics, mouseX, mouseY, partialTicks);
-        matrixStack.popPose();
+        poseStack.popPose();
     }
 
     public void drawTooltip(GuiGraphics stack, int mouseX, int mouseY) {
@@ -60,7 +61,6 @@ public abstract class ModScreen extends Screen {
         collectTooltips(stack, mouseX, mouseY, tooltip);
         if (!tooltip.isEmpty()) {
             stack.renderComponentTooltip(font, tooltip, mouseX, mouseY);
-//            renderComponentTooltip(stack.pose(), tooltip, mouseX, mouseY);
         }
     }
 
