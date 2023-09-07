@@ -1,15 +1,56 @@
 package com.hollingsworth.schematic.export;
 
+import com.hollingsworth.schematic.export.level.FakeForwardingServerLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.world.level.levelgen.SingleThreadedRandomSource;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.zip.GZIPInputStream;
 
 public class WrappedScene {
     @Nullable
     private Scene scene;
 
+    public void setScene(@Nullable Scene scene) {
+        this.scene = scene;
+        if (scene != null) {
+            initialCameraSettings = scene.getCameraSettings().save();
+        } else {
+            initialCameraSettings = new SavedCameraSettings();
+        }
+    }
+
     private final Viewport viewport = new Viewport();
 
     private SavedCameraSettings initialCameraSettings = new SavedCameraSettings();
 
+    public void placeStructure(){
+        try (DataInputStream stream = new DataInputStream(new BufferedInputStream(
+                new GZIPInputStream(Files.newInputStream(Paths.get("./schematics/test.nbt"), StandardOpenOption.READ))))) {
+            CompoundTag compoundTag = NbtIo.read(stream, new NbtAccounter(0x20000000L));
+            var template = new StructureTemplate();
+            var blocks = scene.getLevel().registryAccess().registryOrThrow(Registries.BLOCK).asLookup();
+            template.load(blocks, compoundTag);
+            var random = new SingleThreadedRandomSource(0L);
+            var settings = new StructurePlaceSettings();
+            settings.setIgnoreEntities(true); // Entities need a server level in structures
+
+            template.placeInWorld(new FakeForwardingServerLevel(scene.getLevel()), BlockPos.ZERO, BlockPos.ZERO, settings, random, 0);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     public byte[] exportAsPng(float scale) {
         if (scene == null) {

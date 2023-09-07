@@ -1,8 +1,10 @@
 package com.hollingsworth.schematic.common.item;
 
-import com.hollingsworth.schematic.client.gui.CreateCafeScreen;
 import com.hollingsworth.schematic.common.util.ModItem;
-import net.minecraft.client.Minecraft;
+import com.hollingsworth.schematic.export.CameraSettings;
+import com.hollingsworth.schematic.export.Scene;
+import com.hollingsworth.schematic.export.WrappedScene;
+import com.hollingsworth.schematic.export.level.GuidebookLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -22,8 +24,15 @@ public class DeedItem extends ModItem {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
+//        if(pLevel.isClientSide){
+//            Minecraft.getInstance().setScreen(new CreateCafeScreen());
+//        }
         if(pLevel.isClientSide){
-            Minecraft.getInstance().setScreen(new CreateCafeScreen());
+            System.out.println("making scene");
+            WrappedScene wrappedScene = new WrappedScene();
+            wrappedScene.setScene(new Scene(new GuidebookLevel(), new CameraSettings()));
+            wrappedScene.placeStructure();
+
         }
         return super.use(pLevel, pPlayer, pUsedHand);
     }
