@@ -37,7 +37,7 @@ public class WrappedScene {
 
     public void placeStructure(){
         try (DataInputStream stream = new DataInputStream(new BufferedInputStream(
-                new GZIPInputStream(Files.newInputStream(Paths.get("./schematics/test.nbt"), StandardOpenOption.READ))))) {
+                new GZIPInputStream(Files.newInputStream(Paths.get("./schematics/test/test.nbt"), StandardOpenOption.READ))))) {
             CompoundTag compoundTag = NbtIo.read(stream, new NbtAccounter(0x20000000L));
             var template = new StructureTemplate();
             var blocks = scene.getLevel().registryAccess().registryOrThrow(Registries.BLOCK).asLookup();
