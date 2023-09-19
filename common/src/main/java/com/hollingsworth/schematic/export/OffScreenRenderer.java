@@ -136,23 +136,6 @@ public class OffScreenRenderer implements AutoCloseable {
         fb.unbindRead();
     }
 
-    public void setupItemRendering() {
-        // See GameRenderer
-        // Set up GL state for GUI rendering where the 16x16 item will fill the entire framebuffer
-        var matrix4f = new Matrix4f().setOrtho(
-                0.0f, 16,
-                16, 0.0f,
-                1000.0f, 21000.0f);
-        RenderSystem.setProjectionMatrix(matrix4f, VertexSorting.ORTHOGRAPHIC_Z);
-
-        var poseStack = RenderSystem.getModelViewStack();
-        poseStack.setIdentity();
-        poseStack.translate(0.0f, 0.0f, -11000.0f);
-        RenderSystem.applyModelViewMatrix();
-        Lighting.setupFor3DItems();
-        FogRenderer.setupNoFog();
-    }
-
     public void setupOrtographicRendering() {
         float angle = 36;
         float renderHeight = 0;

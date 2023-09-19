@@ -1,10 +1,12 @@
 package com.hollingsworth.schematic.common.item;
 
+import com.hollingsworth.schematic.client.gui.CreateCafeScreen;
 import com.hollingsworth.schematic.common.util.ModItem;
 import com.hollingsworth.schematic.export.CameraSettings;
 import com.hollingsworth.schematic.export.Scene;
 import com.hollingsworth.schematic.export.WrappedScene;
 import com.hollingsworth.schematic.export.level.GuidebookLevel;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -14,8 +16,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.FileOutputStream;
-import java.nio.file.Paths;
 import java.util.List;
 
 public class DeedItem extends ModItem {
@@ -37,14 +37,15 @@ public class DeedItem extends ModItem {
             wrappedScene.placeStructure();
             scene.getCameraSettings().setRotationCenter(scene.getWorldCenter());
             scene.centerScene();
-            var data = wrappedScene.exportAsPng(1.0f);
-            try {
-                FileOutputStream fos = new FileOutputStream(Paths.get("./schematics/test.png").toFile());
-                fos.write(data);
-                fos.close();
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+//            var data = wrappedScene.exportAsPng(1.0f);
+            Minecraft.getInstance().setScreen(new CreateCafeScreen(wrappedScene));
+//            try {
+//                FileOutputStream fos = new FileOutputStream(Paths.get("./schematics/test.png").toFile());
+//                fos.write(data);
+//                fos.close();
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }
         }
         return super.use(pLevel, pPlayer, pUsedHand);
     }

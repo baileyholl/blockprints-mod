@@ -17,7 +17,6 @@ import java.util.List;
 public abstract class ModScreen extends Screen {
     public int maxScale;
     public float scaleFactor;
-    GuiGraphics graphics;
     public int FULL_WIDTH;
     public int FULL_HEIGHT;
     public int bookLeft;
@@ -43,7 +42,7 @@ public abstract class ModScreen extends Screen {
     }
 
     @Override
-    public void render(net.minecraft.client.gui.GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
         super.render(matrixStack, mouseX, mouseY, partialTicks);
         PoseStack poseStack = matrixStack.pose();
         poseStack.pushPose();
@@ -52,7 +51,7 @@ public abstract class ModScreen extends Screen {
             mouseX /= scaleFactor;
             mouseY /= scaleFactor;
         }
-        drawScreenAfterScale(graphics, mouseX, mouseY, partialTicks);
+        drawScreenAfterScale(matrixStack, mouseX, mouseY, partialTicks);
         poseStack.popPose();
     }
 
