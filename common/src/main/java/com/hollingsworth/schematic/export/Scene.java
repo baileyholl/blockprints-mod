@@ -119,52 +119,6 @@ public class Scene {
 
     }
 
-//    public BlockHitResult pickBlock(LytPoint point, LytRect viewport) {
-//        var screenPos = documentToScreen(viewport, point);
-//
-//        var rayOrigin = new Vector3f();
-//        var rayDir = new Vector3f();
-//        buildPickRay(screenPos.x, screenPos.y, rayOrigin, rayDir);
-//
-//        var levelBounds = level.getBounds();
-//        var intersection = new Vector2f();
-//        if (!Intersectionf.intersectRayAab(
-//                rayOrigin,
-//                rayDir,
-//                new Vector3f(levelBounds.min().getX(), levelBounds.min().getY(), levelBounds.min().getZ()),
-//                new Vector3f(levelBounds.max().getX(), levelBounds.max().getY(), levelBounds.max().getZ()),
-//                intersection)) {
-//            return BlockHitResult.miss(Vec3.ZERO, Direction.UP, BlockPos.ZERO);
-//        }
-//
-//        // Move the ray such that the start and end are on the bounding box of the content
-//        var start = new Vector3f(rayDir).mulAdd(intersection.x, rayOrigin);
-//        var end = new Vector3f(rayDir).mulAdd(intersection.y, rayOrigin);
-//
-//        var fromVec3 = new Vec3(start);
-//        var toVec3 = new Vec3(end);
-//        var blockClipContext = ClipContext.Block.OUTLINE;
-//        var fluidClipContext = ClipContext.Fluid.ANY;
-//        return BlockGetter.traverseBlocks(fromVec3, toVec3, null, (ignored, blockPos) -> {
-//            BlockState blockState = level.getBlockState(blockPos);
-//            FluidState fluidState = level.getFluidState(blockPos);
-//
-//            var blockShape = blockClipContext.get(blockState, level, blockPos, CollisionContext.empty());
-//            var blockHit = level.clipWithInteractionOverride(fromVec3, toVec3, blockPos, blockShape, blockState);
-//
-//            var fluidShape = fluidClipContext.canPick(fluidState) ? fluidState.getShape(level, blockPos)
-//                    : Shapes.empty();
-//            var fluidHit = fluidShape.clip(fromVec3, toVec3, blockPos);
-//
-//            double blockDist = blockHit == null ? Double.MAX_VALUE : fromVec3.distanceToSqr(blockHit.getLocation());
-//            double fluidDist = fluidHit == null ? Double.MAX_VALUE : fromVec3.distanceToSqr(fluidHit.getLocation());
-//            return blockDist <= fluidDist ? blockHit : fluidHit;
-//        }, ignored -> {
-//            Vec3 vec3 = fromVec3.subtract(toVec3);
-//            return BlockHitResult.miss(toVec3, Direction.getNearest(vec3.x, vec3.y, vec3.z),
-//                    BlockPos.containing(toVec3));
-//        });
-//    }
 
     public Stream<BlockPos> getFilledBlocks() {
         return level.getFilledBlocks();

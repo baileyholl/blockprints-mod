@@ -2,10 +2,6 @@ package com.hollingsworth.schematic.common.item;
 
 import com.hollingsworth.schematic.client.gui.CreateCafeScreen;
 import com.hollingsworth.schematic.common.util.ModItem;
-import com.hollingsworth.schematic.export.CameraSettings;
-import com.hollingsworth.schematic.export.Scene;
-import com.hollingsworth.schematic.export.WrappedScene;
-import com.hollingsworth.schematic.export.level.GuidebookLevel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -30,15 +26,7 @@ public class DeedItem extends ModItem {
 //            Minecraft.getInstance().setScreen(new CreateCafeScreen());
 //        }
         if(pLevel.isClientSide){
-            System.out.println("making scene");
-            WrappedScene wrappedScene = new WrappedScene();
-            Scene scene = new Scene(new GuidebookLevel(), new CameraSettings());
-            wrappedScene.setScene(scene);
-            wrappedScene.placeStructure();
-            scene.getCameraSettings().setRotationCenter(scene.getWorldCenter());
-            scene.centerScene();
-//            var data = wrappedScene.exportAsPng(1.0f);
-            Minecraft.getInstance().setScreen(new CreateCafeScreen(wrappedScene));
+            Minecraft.getInstance().setScreen(new CreateCafeScreen());
 //            try {
 //                FileOutputStream fos = new FileOutputStream(Paths.get("./schematics/test.png").toFile());
 //                fos.write(data);

@@ -16,7 +16,7 @@ import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.zip.GZIPInputStream;
 
@@ -37,9 +37,9 @@ public class WrappedScene {
 
     private SavedCameraSettings initialCameraSettings = new SavedCameraSettings();
 
-    public void placeStructure(){
+    public void placeStructure(Path filePath){
         try (DataInputStream stream = new DataInputStream(new BufferedInputStream(
-                new GZIPInputStream(Files.newInputStream(Paths.get("./schematics/test/test.nbt"), StandardOpenOption.READ))))) {
+                new GZIPInputStream(Files.newInputStream(filePath, StandardOpenOption.READ))))) {
             CompoundTag compoundTag = NbtIo.read(stream, new NbtAccounter(0x20000000L));
             var template = new StructureTemplate();
             var blocks = scene.getLevel().registryAccess().registryOrThrow(Registries.BLOCK).asLookup();

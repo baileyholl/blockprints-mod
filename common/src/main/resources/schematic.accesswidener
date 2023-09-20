@@ -159,3 +159,6 @@ accessible method net/minecraft/client/renderer/texture/SpriteContents$AnimatedT
 accessible field net/minecraft/world/entity/Entity level Lnet/minecraft/world/level/Level;
 accessible field net/minecraft/client/gui/components/AbstractWidget x I
 accessible field net/minecraft/client/gui/components/AbstractWidget y I
+accessible field net/minecraft/client/gui/components/AbstractSliderButton SLIDER_LOCATION Lnet/minecraft/resources/ResourceLocation;
+accessible method net/minecraft/client/gui/components/AbstractSliderButton getTextureY ()I
+accessible method net/minecraft/client/gui/components/AbstractSliderButton getHandleTextureY ()I
