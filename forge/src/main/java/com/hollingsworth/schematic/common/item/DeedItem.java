@@ -22,8 +22,18 @@ public class DeedItem extends ModItem {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
+//        if(pLevel.isClientSide){
+//            Minecraft.getInstance().setScreen(new CreateCafeScreen());
+//        }
         if(pLevel.isClientSide){
             Minecraft.getInstance().setScreen(new CreateCafeScreen());
+//            try {
+//                FileOutputStream fos = new FileOutputStream(Paths.get("./schematics/test.png").toFile());
+//                fos.write(data);
+//                fos.close();
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }
         }
         return super.use(pLevel, pPlayer, pUsedHand);
     }

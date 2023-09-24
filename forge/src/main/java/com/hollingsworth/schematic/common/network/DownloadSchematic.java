@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.common.network;
 
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
@@ -55,8 +56,8 @@ public class DownloadSchematic implements Message {
             try (DataInputStream stream = new DataInputStream(new BufferedInputStream(
                     new GZIPInputStream(Files.newInputStream(Paths.get("./schematics/test.nbt"),StandardOpenOption.READ))))) {
                 CompoundTag nbt = NbtIo.read(stream, new NbtAccounter(0x20000000L));
-                t.load(nbt);
-                t.placeInWorld(player.getLevel(), player.getOnPos(), player.getOnPos(), new StructurePlaceSettings(), player.getRandom(), Block.UPDATE_CLIENTS);
+                t.load(minecraftServer.registries().compositeAccess().registryOrThrow(Registries.BLOCK).asLookup().filterFeatures(minecraftServer.getWorldData().enabledFeatures()),  nbt);
+                t.placeInWorld(player.serverLevel(), player.getOnPos(), player.getOnPos(), new StructurePlaceSettings(), player.getRandom(), Block.UPDATE_CLIENTS);
             } catch (IOException e) {
                 e.printStackTrace();
             }

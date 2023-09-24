@@ -9,12 +9,10 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -26,146 +24,11 @@ public class BlockUtil {
      */
     private static final int MAX_DEPTH = 50;
 
-    /**
-     * Amount of string required to try to calculate a blockpos.
-     */
-    private static final int BLOCKPOS_LENGTH = 3;
-
-    /**
-     * Selects a solid position with air above
-     */
-    public static final BiPredicate<BlockGetter, BlockPos> SOLID_AIR_POS_SELECTOR = (world, pos) -> {
-        return (world.getBlockState(pos).canOcclude() || world.getBlockState(pos).getMaterial().isLiquid()) && world.getBlockState(
-                pos.above()).getMaterial() == Material.AIR && world.getBlockState(pos.above(2)).getMaterial() == Material.AIR;
-    };
-
-    /**
-     * Selects a double air position
-     */
-    public static final BiPredicate<BlockGetter, BlockPos> DOUBLE_AIR_POS_SELECTOR = (world, pos) -> {
-        return world.getBlockState(pos).getMaterial() == Material.AIR && world.getBlockState(pos.above(1)).getMaterial() == Material.AIR;
-    };
-
-    public static BlockPos getRandomSpawn(BlockPos calcCenter, Level level) {
-
-        // Get a random point on a circle around the colony,far out for the direction
-        final int degree = level.random.nextInt(360);
-        int x = (int) Math.round(20 * Math.cos(Math.toRadians(degree)));
-        int z = (int) Math.round(20 * Math.sin(Math.toRadians(degree)));
-        final BlockPos advanceTowards = calcCenter.offset(x, 0, z);
-
-        BlockPos spawnPos = null;
-
-        // 8 Tries
-        for (int i = 0; i < 8; i++) {
-            spawnPos = findSpawnPointInDirections(level, new BlockPos(calcCenter.getX(), calcCenter.getY(), calcCenter.getZ()), advanceTowards);
-            if (spawnPos != null) {
-                break;
-            }
-        }
-
-        if (spawnPos == null) {
-            return null;
-        }
-
-
-        return findAround(level, getFloor(spawnPos, level), 3, 30, SOLID_AIR_POS_SELECTOR);
-    }
-
     public static Iterable<BlockPos> iterateAABB(@Nullable AABB pAabb){
         if(pAabb == null)
             return List.of();
         return BlockPos.betweenClosed(Mth.floor(pAabb.minX), Mth.floor(pAabb.minY), Mth.floor(pAabb.minZ), Mth.floor(pAabb.maxX), Mth.floor(pAabb.maxY), Mth.floor(pAabb.maxZ));
     }
-
-    /**
-     * Calculates the floor level.
-     *
-     * @param position input position.
-     * @param world    the world the position is in.
-     * @return returns BlockPos position with air above.
-     */
-    @NotNull
-    public static BlockPos getFloor(@NotNull final BlockPos position, @NotNull final Level world) {
-        final BlockPos floor = getFloor(new BlockPos.MutableBlockPos(position.getX(), position.getY(), position.getZ()), 0, world);
-        if (floor == null) {
-            return position;
-        }
-        return floor;
-    }
-
-    /**
-     * Calculates the floor level.
-     *
-     * @param position input position.
-     * @param depth    the iteration depth.
-     * @param world    the world the position is in.
-     * @return returns BlockPos position with air above.
-     */
-    @Nullable
-    public static BlockPos getFloor(@NotNull final BlockPos.MutableBlockPos position, final int depth, @NotNull final Level world) {
-        if (depth > MAX_DEPTH) {
-            return null;
-        }
-        //If the position is floating in Air go downwards
-        if (!solidOrLiquid(world, position)) {
-            return getFloor(position.set(position.getX(), position.getY() - 1, position.getZ()), depth + 1, world);
-        }
-        //If there is no air above the block go upwards
-        if (!solidOrLiquid(world, position.set(position.getX(), position.getY() + 1, position.getZ())) &&
-                !solidOrLiquid(world, position.set(position.getX(), position.getY() + 2, position.getZ()))) {
-            return position.immutable();
-        }
-        return getFloor(position.set(position.getX(), position.getY() + 1, position.getZ()), depth + 1, world);
-    }
-
-    /**
-     * Finds a spawnpoint randomly in a circular shape around the center Advances
-     *
-     * @param start      the center of the area to search for a spawn point
-     * @param advancePos The position we advance towards
-     * @return the calculated position
-     */
-    private static BlockPos findSpawnPointInDirections(
-            Level level,
-            final BlockPos start,
-            final BlockPos advancePos) {
-        BlockPos spawnPos = new BlockPos(start);
-        Vec3 tempPos = new Vec3(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
-
-        final int xDiff = Math.abs(start.getX() - advancePos.getX());
-        final int zDiff = Math.abs(start.getZ() - advancePos.getZ());
-
-        Vec3 xzRatio = new Vec3(xDiff * (start.getX() < advancePos.getX() ? 1 : -1), 0, zDiff * (start.getZ() < advancePos.getZ() ? 1 : -1));
-        // Reduce ratio to 3 chunks a step
-        xzRatio = xzRatio.normalize().scale(3);
-
-        int validChunkCount = 0;
-        for (int i = 0; i < 10; i++) {
-            if (isEntityBlockLoaded(level, new BlockPos(tempPos))) {
-                tempPos = tempPos.add(16 * xzRatio.x, 0, 16 * xzRatio.z);
-
-                if (isEntityBlockLoaded(level, new BlockPos(tempPos))) {
-                    spawnPos = new BlockPos(tempPos);
-                    validChunkCount++;
-                    if (validChunkCount > 5) {
-                        return spawnPos;
-                    }
-                } else {
-                    break;
-                }
-            } else {
-                break;
-            }
-        }
-
-        if (!spawnPos.equals(start)) {
-            return spawnPos;
-        }
-
-        return null;
-    }
-
 
     /**
      * Returns the first air position near the given start. Advances vertically first then horizontally
@@ -365,22 +228,6 @@ public class BlockUtil {
     {
         final DimensionType dimensionType = world.dimensionType();
         return yBlock > getDimensionMinHeight(dimensionType) && yBlock < getDimensionMaxHeight(dimensionType);
-    }
-
-    /**
-     * Checks if a blockPos in a world is solid or liquid.
-     * <p>
-     * Useful to find a suitable Place to stand. (avoid these blocks to find one)
-     *
-     * @param world    the world to look in
-     * @param blockPos the blocks position
-     * @return true if solid or liquid
-     */
-    public static boolean solidOrLiquid(@NotNull final Level world, @NotNull final BlockPos blockPos)
-    {
-        final Material material = world.getBlockState(blockPos).getMaterial();
-        return material.isSolid()
-                || material.isLiquid();
     }
 
     public static double boxDistance(AABB box1, AABB box2) {

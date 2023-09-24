@@ -2,9 +2,10 @@ package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.common.util.ComponentUtil;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -34,15 +35,6 @@ public class ViewColonyScreen extends ModScreen{
     @Override
     public void init() {
         super.init();
-        for(int i = 0; i < Math.min(18, menuItems.size()); i++){
-            ItemStack stack = menuItems.get(i);
-            HoverableItem item = new HoverableItem(bookLeft + 155 + 20 * (i % 6), bookTop + 30 + (20 * (i / 6)), stack);
-            addRenderableWidget(item);
-        }
-        startGameButton = new ANButton(bookRight - 110, bookBottom - 40, 70, 20, Component.translatable(runningGameID != null ? "cafetier.cancel_game" : "cafetier.start_game"), this::startGame);
-        createCafeButton = new ANButton(bookLeft + 40, bookBottom - 40, 70, 20, Component.translatable("cafetier.change_cafe"), this::openCreate);
-        addRenderableWidget(createCafeButton);
-        addRenderableWidget(startGameButton);
     }
 
     public void openCreate(Button button){
@@ -55,10 +47,10 @@ public class ViewColonyScreen extends ModScreen{
     @Override
     public void drawTooltip(GuiGraphics stack, int mouseX, int mouseY) {
         super.drawTooltip(stack, mouseX, mouseY);
-        for(Widget widget : this.renderables){
+        for(Renderable widget : this.renderables){
             if(widget instanceof HoverableItem hoverableItem){
                 if(GuiUtils.isMouseInRelativeRange(mouseX, mouseY, hoverableItem)) {
-                    renderTooltip(stack.poseStack, getTooltipFromItem(hoverableItem.stack), hoverableItem.stack.getTooltipImage(), mouseX, mouseY, hoverableItem.stack);
+                    stack.renderTooltip(Minecraft.getInstance().font, getTooltipFromItem(Minecraft.getInstance(), hoverableItem.stack), hoverableItem.stack.getTooltipImage(), hoverableItem.stack, mouseX, mouseY);
                 }
             }
             if(widget == this.startGameButton){
@@ -74,7 +66,7 @@ public class ViewColonyScreen extends ModScreen{
                         tooltips.add(Component.translatable("cafetier.not_enough_menu_items").withStyle(ComponentUtil.TAKE_ACTION_STYLE));
                     }
                     if(!tooltips.isEmpty()) {
-                        renderComponentTooltip(stack.poseStack, tooltips, mouseX, mouseY);
+                        stack.renderComponentTooltip(Minecraft.getInstance().font, tooltips, mouseX, mouseY);
                     }
                 }
             }
@@ -82,8 +74,8 @@ public class ViewColonyScreen extends ModScreen{
     }
 
     @Override
-    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+        super.render(graphics, mouseX, mouseY, partialTicks);
     }
 
     @Override
@@ -96,7 +88,6 @@ public class ViewColonyScreen extends ModScreen{
         graphics.drawString(font, Component.translatable("cafetier.spawners", numSpawners).getString(), 155, bookTop + 85, color, false);
     }
 
-    @Override
     public ResourceLocation getBgTexture() {
         return background;
     }

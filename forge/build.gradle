@@ -23,12 +23,11 @@ archivesBaseName = "${mod_name}-forge-${minecraft_version}"
 minecraft {
     mappings channel: 'official', version: minecraft_version
     
-    if (project.hasProperty('forge_ats_enabled') && project.findProperty('forge_ats_enabled').toBoolean()) {
-        // This location is hardcoded in Forge and can not be changed.
-        // https://github.com/MinecraftForge/MinecraftForge/blob/be1698bb1554f9c8fa2f58e32b9ab70bc4385e60/fmlloader/src/main/java/net/minecraftforge/fml/loading/moddiscovery/ModFile.java#L123
-        accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-        project.logger.debug('Forge Access Transformers are enabled for this project.')
-    }
+
+    // This location is hardcoded in Forge and can not be changed.
+    // https://github.com/MinecraftForge/MinecraftForge/blob/be1698bb1554f9c8fa2f58e32b9ab70bc4385e60/fmlloader/src/main/java/net/minecraftforge/fml/loading/moddiscovery/ModFile.java#L123
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
 
     runs {
         client {
@@ -97,7 +96,7 @@ dependencies {
     implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.2.0-beta.11")) {
         jarJar.ranged(it, "[0.2.0-beta.11,)")
     }
-
+    implementation("org.bytedeco:ffmpeg-platform:6.0-1.5.9")
     implementation fg.deobf("curse.maven:oauth-513857:4518842")
 }
 
