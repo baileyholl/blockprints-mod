@@ -28,10 +28,10 @@ public class HomeScreen extends BaseSchematicScreen{
         graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_upload.png"), bookLeft + 76, bookTop + 27, 0, 0, 9, 11, 9, 11);
 
         graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_download.png"), bookLeft + 76,bookTop + 107, 0, 0, 9, 11, 9, 11);
-        graphics.drawString(font, Component.translatable("blockprints.upload"), bookLeft + 93, bookTop + 29, 16777215, false);
-        graphics.drawString(font, Component.translatable("blockprints.download"), bookLeft + 93, bookTop + 109, 16777215, false);
-        graphics.drawWordWrap(font, Component.translatable("blockprints.upload_desc"), bookLeft + 76, bookTop + 44, 150, 16777215);
-        graphics.drawWordWrap(font, Component.translatable("blockprints.download_desc"), bookLeft + 76, bookTop + 124, 150, 16777215);
+        GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.upload").getVisualOrderText(), bookLeft + 93, bookTop + 29);
+        GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.download").getVisualOrderText(), bookLeft + 93, bookTop + 109);
+        GuiUtils.drawOutlinedWordWrap(graphics, font, Component.translatable("blockprints.upload_desc"), bookLeft + 78, bookTop + 46, 150);
+        GuiUtils.drawOutlinedWordWrap(graphics, font, Component.translatable("blockprints.download_desc"), bookLeft + 76, bookTop + 124, 150);
     }
 
     @Override

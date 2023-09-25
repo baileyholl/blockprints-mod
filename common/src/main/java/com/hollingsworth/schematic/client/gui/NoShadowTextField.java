@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
+import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.mixin.EditBoxAccessor;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -40,10 +41,10 @@ public class NoShadowTextField extends EditBox {
         if (k > s.length()) {
             k = s.length();
         }
-
+        int color = Constants.WHITE;
         if (!s.isEmpty()) {
             String s1 = flag ? s.substring(0, j) : s;
-            j1 = graphics.drawString(accessor.getFont(), accessor.getFormatter().apply(s1, accessor.getDisplayPos()),  l,  i1, -8355712, false);
+            j1 = graphics.drawString(accessor.getFont(), accessor.getFormatter().apply(s1, accessor.getDisplayPos()),  l,  i1, color, false);
 
         }
 
@@ -61,12 +62,12 @@ public class NoShadowTextField extends EditBox {
         }
 
         if (!flag2 && accessor.getSuggestion() != null) {
-            graphics.drawString(accessor.getFont(), accessor.getSuggestion(), k1 - 1, i1, -8355712, false);
+            graphics.drawString(accessor.getFont(), accessor.getSuggestion(), k1 - 1, i1, color, false);
         }
 
         if (flag1) {
             if (flag2) {
-                graphics.fill(k1, i1 - 1, k1 + 1, i1 + 1 + 9, -3092272);
+                graphics.fill(k1, i1 - 1, k1 + 1, i1 + 1 + 9, color);
             } else {
                 graphics.drawString(accessor.getFont(), "_", k1, i1, i2, false);
             }

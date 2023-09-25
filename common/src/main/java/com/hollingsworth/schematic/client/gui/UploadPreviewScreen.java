@@ -6,14 +6,11 @@ import com.hollingsworth.schematic.export.Scene;
 import com.hollingsworth.schematic.export.WrappedScene;
 import com.hollingsworth.schematic.export.level.GuidebookLevel;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.DyeColor;
 
 import java.nio.file.Paths;
 
@@ -45,7 +42,9 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     @Override
     public void init() {
         super.init();
-        addRenderableWidget(new ShortTextField(font, bookLeft + 201, bookTop + 41, Component.empty()));
+        addRenderableWidget(new ShortTextField(font, bookLeft + 185, bookTop + 41, Component.empty()));
+        addRenderableWidget(new GuiImageButton(bookRight - 119, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_small.png"), b ->{
+        }));
 //        cafeName = new EditBox(font, bookLeft + 50, bookTop + 36, 80, 14, Component.empty());
 //        new ANButton(bookLeft + 40, bookTop + 150, 80, 20, Component.translatable("cafetier.create_schematic"), this::onCreate);
 //        cafeName.setMaxLength(64);
@@ -72,7 +71,8 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.render(graphics, pMouseX, pMouseY, pPartialTick);
         graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/dialogue_model_preview.png"),bookLeft + 25, bookTop + 41, 0, 0 , 143, 111, 143, 111);
-
+        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_upload.png"), bookRight - 116, bookTop + 155, 0, 0, 9, 11, 9, 11);
+        GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.upload").getVisualOrderText(),  bookRight - 99, bookTop + 157);
 //        int scaledHeight, scaledWidth;
 //        int maxWidth = 100;
 //        int maxHeight = 100;
@@ -102,10 +102,13 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     public void drawBackgroundElements(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.drawBackgroundElements(graphics, mouseX, mouseY, partialTicks);
         graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/dialogue_long.png"), 25, 25, 0, 0 , 143, 15, 143, 15);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/dialogue_short.png"), 201, 25, 0, 0 , 95, 15, 95, 15);
-        GuiUtils.drawCenteredStringNoShadow(font, graphics, Component.literal("12345"), 25 + 143/2, 29, Constants.WHITE);
-        MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(new BufferBuilder(255));
-        font.drawInBatch8xOutline(Component.literal("12234").getVisualOrderText(), 10, 10, DyeColor.WHITE.getTextColor(), DyeColor.BLACK.getTextColor(), graphics.pose().last().pose(),  bufferSource, 15728880);
-        bufferSource.endBatch();
+        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/dialogue_short.png"), 185, 25, 0, 0 , 95, 15, 95, 15);
+
+        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/dialogue_short.png"), 185, 57, 0, 0 , 95, 15, 95, 15);
+        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.preview").getVisualOrderText(), 25 + 143/2, 29);
+
+        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.name").getVisualOrderText(), 185 + 48, 29);
+        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.description").getVisualOrderText(), 185 + 48, 61);
+
     }
 }
