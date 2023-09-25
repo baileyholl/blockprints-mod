@@ -89,7 +89,7 @@ public abstract class ModScreen extends Screen {
         graphics.blit(getBgTexture(), 0, 0, 0, 0, FULL_WIDTH, FULL_HEIGHT, FULL_WIDTH, FULL_HEIGHT);
     }
 
-    public void drawForegroundElements(int mouseX, int mouseY, float partialTicks) {
+    public void drawForegroundElements(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
@@ -100,7 +100,7 @@ public abstract class ModScreen extends Screen {
         poseStack.translate(bookLeft, bookTop, 0);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         drawBackgroundElements(graphics, mouseX, mouseY, partialTicks);
-        drawForegroundElements(mouseX, mouseY, partialTicks);
+        drawForegroundElements(graphics, mouseX, mouseY, partialTicks);
         poseStack.popPose();
         super.render(graphics, mouseX, mouseY, partialTicks);
         drawTooltip(graphics, mouseX, mouseY);

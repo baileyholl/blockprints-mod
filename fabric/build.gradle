@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.12-SNAPSHOT'
+    id 'fabric-loom' version '1.3-SNAPSHOT'
     id 'maven-publish'
     id 'idea'
 }
@@ -20,7 +20,7 @@ dependencies {
 }
 
 loom {
-    accessWidenerPath = file("${getRootProject().project("common").projectDir}/src/main/resources/schematic.accesswidener")
+    accessWidenerPath = file("${getRootProject().project("common").projectDir}/src/main/resources/blockprints.accesswidener")
 
     runs {
         client {
@@ -38,7 +38,7 @@ loom {
     }
 
     mixin {
-        defaultRefmapName = "schematic.refmap.json"
+        defaultRefmapName = "blockprints.refmap.json"
     }
 }
 

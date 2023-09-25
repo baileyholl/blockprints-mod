@@ -1,6 +1,6 @@
 package com.hollingsworth.schematic.common.item;
 
-import com.hollingsworth.schematic.client.gui.CreateCafeScreen;
+import com.hollingsworth.schematic.client.gui.HomeScreen;
 import com.hollingsworth.schematic.common.util.ModItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -26,7 +26,7 @@ public class DeedItem extends ModItem {
 //            Minecraft.getInstance().setScreen(new CreateCafeScreen());
 //        }
         if(pLevel.isClientSide){
-            Minecraft.getInstance().setScreen(new CreateCafeScreen());
+            Minecraft.getInstance().setScreen(new HomeScreen());
 //            try {
 //                FileOutputStream fos = new FileOutputStream(Paths.get("./schematics/test.png").toFile());
 //                fos.write(data);

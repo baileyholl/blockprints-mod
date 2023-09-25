@@ -1,0 +1,8 @@
+{
+  "blockprints.upload": "Upload",
+  "blockprints.download": "Download",
+  "blockprints.upload_desc": "Upload a schematic to BlockPrints!",
+  "blockprints.download_desc": "Download a schematic using a magic code from Blockprints.io",
+  "blockprints.discord": "Join the Discord for support or show off your builds!",
+  "blockprints.website": "Visit the website for schematic downloads!"
+}

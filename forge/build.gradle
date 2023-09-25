@@ -8,7 +8,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.0.+', changing: true
         classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7.+'
     }
 }
@@ -76,10 +76,10 @@ minecraft {
 }
 
 mixin {
-    add sourceSets.main, 'schematic.refmap.json'
+    add sourceSets.main, 'blockprints.refmap.json'
 
-    config 'schematic.mixins.json'
-    config 'schematic.forge.mixins.json'
+    config 'blockprints.mixins.json'
+    config 'blockprints.forge.mixins.json'
 
     debug.verbose = true
     debug.export = true

@@ -19,8 +19,8 @@ minecraft {
             }
         }
     }
-    if(file("src/main/resources/schematic.accesswidener").exists()){
-        accessWideners(file("src/main/resources/schematic.accesswidener"))
+    if(file("src/main/resources/blockprints.accesswidener").exists()){
+        accessWideners(file("src/main/resources/blockprints.accesswidener"))
     }
 }
 
