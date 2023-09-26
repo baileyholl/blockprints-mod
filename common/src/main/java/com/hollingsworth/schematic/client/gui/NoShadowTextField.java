@@ -29,6 +29,7 @@ public class NoShadowTextField extends EditBox {
             return;
         }
         EditBoxAccessor accessor = (EditBoxAccessor) this;
+        int color = Constants.WHITE;
         int i2 = accessor.isIsEditable() ? accessor.getTextColor() : accessor.getTextColorUneditable();
         int j = accessor.getCursorPos() - accessor.getDisplayPos();
         int k = accessor.getHighlightPos() - accessor.getDisplayPos();
@@ -41,7 +42,6 @@ public class NoShadowTextField extends EditBox {
         if (k > s.length()) {
             k = s.length();
         }
-        int color = Constants.WHITE;
         if (!s.isEmpty()) {
             String s1 = flag ? s.substring(0, j) : s;
             j1 = graphics.drawString(accessor.getFont(), accessor.getFormatter().apply(s1, accessor.getDisplayPos()),  l,  i1, color, false);

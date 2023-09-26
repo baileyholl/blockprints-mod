@@ -33,7 +33,7 @@ public class WrappedScene {
         }
     }
 
-    private final Viewport viewport = new Viewport();
+    public final Viewport viewport = new Viewport();
 
     private SavedCameraSettings initialCameraSettings = new SavedCameraSettings();
 

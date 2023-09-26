@@ -8,7 +8,8 @@
   ],
   "client": [
     "ExampleMixin",
-    "EditBoxAccessor"
+    "EditBoxAccessor",
+    "NativeImageAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

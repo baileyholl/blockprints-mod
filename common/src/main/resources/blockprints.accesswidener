@@ -162,3 +162,4 @@ accessible field net/minecraft/client/gui/components/AbstractWidget y I
 accessible field net/minecraft/client/gui/components/AbstractSliderButton SLIDER_LOCATION Lnet/minecraft/resources/ResourceLocation;
 accessible method net/minecraft/client/gui/components/AbstractSliderButton getTextureY ()I
 accessible method net/minecraft/client/gui/components/AbstractSliderButton getHandleTextureY ()I
+accessible class net/minecraft/client/gui/components/MultilineTextField$StringView
