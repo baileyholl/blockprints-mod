@@ -5,7 +5,6 @@ import com.hollingsworth.schematic.export.CameraSettings;
 import com.hollingsworth.schematic.export.Scene;
 import com.hollingsworth.schematic.export.WrappedScene;
 import com.hollingsworth.schematic.export.level.GuidebookLevel;
-import com.hollingsworth.schematic.mixin.NativeImageAccessor;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
@@ -13,7 +12,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import org.lwjgl.stb.STBImageResize;
 
 import java.nio.file.Paths;
 
@@ -23,39 +21,38 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     public int yaw = 225;
     public int pitch = 30;
     public int roll;
-
+    WrappedScene wrappedScene;
+    Scene scene;
+    int drawDelay = 0;
     public UploadPreviewScreen() {
         super();
-    }
-
-    public void buildTexture(){
-        WrappedScene wrappedScene = new WrappedScene();
-        Scene scene = new Scene(new GuidebookLevel(), new CameraSettings());
+        wrappedScene = new WrappedScene();
+        scene = new Scene(new GuidebookLevel(), new CameraSettings());
         scene.getCameraSettings().setIsometricYawPitchRoll(yaw, pitch, roll);
         wrappedScene.setScene(scene);
         wrappedScene.placeStructure(Paths.get("./schematics/test/test.nbt"));
         scene.getCameraSettings().setRotationCenter(scene.getWorldCenter());
         scene.centerScene();
+    }
 
-        try (NativeImage nativeImage = wrappedScene.asNativeImage(1.0f); NativeImage scaledImage = new NativeImage(100, 100, false)) {
-            Dimension origDim = new Dimension(nativeImage.getWidth(), nativeImage.getHeight());
-            Dimension boundary = new Dimension(100, 100);
-            Dimension newDim = getScaledDimension(origDim, boundary);
-            NativeImageAccessor accessor = ((NativeImageAccessor) (Object) nativeImage);
-            NativeImageAccessor sca = ((NativeImageAccessor) (Object) scaledImage);
-            STBImageResize.nstbir_resize_uint8(accessor.getPixels(),
-                    nativeImage.getWidth(),
-                    nativeImage.getHeight(),
-                    0,
-                    sca.getPixels(),
-                    100,
-                    100,
-                    0,
-                    nativeImage.format().components()
-            );
+    public void buildTexture(){
+        scene.getCameraSettings().setIsometricYawPitchRoll(yaw, pitch, roll);
+        scene.getCameraSettings().setRotationCenter(scene.getWorldCenter());
+        scene.centerScene();
+        NativeImage nativeImage = wrappedScene.asNativeImage(1.0f);
+        dynamicTexture = new DynamicTexture(nativeImage);
+        Minecraft.getInstance().getTextureManager().register(new ResourceLocation(Constants.MOD_ID, "test_text"), dynamicTexture);
 
-            dynamicTexture = new DynamicTexture(nativeImage);
-            Minecraft.getInstance().getTextureManager().register(new ResourceLocation(Constants.MOD_ID, "test_text"), dynamicTexture);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if(drawDelay > 0) {
+            drawDelay--;
+            if(drawDelay == 0){
+                buildTexture();
+            }
         }
     }
 
@@ -74,12 +71,12 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
 
     public void setYaw(int yaw){
         this.yaw = yaw;
-        buildTexture();
+        drawDelay = 3;
     }
 
     public void setPitch(int pitch){
         this.pitch = pitch;
-        buildTexture();
+        drawDelay = 3;
     }
 
     @Override
