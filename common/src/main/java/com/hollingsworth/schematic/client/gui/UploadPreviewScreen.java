@@ -7,6 +7,7 @@ import com.hollingsworth.schematic.export.WrappedScene;
 import com.hollingsworth.schematic.export.level.GuidebookLevel;
 import com.hollingsworth.schematic.mixin.NativeImageAccessor;
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -35,14 +36,13 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         wrappedScene.placeStructure(Paths.get("./schematics/test/test.nbt"));
         scene.getCameraSettings().setRotationCenter(scene.getWorldCenter());
         scene.centerScene();
-//        wrappedScene.viewport
-        NativeImage nativeImage = wrappedScene.asNativeImage(1.0f);
-        try(NativeImage scaledImage = new NativeImage(100, 100, false)){
+
+        try (NativeImage nativeImage = wrappedScene.asNativeImage(1.0f); NativeImage scaledImage = new NativeImage(100, 100, false)) {
             Dimension origDim = new Dimension(nativeImage.getWidth(), nativeImage.getHeight());
             Dimension boundary = new Dimension(100, 100);
             Dimension newDim = getScaledDimension(origDim, boundary);
-            NativeImageAccessor accessor = ((NativeImageAccessor)(Object)nativeImage);
-            NativeImageAccessor sca = ((NativeImageAccessor)(Object)scaledImage);
+            NativeImageAccessor accessor = ((NativeImageAccessor) (Object) nativeImage);
+            NativeImageAccessor sca = ((NativeImageAccessor) (Object) scaledImage);
             STBImageResize.nstbir_resize_uint8(accessor.getPixels(),
                     nativeImage.getWidth(),
                     nativeImage.getHeight(),
@@ -52,7 +52,7 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
                     100,
                     0,
                     nativeImage.format().components()
-                    );
+            );
 
             dynamicTexture = new DynamicTexture(nativeImage);
             Minecraft.getInstance().getTextureManager().register(new ResourceLocation(Constants.MOD_ID, "test_text"), dynamicTexture);
@@ -98,11 +98,21 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
 
         int imageWidth = dynamicTexture.getPixels().getWidth();
         int imageHeight = dynamicTexture.getPixels().getHeight();
-        // Offset x and Y so the image is centered
-        x -= imageWidth/2;
-        y -= imageHeight/2;
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "test_text"), x,y, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
 
+        // scale width and height to fit in the box of 100,100
+        Dimension origDim = new Dimension(imageWidth, imageHeight);
+        Dimension boundary = new Dimension(100, 100);
+        Dimension newDim = getScaledDimension(origDim, boundary);
+        // Offset x and Y so the image is centered
+        x -= newDim.width/2;
+        y -= newDim.height/2;
+        PoseStack poseStack = graphics.pose();
+        poseStack.pushPose();
+        poseStack.scale((float)newDim.width / (float)imageWidth, (float)newDim.height / (float)imageHeight, 1);
+        // translate so it is back to the center, account for scale
+        poseStack.translate((float)x / ((float)newDim.width / (float)imageWidth), (float)y / ((float)newDim.height / (float)imageHeight), 0);
+        graphics.blit(new ResourceLocation(Constants.MOD_ID, "test_text"), 0, 0, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+        poseStack.popPose();
 //        PoseStack poseStack = graphics.pose();
 //        poseStack.pushPose();
 //        // scale so the image fits in the box
