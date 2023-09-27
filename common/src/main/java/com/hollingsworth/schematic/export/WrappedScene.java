@@ -89,21 +89,12 @@ public class WrappedScene {
         renderer.render(scene.getLevel(), scene.getCameraSettings());
     }
 
-    public LytSize getPreferredSize(float scale) {
+    public LytSize getPreferredSize() {
         if (scene == null) {
             return LytSize.empty();
         }
 
-        var prefSize = viewport.getPreferredSize();
-        if (prefSize.width() <= 0 || prefSize.height() <= 0) {
-            return null;
-        }
-
-        // We only scale the viewport, not scaling the view matrix means the scene will still fill it
-        var width = (int) Math.max(1, prefSize.width() * scale);
-        var height = (int) Math.max(1, prefSize.height() * scale);
-
-        return new LytSize(width, height);
+        return viewport.getPreferredSize();
     }
 
     public NativeImage asNativeImage(float scale){

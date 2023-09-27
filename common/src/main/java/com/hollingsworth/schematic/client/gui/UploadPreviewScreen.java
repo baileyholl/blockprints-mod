@@ -9,6 +9,7 @@ import com.hollingsworth.schematic.export.WrappedScene;
 import com.hollingsworth.schematic.export.level.GuidebookLevel;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -47,31 +48,29 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         scene.centerScene();
 
         // Lazily create the renderer using the preferred size of the scene
-        var preferredSize = wrappedScene.getPreferredSize(3);
-        if (preferredSize.width() > 0 && preferredSize.height() > 0) {
-            // Create/Re-Create Renderer if the pref-size changed or if the renderer hasn't been created yet
-            if (renderer == null || renderer.width != preferredSize.width() || renderer.height != preferredSize.height()) {
+        var prefSize = wrappedScene.getPreferredSize();
+        final float scale = (float) Minecraft.getInstance().getWindow().getGuiScale();
+        if (prefSize.width() > 0 && prefSize.height() > 0) {
+            // We only scale the viewport, not scaling the view matrix means the scene will still fill it
+            var renderWidth = (int) Math.max(1, prefSize.width() * scale);
+            var renderHeight = (int) Math.max(1, prefSize.height() * scale);
+
+            // Create/Re-Create Renderer if the desired render-size changed or if the renderer hasn't been created yet
+            if (renderer == null || renderer.width != renderWidth || renderer.height != renderHeight) {
                 if (renderer != null) {
                     renderer.close();
                 }
-                renderer = new OffScreenRenderer(preferredSize.width(), preferredSize.height());
+                renderer = new OffScreenRenderer(renderWidth, renderHeight);
             }
 
             // Render the scene to the renderer's off-screen surface
-            renderer.renderToTexture(() -> wrappedScene.renderToCurrentTarget(preferredSize));
+            renderer.renderToTexture(() -> wrappedScene.renderToCurrentTarget(prefSize));
         }
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-        updateSceneTexture();
     }
 
     @Override
     public void init() {
         super.init();
-        updateSceneTexture();
         addRenderableWidget(new ShortTextField(font, bookLeft + 185, bookTop + 41, Component.empty()));
         addRenderableWidget(new GuiImageButton(bookRight - 119, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_small.png"), b ->{
         }));
@@ -100,16 +99,14 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
 
     @Override
     public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
+        updateSceneTexture();
+
         super.render(graphics, pMouseX, pMouseY, pPartialTick);
         int previewX = bookLeft + 25;
         int previewY = bookTop + 41;
         graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/dialogue_model_preview.png"), previewX, previewY, 0, 0 , 143, 111, 143, 111);
         graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_upload.png"), bookRight - 116, bookTop + 155, 0, 0, 9, 11, 9, 11);
         GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.upload").getVisualOrderText(),  bookRight - 67, bookTop + 157);
-
-        // center x and y on point 50, 50
-        int x = previewX + 143/2;
-        int y = previewY + 111/2;
 
         if (renderer != null) {
             int imageWidth = renderer.width;
@@ -120,6 +117,9 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
             LytSize boundary = new LytSize(100, 100);
             LytSize newDim = getScaledDimension(origDim, boundary);
             // Offset x and Y so the image is centered
+            // center x and y on point 50, 50
+            int x = previewX + 143/2;
+            int y = previewY + 111/2;
             x -= newDim.width() / 2;
             y -= newDim.height() / 2;
 
