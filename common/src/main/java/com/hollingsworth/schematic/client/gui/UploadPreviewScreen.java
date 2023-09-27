@@ -2,28 +2,32 @@ package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.export.CameraSettings;
+import com.hollingsworth.schematic.export.OffScreenRenderer;
 import com.hollingsworth.schematic.export.Scene;
 import com.hollingsworth.schematic.export.WrappedScene;
 import com.hollingsworth.schematic.export.level.GuidebookLevel;
-import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.joml.Matrix4f;
 
 import java.nio.file.Paths;
 
 public class UploadPreviewScreen extends BaseSchematicScreen {
 
-    DynamicTexture dynamicTexture;
+    AbstractTexture dynamicTexture;
     public int yaw = 225;
     public int pitch = 30;
     public int roll;
     WrappedScene wrappedScene;
     Scene scene;
     int drawDelay = 0;
+    OffScreenRenderer renderer;
     public UploadPreviewScreen() {
         super();
         wrappedScene = new WrappedScene();
@@ -38,11 +42,16 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     public void buildTexture(){
         scene.getCameraSettings().setIsometricYawPitchRoll(yaw, pitch, roll);
         scene.getCameraSettings().setRotationCenter(scene.getWorldCenter());
-        scene.centerScene();
-        NativeImage nativeImage = wrappedScene.asNativeImage(1.0f);
-        dynamicTexture = new DynamicTexture(nativeImage);
-        Minecraft.getInstance().getTextureManager().register(new ResourceLocation(Constants.MOD_ID, "test_text"), dynamicTexture);
 
+        scene.getCameraSettings().setZoom(1.0f);
+        scene.centerScene();
+        renderer = wrappedScene.renderAsImage(3f);
+        Minecraft.getInstance().getTextureManager().register(new ResourceLocation(Constants.MOD_ID, "test_text"), renderer.getTexture());
+//        NativeImage nativeImage = wrappedScene.asNativeImage(3f);
+//        dynamicTexture = new DynamicTexture(nativeImage);
+//        Minecraft.getInstance().getTextureManager().register(new ResourceLocation(Constants.MOD_ID, "test_text"),);
+//        System.out.println(nativeImage.getWidth());
+//        System.out.println(nativeImage.getHeight());
     }
 
     @Override
@@ -71,12 +80,14 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
 
     public void setYaw(int yaw){
         this.yaw = yaw;
-        drawDelay = 3;
+        buildTexture();
+//        drawDelay = 3;
     }
 
     public void setPitch(int pitch){
         this.pitch = pitch;
-        drawDelay = 3;
+        buildTexture();
+//        drawDelay = 3;
     }
 
     @Override
@@ -93,8 +104,8 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         int x = previewX + 143/2;
         int y = previewY + 111/2;
 
-        int imageWidth = dynamicTexture.getPixels().getWidth();
-        int imageHeight = dynamicTexture.getPixels().getHeight();
+        int imageWidth = renderer.width;// dynamicTexture.getPixels().getWidth();
+        int imageHeight = renderer.height;//dynamicTexture.getPixels().getHeight();
 
         // scale width and height to fit in the box of 100,100
         Dimension origDim = new Dimension(imageWidth, imageHeight);
@@ -108,15 +119,23 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         poseStack.scale((float)newDim.width / (float)imageWidth, (float)newDim.height / (float)imageHeight, 1);
         // translate so it is back to the center, account for scale
         poseStack.translate((float)x / ((float)newDim.width / (float)imageWidth), (float)y / ((float)newDim.height / (float)imageHeight), 0);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "test_text"), 0, 0, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+        innerBlit(poseStack, renderer, 0, imageWidth, 0, imageHeight, 0);
+//        graphics.blit(new ResourceLocation(Constants.MOD_ID, "test_text"), 0, 0, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
         poseStack.popPose();
-//        PoseStack poseStack = graphics.pose();
-//        poseStack.pushPose();
-//        // scale so the image fits in the box
-//        poseStack.scale((float)scaledWidth / (float)dynamicTexture.getPixels().getWidth(), (float)scaledHeight / (float)dynamicTexture.getPixels().getHeight(), 1);
-//        graphics.blit(new ResourceLocation(Constants.MOD_ID, "test_text"), x,y, 0, 0, dynamicTexture.getPixels().getWidth(),  dynamicTexture.getPixels().getHeight(), dynamicTexture.getPixels().getWidth(),  dynamicTexture.getPixels().getHeight());
-//        poseStack.popPose();
+    }
 
+    void innerBlit(PoseStack pose, OffScreenRenderer osr, int x1, int x2, int y1, int y2, int blitOffset) {
+        RenderSystem.setShaderTexture(0, osr.fb.getColorTextureId());
+        // Rest is same as GuiGraphics#
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        Matrix4f matrix4f = pose.last().pose();
+        BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
+        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        bufferBuilder.vertex(matrix4f, x1, y1, blitOffset).uv(0, 1).endVertex();
+        bufferBuilder.vertex(matrix4f, x1, y2, blitOffset).uv(0, 0).endVertex();
+        bufferBuilder.vertex(matrix4f, x2, y2, blitOffset).uv(1, 0).endVertex();
+        bufferBuilder.vertex(matrix4f, x2, y1, blitOffset).uv(1, 1).endVertex();
+        BufferUploader.drawWithShader(bufferBuilder.end());
     }
 
     public static Dimension getScaledDimension(Dimension imgSize, Dimension boundary) {

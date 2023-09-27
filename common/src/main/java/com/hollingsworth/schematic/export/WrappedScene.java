@@ -11,10 +11,12 @@ import net.minecraft.world.level.levelgen.SingleThreadedRandomSource;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.system.MemoryUtil;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -77,6 +79,29 @@ public class WrappedScene {
         }
     }
 
+    public OffScreenRenderer renderAsImage(float scale){
+        if (scene == null) {
+            return null;
+        }
+
+        var prefSize = viewport.getPreferredSize();
+        if (prefSize.width() <= 0 || prefSize.height() <= 0) {
+            return null;
+        }
+
+        // We only scale the viewport, not scaling the view matrix means the scene will still fill it
+        var width = (int) Math.max(1, prefSize.width() * scale);
+        var height = (int) Math.max(1, prefSize.height() * scale);
+
+       var osr = new OffScreenRenderer(width, height);
+        osr.renderToTexture(() -> {
+            var renderer = GuidebookLevelRenderer.getInstance();
+            scene.getCameraSettings().setViewportSize(prefSize);
+            renderer.render(scene.getLevel(), scene.getCameraSettings());
+        });
+        return osr;
+    }
+
     public NativeImage asNativeImage(float scale){
         if(scene == null){
             return null;
@@ -96,10 +121,14 @@ public class WrappedScene {
                 scene.getCameraSettings().setViewportSize(prefSize);
                 renderer.render(scene.getLevel(), scene.getCameraSettings());
             });
-            return NativeImage.read(bytes);
+            ByteBuffer buffer = MemoryUtil.memAlloc(bytes.length);
+            buffer.put(bytes);
+            return NativeImage.read(buffer.flip());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+//            throw new RuntimeException(e);
         }
+        return null;
     }
 
     class Viewport {
