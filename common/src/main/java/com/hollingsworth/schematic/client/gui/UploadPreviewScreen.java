@@ -39,12 +39,23 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         scene.centerScene();
     }
 
+    @Override
+    public void onClose() {
+        super.onClose();
+        if(renderer != null){
+            renderer.close();
+        }
+    }
+
     public void buildTexture(){
         scene.getCameraSettings().setIsometricYawPitchRoll(yaw, pitch, roll);
         scene.getCameraSettings().setRotationCenter(scene.getWorldCenter());
 
         scene.getCameraSettings().setZoom(1.0f);
         scene.centerScene();
+        if(renderer != null){
+            renderer.close();
+        }
         renderer = wrappedScene.renderAsImage(3f);
         Minecraft.getInstance().getTextureManager().register(new ResourceLocation(Constants.MOD_ID, "test_text"), renderer.getTexture());
 //        NativeImage nativeImage = wrappedScene.asNativeImage(3f);
