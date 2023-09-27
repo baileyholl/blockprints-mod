@@ -79,9 +79,19 @@ public class WrappedScene {
         }
     }
 
-    public OffScreenRenderer renderAsImage(float scale){
+    public void renderToCurrentTarget(LytSize size) {
         if (scene == null) {
-            return null;
+            return;
+        }
+
+        var renderer = GuidebookLevelRenderer.getInstance();
+        scene.getCameraSettings().setViewportSize(size);
+        renderer.render(scene.getLevel(), scene.getCameraSettings());
+    }
+
+    public LytSize getPreferredSize(float scale) {
+        if (scene == null) {
+            return LytSize.empty();
         }
 
         var prefSize = viewport.getPreferredSize();
@@ -93,13 +103,7 @@ public class WrappedScene {
         var width = (int) Math.max(1, prefSize.width() * scale);
         var height = (int) Math.max(1, prefSize.height() * scale);
 
-       var osr = new OffScreenRenderer(width, height);
-        osr.renderToTexture(() -> {
-            var renderer = GuidebookLevelRenderer.getInstance();
-            scene.getCameraSettings().setViewportSize(prefSize);
-            renderer.render(scene.getLevel(), scene.getCameraSettings());
-        });
-        return osr;
+        return new LytSize(width, height);
     }
 
     public NativeImage asNativeImage(float scale){
