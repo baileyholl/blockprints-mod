@@ -2,6 +2,7 @@ package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.export.CameraSettings;
+import com.hollingsworth.schematic.export.LytSize;
 import com.hollingsworth.schematic.export.OffScreenRenderer;
 import com.hollingsworth.schematic.export.Scene;
 import com.hollingsworth.schematic.export.WrappedScene;
@@ -11,7 +12,6 @@ import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
@@ -20,13 +20,11 @@ import java.nio.file.Paths;
 
 public class UploadPreviewScreen extends BaseSchematicScreen {
 
-    AbstractTexture dynamicTexture;
     public int yaw = 225;
     public int pitch = 30;
     public int roll;
     WrappedScene wrappedScene;
     Scene scene;
-    int drawDelay = 0;
     OffScreenRenderer renderer;
     public UploadPreviewScreen() {
         super();
@@ -39,47 +37,37 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         scene.centerScene();
     }
 
-    @Override
-    public void onClose() {
-        super.onClose();
-        if(renderer != null){
-            renderer.close();
-        }
-    }
-
-    public void buildTexture(){
+    public void updateSceneTexture() {
         scene.getCameraSettings().setIsometricYawPitchRoll(yaw, pitch, roll);
         scene.getCameraSettings().setRotationCenter(scene.getWorldCenter());
 
         scene.getCameraSettings().setZoom(1.0f);
         scene.centerScene();
-        if(renderer != null){
-            renderer.close();
-        }
-        renderer = wrappedScene.renderAsImage(3f);
-        Minecraft.getInstance().getTextureManager().register(new ResourceLocation(Constants.MOD_ID, "test_text"), renderer.getTexture());
-//        NativeImage nativeImage = wrappedScene.asNativeImage(3f);
-//        dynamicTexture = new DynamicTexture(nativeImage);
-//        Minecraft.getInstance().getTextureManager().register(new ResourceLocation(Constants.MOD_ID, "test_text"),);
-//        System.out.println(nativeImage.getWidth());
-//        System.out.println(nativeImage.getHeight());
-    }
 
-    @Override
-    public void tick() {
-        super.tick();
-        if(drawDelay > 0) {
-            drawDelay--;
-            if(drawDelay == 0){
-                buildTexture();
+        // Lazily create the renderer using the preferred size of the scene
+        var prefSize = wrappedScene.getPreferredSize();
+        final float scale = (float) Minecraft.getInstance().getWindow().getGuiScale();
+        if (prefSize.width() > 0 && prefSize.height() > 0) {
+            // We only scale the viewport, not scaling the view matrix means the scene will still fill it
+            var renderWidth = (int) Math.max(1, prefSize.width() * scale);
+            var renderHeight = (int) Math.max(1, prefSize.height() * scale);
+
+            // Create/Re-Create Renderer if the desired render-size changed or if the renderer hasn't been created yet
+            if (renderer == null || renderer.width != renderWidth || renderer.height != renderHeight) {
+                if (renderer != null) {
+                    renderer.close();
+                }
+                renderer = new OffScreenRenderer(renderWidth, renderHeight);
             }
+
+            // Render the scene to the renderer's off-screen surface
+            renderer.renderToTexture(() -> wrappedScene.renderToCurrentTarget(prefSize));
         }
     }
 
     @Override
     public void init() {
         super.init();
-        buildTexture();
         addRenderableWidget(new ShortTextField(font, bookLeft + 185, bookTop + 41, Component.empty()));
         addRenderableWidget(new GuiImageButton(bookRight - 119, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_small.png"), b ->{
         }));
@@ -89,20 +77,27 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         addRenderableWidget(new DecoratedSlider(bookLeft + 41, bookTop + 168, 95, 15, Component.empty(), Component.empty(), 0, 90, 30, 5, 1, true, this::setPitch));
     }
 
+    @Override
+    public void removed() {
+        super.removed();
+        if (renderer != null) {
+            renderer.close();
+            renderer = null;
+        }
+    }
+
     public void setYaw(int yaw){
         this.yaw = yaw;
-        buildTexture();
-//        drawDelay = 3;
     }
 
     public void setPitch(int pitch){
         this.pitch = pitch;
-        buildTexture();
-//        drawDelay = 3;
     }
 
     @Override
     public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
+        updateSceneTexture();
+
         super.render(graphics, pMouseX, pMouseY, pPartialTick);
         int previewX = bookLeft + 25;
         int previewY = bookTop + 41;
@@ -110,29 +105,23 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_upload.png"), bookRight - 116, bookTop + 155, 0, 0, 9, 11, 9, 11);
         GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.upload").getVisualOrderText(),  bookRight - 67, bookTop + 157);
 
+        if (renderer != null) {
+            int imageWidth = renderer.width;
+            int imageHeight = renderer.height;
 
-        // center x and y on point 50, 50
-        int x = previewX + 143/2;
-        int y = previewY + 111/2;
+            // scale width and height to fit in the box of 100,100
+            LytSize origDim = new LytSize(imageWidth, imageHeight);
+            LytSize boundary = new LytSize(100, 100);
+            LytSize newDim = getScaledDimension(origDim, boundary);
+            // Offset x and Y so the image is centered
+            // center x and y on point 50, 50
+            int x = previewX + 143/2;
+            int y = previewY + 111/2;
+            x -= newDim.width() / 2;
+            y -= newDim.height() / 2;
 
-        int imageWidth = renderer.width;// dynamicTexture.getPixels().getWidth();
-        int imageHeight = renderer.height;//dynamicTexture.getPixels().getHeight();
-
-        // scale width and height to fit in the box of 100,100
-        Dimension origDim = new Dimension(imageWidth, imageHeight);
-        Dimension boundary = new Dimension(100, 100);
-        Dimension newDim = getScaledDimension(origDim, boundary);
-        // Offset x and Y so the image is centered
-        x -= newDim.width/2;
-        y -= newDim.height/2;
-        PoseStack poseStack = graphics.pose();
-        poseStack.pushPose();
-        poseStack.scale((float)newDim.width / (float)imageWidth, (float)newDim.height / (float)imageHeight, 1);
-        // translate so it is back to the center, account for scale
-        poseStack.translate((float)x / ((float)newDim.width / (float)imageWidth), (float)y / ((float)newDim.height / (float)imageHeight), 0);
-        innerBlit(poseStack, renderer, 0, imageWidth, 0, imageHeight, 0);
-//        graphics.blit(new ResourceLocation(Constants.MOD_ID, "test_text"), 0, 0, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
-        poseStack.popPose();
+            innerBlit(graphics.pose(), renderer, x, x + newDim.width(), y, y + newDim.height(), 0);
+        }
     }
 
     void innerBlit(PoseStack pose, OffScreenRenderer osr, int x1, int x2, int y1, int y2, int blitOffset) {
@@ -149,12 +138,12 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         BufferUploader.drawWithShader(bufferBuilder.end());
     }
 
-    public static Dimension getScaledDimension(Dimension imgSize, Dimension boundary) {
+    public static LytSize getScaledDimension(LytSize imgSize, LytSize boundary) {
 
-        int original_width = imgSize.width;
-        int original_height = imgSize.height;
-        int bound_width = boundary.width;
-        int bound_height = boundary.height;
+        int original_width = imgSize.width();
+        int original_height = imgSize.height();
+        int bound_width = boundary.width();
+        int bound_height = boundary.height();
         int new_width = original_width;
         int new_height = original_height;
 
@@ -174,7 +163,7 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
             new_width = (new_height * original_width) / original_height;
         }
 
-        return new Dimension(new_width, new_height);
+        return new LytSize(new_width, new_height);
     }
 
     @Override
@@ -188,10 +177,6 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
 
         GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.name").getVisualOrderText(), 185 + 48, 29);
         GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.description").getVisualOrderText(), 185 + 48, 61);
-
-    }
-
-    public record Dimension(int width, int height){
 
     }
 }

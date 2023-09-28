@@ -17,6 +17,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL30;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
@@ -34,7 +35,6 @@ public class OffScreenRenderer implements AutoCloseable {
     public OffScreenRenderer(int width, int height) {
         this.width = width;
         this.height = height;
-        RenderSystem.viewport(0, 0, width, height);
         nativeImage = new NativeImage(width, height, true);
         fb = new TextureTarget(width, height, true /* with depth */, true /* check error */);
         fb.setClearColor(0, 0, 0, 0);
@@ -56,21 +56,26 @@ public class OffScreenRenderer implements AutoCloseable {
     }
 
     public void renderToTexture(Runnable r) {
+        RenderSystem.viewport(0, 0, width, height);
+
+        var currentBuffer = GlStateManager.getBoundFramebuffer();
         fb.bindWrite(true);
         GlStateManager._clear(GL12.GL_COLOR_BUFFER_BIT | GL12.GL_DEPTH_BUFFER_BIT, false);
         r.run();
         fb.unbindWrite();
-    }
-    @Override
-    public void close() {
-        nativeImage.close();
-        fb.destroyBuffers();
+        GlStateManager._glBindFramebuffer(GL30.GL_FRAMEBUFFER, currentBuffer);
 
         var minecraft = Minecraft.getInstance();
         if (minecraft != null) {
             var window = minecraft.getWindow();
             RenderSystem.viewport(0, 0, window.getWidth(), window.getHeight());
         }
+    }
+
+    @Override
+    public void close() {
+        nativeImage.close();
+        fb.destroyBuffers();
     }
 
     public byte[] captureAsPng(Runnable r) {
