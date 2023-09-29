@@ -2,6 +2,7 @@ package com.hollingsworth.schematic.client;
 
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.common.item.Schematic;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -20,6 +21,8 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -30,6 +33,21 @@ import static com.hollingsworth.schematic.client.RaycastHelper.rayTraceUntil;
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = Constants.MOD_ID)
 @OnlyIn(Dist.CLIENT)
 public class ClientEvents {
+
+    private static final Minecraft MINECRAFT = Minecraft.getInstance();
+
+    @SubscribeEvent
+    public static void registerKeyBindings(RegisterKeyMappingsEvent event) {
+        event.register(ClientData.OPEN_MENU);
+    }
+
+    @SubscribeEvent
+    public static void keyEvent(final InputEvent.Key event) {
+        if (Minecraft.getInstance().player == null || InputConstants.PRESS != event.getAction())
+            return;
+        if(MINECRAFT.screen == null)
+            ClientData.openMenu();
+    }
 
     @SubscribeEvent
     public static void renderLast(final RenderLevelStageEvent event) {
