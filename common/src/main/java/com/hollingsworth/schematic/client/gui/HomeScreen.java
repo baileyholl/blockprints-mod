@@ -1,6 +1,7 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
+import com.hollingsworth.schematic.client.ClientData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -15,7 +16,11 @@ public class HomeScreen extends BaseSchematicScreen{
     public void init() {
         super.init();
         addRenderableWidget(new GuiImageButton(bookLeft + 73, bookTop + 25, 159, 63, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_large_blue.png"), b ->{
-            Minecraft.getInstance().setScreen(new UploadPreviewScreen());
+            ClientData.showBoundary = true;
+            ClientData.firstTarget = null;
+            ClientData.secondTarget = null;
+            Minecraft.getInstance().setScreen(null);
+            Minecraft.getInstance().player.sendSystemMessage(Component.translatable(Constants.MOD_ID + ".start_selecting"));
         }));
         addRenderableWidget(new GuiImageButton(bookLeft + 73, bookTop + 105, 159, 63, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_large_orange.png"), b ->{
 

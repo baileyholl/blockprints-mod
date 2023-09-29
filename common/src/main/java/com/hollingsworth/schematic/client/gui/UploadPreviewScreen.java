@@ -8,17 +8,18 @@ import com.hollingsworth.schematic.export.level.GuidebookLevel;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-
-import java.nio.file.Paths;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 public class UploadPreviewScreen extends BaseSchematicScreen {
 
     ScenePreview scenePreview;
     DecoratedSlider yawSlider;
     DecoratedSlider pitchSlider;
+    public StructureTemplate structureTemplate;
 
-    public UploadPreviewScreen() {
+    public UploadPreviewScreen(StructureTemplate structureTemplate) {
         super();
+        this.structureTemplate = structureTemplate;
     }
 
     @Override
@@ -27,7 +28,8 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         WrappedScene wrappedScene = new WrappedScene();
         Scene scene = new Scene(new GuidebookLevel(), new CameraSettings());
         wrappedScene.setScene(scene);
-        wrappedScene.placeStructure(Paths.get("./schematics/test/test.nbt"));
+        wrappedScene.placeStructure(structureTemplate);
+
         addRenderableWidget(new ShortTextField(font, bookLeft + 185, bookTop + 41, Component.empty()));
         addRenderableWidget(new GuiImageButton(bookRight - 119, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_small.png"), b ->{
         }));

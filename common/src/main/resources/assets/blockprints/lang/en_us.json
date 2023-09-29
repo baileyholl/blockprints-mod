@@ -7,5 +7,12 @@
   "blockprints.website": "Visit the website for schematic downloads!",
   "blockprints.preview": "Preview",
   "blockprints.name": "Enter Name",
-  "blockprints.description": "Enter Description"
+  "blockprints.description": "Enter Description",
+  "key.category.blockprints.general": "Blockprints",
+  "key.blockprints.open_menu": "Open Menu",
+  "blockprints.select_first": "Select first corner",
+  "blockprints.select_second": "Select second corner",
+  "blockprints.confirm_selection": "Press %s to confirm selection",
+  "blockprints.start_selecting": "Interact with a block to select a corner."
+
 }

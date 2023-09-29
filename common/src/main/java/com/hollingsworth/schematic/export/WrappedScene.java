@@ -46,14 +46,17 @@ public class WrappedScene {
             var template = new StructureTemplate();
             var blocks = scene.getLevel().registryAccess().registryOrThrow(Registries.BLOCK).asLookup();
             template.load(blocks, compoundTag);
-            var random = new SingleThreadedRandomSource(0L);
-            var settings = new StructurePlaceSettings();
-            settings.setIgnoreEntities(true); // Entities need a server level in structures
-
-            template.placeInWorld(new FakeForwardingServerLevel(scene.getLevel()), BlockPos.ZERO, BlockPos.ZERO, settings, random, 0);
+            placeStructure(template);
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void placeStructure(StructureTemplate structureTemplate){
+        var random = new SingleThreadedRandomSource(0L);
+        var settings = new StructurePlaceSettings();
+        settings.setIgnoreEntities(true); // Entities need a server level in structures
+        structureTemplate.placeInWorld(new FakeForwardingServerLevel(scene.getLevel()), BlockPos.ZERO, BlockPos.ZERO, settings, random, 0);
     }
 
     public byte[] exportAsPng(float scale) {
