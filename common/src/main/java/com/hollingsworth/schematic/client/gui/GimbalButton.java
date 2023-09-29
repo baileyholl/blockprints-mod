@@ -18,6 +18,7 @@ public class GimbalButton extends ANButton{
         if(!this.visible){
             return;
         }
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/gimbal/gimbal_" + direction + (isMouseOver(parX, parY) ? "_highlighted" : "_faded") + ".png"), x, y, 0, 0, width, height, width, height);
+        int alpha = isMouseOver(parX, parY) ? 255 : 100;
+        ModScreen.blitRect(graphics.pose(), x, y, 0, 0, width, height, width, height, new ResourceLocation(Constants.MOD_ID, "textures/gui/gimbal/gimbal_" + direction + "_highlighted.png"), alpha);
     }
 }

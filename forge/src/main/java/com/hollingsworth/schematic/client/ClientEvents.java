@@ -1,7 +1,6 @@
 package com.hollingsworth.schematic.client;
 
 import com.hollingsworth.schematic.Constants;
-import com.hollingsworth.schematic.common.item.Schematic;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -12,7 +11,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.phys.AABB;
@@ -45,7 +43,7 @@ public class ClientEvents {
     public static void keyEvent(final InputEvent.Key event) {
         if (Minecraft.getInstance().player == null || InputConstants.PRESS != event.getAction())
             return;
-        if(MINECRAFT.screen == null)
+        if(MINECRAFT.screen == null && event.getKey() == ClientData.OPEN_MENU.getKey().getValue())
             ClientData.openMenu();
     }
 
@@ -54,10 +52,9 @@ public class ClientEvents {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY) {
             return;
         }
-        ItemStack stack = Minecraft.getInstance().player.getMainHandItem();
-        if (!(stack.getItem() instanceof Schematic) || !stack.hasTag())
+        if (!ClientData.showBoundary)
             return;
-        BlockPos firstPos = stack.getTag().contains(Schematic.POS1) ? BlockPos.of(stack.getTag().getLong(Schematic.POS1)) : null;
+        BlockPos firstPos = ClientData.firstTarget;
         if (firstPos == null)
             return;
         BlockPos selectedPos = null;
@@ -75,7 +72,7 @@ public class ClientEvents {
             selectedPos = hit;
         } else
             selectedPos = null;
-        BlockPos secondPos = stack.getTag().contains(Schematic.POS2) ? BlockPos.of(stack.getTag().getLong(Schematic.POS2)) : null;
+        BlockPos secondPos = ClientData.secondTarget;
         if (secondPos == null) {
             secondPos = selectedPos;
         }
@@ -115,9 +112,9 @@ public class ClientEvents {
 
             PoseStack poseStack = event.getPoseStack();
             poseStack.pushPose();
-            VertexConsumer vertexconsumer = CafeRenders.bufferSource.getBuffer(RenderType.lines());
+            VertexConsumer vertexconsumer = Constants.bufferSource.getBuffer(RenderType.lines());
             LevelRenderer.renderLineBox(poseStack, vertexconsumer, currentSelectionBox, 0.9F, 0.9F, 0.9F, 1.0f);
-            CafeRenders.bufferSource.endBatch();
+            Constants.bufferSource.endBatch();
             poseStack.popPose();
         }
     }

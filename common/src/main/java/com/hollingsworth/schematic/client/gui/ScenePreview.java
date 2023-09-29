@@ -20,9 +20,10 @@ public class ScenePreview extends AbstractWidget {
     public int yaw = 225;
     public int pitch = 30;
     public int roll;
-    WrappedScene wrappedScene;
-    Scene scene;
-    OffScreenRenderer renderer;
+    public WrappedScene wrappedScene;
+    public Scene scene;
+    public OffScreenRenderer renderer;
+
     public ScenePreview(int x, int y, int width, int height, Scene scene, WrappedScene wrappedScene) {
         super(x, y, width, height, Component.empty());
         this.wrappedScene = wrappedScene;
@@ -91,7 +92,7 @@ public class ScenePreview extends AbstractWidget {
 
             innerBlit(graphics.pose(), renderer, x, x + newDim.width(), y, y + newDim.height(), 0);
         }
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/gimbal/gimbal_cardinal.png"), x + 121, y + 5, 0, 0, 17, 17, 17, 17);
+        ModScreen.blitRect(graphics.pose(), x + 121, y + 5, 0, 0, 17, 17, 17, 17, new ResourceLocation(Constants.MOD_ID, "textures/gui/gimbal/gimbal_cardinal.png"), 150);
     }
 
     void innerBlit(PoseStack pose, OffScreenRenderer osr, int x1, int x2, int y1, int y2, int blitOffset) {
