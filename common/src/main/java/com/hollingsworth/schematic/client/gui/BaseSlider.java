@@ -230,4 +230,5 @@ public class BaseSlider extends AbstractSliderButton
 
         renderScrollingString(guiGraphics, mc.font, 2, this.active ? 16777215 : 10526880 | Mth.ceil(this.alpha * 255.0F) << 24);
     }
+
 }

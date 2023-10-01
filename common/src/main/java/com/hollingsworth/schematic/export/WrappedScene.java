@@ -11,10 +11,12 @@ import net.minecraft.world.level.levelgen.SingleThreadedRandomSource;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.system.MemoryUtil;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -33,7 +35,7 @@ public class WrappedScene {
         }
     }
 
-    private final Viewport viewport = new Viewport();
+    public final Viewport viewport = new Viewport();
 
     private SavedCameraSettings initialCameraSettings = new SavedCameraSettings();
 
@@ -44,14 +46,17 @@ public class WrappedScene {
             var template = new StructureTemplate();
             var blocks = scene.getLevel().registryAccess().registryOrThrow(Registries.BLOCK).asLookup();
             template.load(blocks, compoundTag);
-            var random = new SingleThreadedRandomSource(0L);
-            var settings = new StructurePlaceSettings();
-            settings.setIgnoreEntities(true); // Entities need a server level in structures
-
-            template.placeInWorld(new FakeForwardingServerLevel(scene.getLevel()), BlockPos.ZERO, BlockPos.ZERO, settings, random, 0);
+            placeStructure(template);
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void placeStructure(StructureTemplate structureTemplate){
+        var random = new SingleThreadedRandomSource(0L);
+        var settings = new StructurePlaceSettings();
+        settings.setIgnoreEntities(true); // Entities need a server level in structures
+        structureTemplate.placeInWorld(new FakeForwardingServerLevel(scene.getLevel()), BlockPos.ZERO, BlockPos.ZERO, settings, random, 0);
     }
 
     public byte[] exportAsPng(float scale) {
@@ -77,6 +82,24 @@ public class WrappedScene {
         }
     }
 
+    public void renderToCurrentTarget(LytSize size) {
+        if (scene == null) {
+            return;
+        }
+
+        var renderer = GuidebookLevelRenderer.getInstance();
+        scene.getCameraSettings().setViewportSize(size);
+        renderer.render(scene.getLevel(), scene.getCameraSettings());
+    }
+
+    public LytSize getPreferredSize() {
+        if (scene == null) {
+            return LytSize.empty();
+        }
+
+        return viewport.getPreferredSize();
+    }
+
     public NativeImage asNativeImage(float scale){
         if(scene == null){
             return null;
@@ -96,10 +119,14 @@ public class WrappedScene {
                 scene.getCameraSettings().setViewportSize(prefSize);
                 renderer.render(scene.getLevel(), scene.getCameraSettings());
             });
-            return NativeImage.read(bytes);
+            ByteBuffer buffer = MemoryUtil.memAlloc(bytes.length);
+            buffer.put(bytes);
+            return NativeImage.read(buffer.flip());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+//            throw new RuntimeException(e);
         }
+        return null;
     }
 
     class Viewport {

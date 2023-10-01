@@ -79,8 +79,6 @@ public class GuidebookLevelRenderer {
 
         renderContent(level, buffers);
 
-
-
         modelViewStack.popPose();
         RenderSystem.applyModelViewMatrix();
         RenderSystem.restoreProjectionMatrix();

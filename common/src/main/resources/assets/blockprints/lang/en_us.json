@@ -1,0 +1,21 @@
+{
+  "blockprints.upload": "Upload",
+  "blockprints.download": "Download",
+  "blockprints.upload_desc": "Upload a schematic to BlockPrints!",
+  "blockprints.download_desc": "Download a schematic using a magic code from Blockprints.io",
+  "blockprints.discord": "Join the Discord for support or show off your builds!",
+  "blockprints.website": "Visit the website for schematic downloads!",
+  "blockprints.preview": "Preview",
+  "blockprints.name": "Enter Name",
+  "blockprints.description": "Enter Description",
+  "key.category.blockprints.general": "Blockprints",
+  "key.blockprints.open_menu": "Open Menu",
+  "key.blockprints.cancel_selection": "Cancel Selection",
+  "key.blockprints.confirm_selection": "Confirm Selection",
+  "blockprints.select_first": "Select first corner",
+  "blockprints.select_second": "Select second corner",
+  "blockprints.confirm_selection": "Press %s to confirm selection",
+  "blockprints.start_selecting": "Interact with a block to select a corner.",
+  "blockprints.cancel_selection": "Press %s to cancel"
+
+}

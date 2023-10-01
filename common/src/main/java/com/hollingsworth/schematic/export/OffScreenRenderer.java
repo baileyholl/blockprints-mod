@@ -9,12 +9,15 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexSorting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.FogRenderer;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL30;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
@@ -25,30 +28,54 @@ import java.util.stream.Collectors;
 
 public class OffScreenRenderer implements AutoCloseable {
     private final NativeImage nativeImage;
-    private final TextureTarget fb;
-    private final int width;
-    private final int height;
+    public final TextureTarget fb;
+    public final int width;
+    public final int height;
 
     public OffScreenRenderer(int width, int height) {
         this.width = width;
         this.height = height;
-        RenderSystem.viewport(0, 0, width, height);
         nativeImage = new NativeImage(width, height, true);
         fb = new TextureTarget(width, height, true /* with depth */, true /* check error */);
         fb.setClearColor(0, 0, 0, 0);
         fb.clear(true /* check error */);
     }
+    private final AbstractTexture texture = new AbstractTexture() {
+        @Override
+        public int getId() {
+            return fb.getColorTextureId();
+        }
 
-    @Override
-    public void close() {
-        nativeImage.close();
-        fb.destroyBuffers();
+        @Override
+        public void load(ResourceManager resourceManager) throws IOException {
+        }
+    };
+
+    public AbstractTexture getTexture() {
+        return texture;
+    }
+
+    public void renderToTexture(Runnable r) {
+        RenderSystem.viewport(0, 0, width, height);
+
+        var currentBuffer = GlStateManager.getBoundFramebuffer();
+        fb.bindWrite(true);
+        GlStateManager._clear(GL12.GL_COLOR_BUFFER_BIT | GL12.GL_DEPTH_BUFFER_BIT, false);
+        r.run();
+        fb.unbindWrite();
+        GlStateManager._glBindFramebuffer(GL30.GL_FRAMEBUFFER, currentBuffer);
 
         var minecraft = Minecraft.getInstance();
         if (minecraft != null) {
             var window = minecraft.getWindow();
             RenderSystem.viewport(0, 0, window.getWidth(), window.getHeight());
         }
+    }
+
+    @Override
+    public void close() {
+        nativeImage.close();
+        fb.destroyBuffers();
     }
 
     public byte[] captureAsPng(Runnable r) {

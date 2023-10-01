@@ -20,6 +20,16 @@ import java.util.Locale;
 public class SchematicExport {
 	public static final Path SCHEMATICS = Services.PLATFORM.getGameDirectory().resolve("schematics");
 
+	public static StructureTemplate getStructure(Level level, BlockPos first, BlockPos second){
+		BoundingBox bb = BoundingBox.fromCorners(first, second);
+		BlockPos origin = new BlockPos(bb.minX(), bb.minY(), bb.minZ());
+		BlockPos bounds = new BlockPos(bb.getXSpan(), bb.getYSpan(), bb.getZSpan());
+
+		StructureTemplate structure = new StructureTemplate();
+		structure.fillFromWorld(level, origin, bounds, true, Blocks.AIR);
+		return structure;
+	}
+
 	/**
 	 * Save a schematic to a file from a world.
 	 * @param dir the directory the schematic will be created in
@@ -36,8 +46,7 @@ public class SchematicExport {
 		BlockPos origin = new BlockPos(bb.minX(), bb.minY(), bb.minZ());
 		BlockPos bounds = new BlockPos(bb.getXSpan(), bb.getYSpan(), bb.getZSpan());
 
-		StructureTemplate structure = new StructureTemplate();
-		structure.fillFromWorld(level, origin, bounds, true, Blocks.AIR);
+		StructureTemplate structure = getStructure(level, first, second);
 		CompoundTag data = structure.save(new CompoundTag());
 		String air = "minecraft:air";
 		String structureVoid = "minecraft:structure_void";

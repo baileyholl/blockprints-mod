@@ -1,9 +1,9 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.hollingsworth.schematic.mixin",
+  "package": "com.hollingsworth.schematic.mixin.forge",
   "compatibilityLevel": "JAVA_17",
-  "refmap": "schematic.refmap.json",
+  "refmap": "blockprints.refmap.json",
   "mixins": [
   ],
   "client": [
@@ -13,4 +13,4 @@
     "defaultRequire": 1
   }
 }
-  
+
