@@ -28,6 +28,9 @@ public class ClientEvents {
         if(event.getKey() == ClientData.CONFIRM.getKey().getValue()){
             ClientData.onConfirmHit();
         }
+        if(event.getKey() == ClientData.CANCEL.getKey().getValue()){
+            ClientData.onCancelHit();
+        }
     }
 
     @SubscribeEvent

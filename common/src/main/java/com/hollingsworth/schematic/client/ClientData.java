@@ -35,17 +35,30 @@ public class ClientData {
     private static final String CATEGORY = "key.category." + Constants.MOD_ID + ".general";
     public static final KeyMapping OPEN_MENU = new KeyMapping("key." + Constants.MOD_ID + ".open_menu", GLFW.GLFW_KEY_GRAVE_ACCENT, CATEGORY);
     public static final KeyMapping CONFIRM = new KeyMapping("key." + Constants.MOD_ID + ".confirm_selection", GLFW.GLFW_KEY_ENTER, CATEGORY);
-
+    public static final KeyMapping CANCEL = new KeyMapping("key." + Constants.MOD_ID + ".cancel_selection", GLFW.GLFW_KEY_BACKSPACE, CATEGORY);
+    public static final KeyMapping[] KEYS = new KeyMapping[]{OPEN_MENU, CONFIRM, CANCEL};
     public static void openMenu(){
         Minecraft.getInstance().setScreen(new HomeScreen());
     }
 
     public static void onConfirmHit(){
+        if(!ClientData.showBoundary){
+            return;
+        }
         ClientData.showBoundary = false;
         if(ClientData.firstTarget != null && ClientData.secondTarget != null){
             StructureTemplate structure = SchematicExport.getStructure(Minecraft.getInstance().level, ClientData.firstTarget, ClientData.secondTarget);
             Minecraft.getInstance().setScreen(new UploadPreviewScreen(structure));
         }
+    }
+
+    public static void onCancelHit(){
+        if(!ClientData.showBoundary){
+            return;
+        }
+        ClientData.showBoundary = false;
+        ClientData.firstTarget = null;
+        ClientData.secondTarget = null;
     }
 
     public static void renderBoundary(PoseStack poseStack){
@@ -122,14 +135,17 @@ public class ClientData {
             return;
         float screenY = window.getGuiScaledHeight() / 2f;
         float screenX = window.getGuiScaledWidth() / 2f;
+        float instructionY = window.getGuiScaledHeight() - 42;
         graphics.pose().pushPose();
-        graphics.pose().translate(screenX, window.getGuiScaledHeight() - 32, 0);
+        graphics.pose().translate(screenX, instructionY, 0);
         if(firstTarget != null && secondTarget != null){
             GuiUtils.drawCenteredOutlinedText(Minecraft.getInstance().font, graphics, Component.translatable(Constants.MOD_ID + ".confirm_selection", CONFIRM.getTranslatedKeyMessage()).getVisualOrderText(), 0, 0);
         }else{
             String compKey = firstTarget == null ? "select_first" : "select_second";
             GuiUtils.drawCenteredOutlinedText(Minecraft.getInstance().font, graphics, Component.translatable(Constants.MOD_ID + "." + compKey).getVisualOrderText(), 0, 0);
         }
+        graphics.pose().translate(screenX, instructionY + 10, 0);
+        GuiUtils.drawCenteredOutlinedText(Minecraft.getInstance().font, graphics, Component.translatable(Constants.MOD_ID + ".cancel_selection", CANCEL.getTranslatedKeyMessage()).getVisualOrderText(), 0, 0);
         graphics.pose().popPose();
     }
 }
