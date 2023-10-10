@@ -12,5 +12,6 @@ public class Constants {
 
 	public static final int WHITE = 16777215;
 	public static MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(new BufferBuilder(256));
-
+	// TODO: link on fabric
+	public static boolean isDev;
 }

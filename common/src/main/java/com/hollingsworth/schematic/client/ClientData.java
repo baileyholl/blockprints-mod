@@ -26,9 +26,12 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import static com.hollingsworth.schematic.client.RaycastHelper.rayTraceRange;
 
 public class ClientData {
+    public static final AtomicReference<String> uploadStatus = new AtomicReference<>();
     public static boolean showBoundary;
     public static BlockPos firstTarget;
     public static BlockPos secondTarget;
@@ -131,6 +134,10 @@ public class ClientData {
     }
 
     public static void renderBoundaryUI(GuiGraphics graphics, Window window){
+        String status = uploadStatus.get();
+        if(status != null && !status.isEmpty()){
+            GuiUtils.drawOutlinedText(Minecraft.getInstance().font, graphics, Component.literal(status).getVisualOrderText(), 0, 20);
+        }
         if(!showBoundary)
             return;
         float screenY = window.getGuiScaledHeight() / 2f;

@@ -40,17 +40,7 @@ public class CameraSettings {
     }
 
     public void setPerspectivePreset(PerspectivePreset preset) {
-        switch (preset) {
-            case ISOMETRIC_NORTH_EAST -> {
-                setIsometricYawPitchRoll(225, 30, 0);
-            }
-            case ISOMETRIC_NORTH_WEST -> {
-                setIsometricYawPitchRoll(135, 30, 0);
-            }
-            case UP -> {
-                setIsometricYawPitchRoll(120, 0, 45);
-            }
-        }
+        setIsometricYawPitchRoll(preset.yaw(), preset.pitch(), preset.roll());
     }
 
     public void setIsometricYawPitchRoll(float yawDeg, float pitchDeg, float rollDeg) {

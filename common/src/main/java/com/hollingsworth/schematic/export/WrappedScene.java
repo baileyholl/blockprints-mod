@@ -24,7 +24,7 @@ import java.util.zip.GZIPInputStream;
 
 public class WrappedScene {
     @Nullable
-    private Scene scene;
+    public Scene scene;
 
     public void setScene(@Nullable Scene scene) {
         this.scene = scene;

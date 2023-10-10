@@ -37,6 +37,7 @@ public class Schematic extends Item {
     public Schematic(String buildingID) {
         super(new Item.Properties());
         this.buildingID = buildingID;
+
     }
 
     @Override
@@ -56,8 +57,7 @@ public class Schematic extends Item {
                         .addFile("file1", fileA.toPath(), Files.probeContentType(fileA.toPath()))
                         .build();
 
-                HttpRequest request = null;
-                request = HttpRequest.newBuilder()
+                HttpRequest request = HttpRequest.newBuilder()
                         .header("Content-Type", mimeMultipartData.getContentType())
                         .POST(mimeMultipartData.getBodyPublisher())
                         .uri(URI.create("http://localhost:3000/test"))

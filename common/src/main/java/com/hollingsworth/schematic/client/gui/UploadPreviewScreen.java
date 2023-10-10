@@ -1,6 +1,7 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
+import com.hollingsworth.schematic.api.SceneExporter;
 import com.hollingsworth.schematic.export.CameraSettings;
 import com.hollingsworth.schematic.export.Scene;
 import com.hollingsworth.schematic.export.WrappedScene;
@@ -9,6 +10,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+
+import java.io.IOException;
 
 public class UploadPreviewScreen extends BaseSchematicScreen {
 
@@ -32,6 +35,12 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
 
         addRenderableWidget(new ShortTextField(font, bookLeft + 185, bookTop + 41, Component.empty()));
         addRenderableWidget(new GuiImageButton(bookRight - 119, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_small.png"), b ->{
+            SceneExporter sceneExporter = new SceneExporter(wrappedScene);
+            try {
+                sceneExporter.exportLocally("test");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }));
         NoScrollMultiText description = new NoScrollMultiText(font, bookLeft + 185, bookTop + 73, 95, 78, Component.empty(), Component.empty());
         addRenderableWidget(description);
