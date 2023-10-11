@@ -1,12 +1,17 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
+import com.hollingsworth.schematic.api.blockprints.GoogleCloudStorage;
 import com.hollingsworth.schematic.api.blockprints.Upload;
 import com.hollingsworth.schematic.client.ClientData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Paths;
 
 public class HomeScreen extends BaseSchematicScreen{
     public HomeScreen() {
@@ -25,7 +30,15 @@ public class HomeScreen extends BaseSchematicScreen{
         }));
         addRenderableWidget(new GuiImageButton(bookLeft + 73, bookTop + 105, 159, 63, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_large_orange.png"), b ->{
             var response = Upload.postUpload("test", "test");
-            System.out.println(response);
+            var preview = response.signedImages[0];
+            var schematic = response.signedSchematic;
+            try {
+                GoogleCloudStorage.uploadFileToGCS(URI.create(preview).toURL(), Paths.get("schematics/test0.png"), "image/png");
+                GoogleCloudStorage.uploadFileToGCS(URI.create(schematic).toURL(), Paths.get("schematics/test/test.nbt"), "application/octet-stream");
+
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }));
     }
 

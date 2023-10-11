@@ -72,8 +72,34 @@ public class WrappedScene {
         // We only scale the viewport, not scaling the view matrix means the scene will still fill it
         var width = (int) Math.max(1, prefSize.width() * scale);
         var height = (int) Math.max(1, prefSize.height() * scale);
-
         try (var osr = new OffScreenRenderer(width, height)) {
+            return osr.captureAsPng(() -> {
+                var renderer = GuidebookLevelRenderer.getInstance();
+                scene.getCameraSettings().setViewportSize(prefSize);
+                renderer.render(scene.getLevel(), scene.getCameraSettings());
+            });
+        }
+    }
+
+    public byte[] exportPreviewPng(){
+        if (scene == null) {
+            return null;
+        }
+
+        var prefSize = viewport.getPreferredSize();
+        if (prefSize.width() <= 0 || prefSize.height() <= 0) {
+            return null;
+        }
+
+        // Make a width and height where the max width is 400 and the max height is the same aspect ratio
+        var maxWidth = 400;
+        var originalWidth = prefSize.width();
+        var originalHeight = prefSize.height();
+
+        double scaleFactor = (double) maxWidth / originalWidth;
+        int newHeight = (int) (originalHeight * scaleFactor);
+        int newWidth = (int) (originalWidth * scaleFactor);
+        try (var osr = new OffScreenRenderer(newWidth, newHeight)) {
             return osr.captureAsPng(() -> {
                 var renderer = GuidebookLevelRenderer.getInstance();
                 scene.getCameraSettings().setViewportSize(prefSize);

@@ -57,16 +57,12 @@ public class SceneExporter {
                 try {
                     int count = 0;
                     for(byte[] image : images) {
-                        System.out.println(count);
-                        Thread.sleep(1000);
                         ClientData.uploadStatus.set("Uploading " + exportName + count + ".png");
-                        Files.createDirectories(Paths.get("./schematics/"));
-                        Files.write(Paths.get("./schematics/" + exportName + count++ +".png"), image);
+                        Files.createDirectories(Paths.get("./schematics/blockprints/images/"));
+                        Files.write(Paths.get("./schematics/blockprints/images/" + exportName + count++ +".png"), image);
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
                 }
             }, Util.backgroundExecutor()).whenComplete((t, a) ->{
                 System.out.println("done");
