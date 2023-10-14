@@ -35,7 +35,7 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
 
         addRenderableWidget(new ShortTextField(font, bookLeft + 185, bookTop + 41, Component.empty()));
         addRenderableWidget(new GuiImageButton(bookRight - 119, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_small.png"), b ->{
-            SceneExporter sceneExporter = new SceneExporter(wrappedScene);
+            SceneExporter sceneExporter = new SceneExporter(wrappedScene, structureTemplate);
             try {
                 sceneExporter.exportLocally("test");
             } catch (IOException e) {

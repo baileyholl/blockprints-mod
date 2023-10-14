@@ -30,11 +30,13 @@ public class Upload {
         public final String id;
         public final String[] signedImages;
         public final String signedSchematic;
+        public final String signedPreviewImage;
 
-        public UploadResponse(String id, String[] signedImages, String signedSchematic){
+        public UploadResponse(String id, String[] signedImages, String signedSchematic, String signedPreviewImage){
             this.id = id;
             this.signedImages = signedImages;
             this.signedSchematic = signedSchematic;
+            this.signedPreviewImage = signedPreviewImage;
         }
 
         public UploadResponse(JsonObject jsonObject){
@@ -45,6 +47,7 @@ public class Upload {
             }
             this.signedImages = signedImages;
             this.signedSchematic = jsonObject.get("signedSchematic").getAsString();
+            this.signedPreviewImage = jsonObject.get("signedPreviewImage").getAsString();
             this.id = jsonObject.get("id").getAsString();
         }
     }

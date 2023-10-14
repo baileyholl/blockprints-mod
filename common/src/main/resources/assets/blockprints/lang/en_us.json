@@ -16,6 +16,7 @@
   "blockprints.select_second": "Select second corner",
   "blockprints.confirm_selection": "Press %s to confirm selection",
   "blockprints.start_selecting": "Interact with a block to select a corner.",
-  "blockprints.cancel_selection": "Press %s to cancel"
-
+  "blockprints.cancel_selection": "Press %s to cancel",
+  "blockprints.uploading": "Uploading structure...",
+  "blockprints.upload_complete": "Upload complete, click here to view your structure!"
 }

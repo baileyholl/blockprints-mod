@@ -1,15 +1,21 @@
 package com.hollingsworth.schematic.api;
 
+import com.hollingsworth.schematic.api.blockprints.GoogleCloudStorage;
+import com.hollingsworth.schematic.api.blockprints.Upload;
 import com.hollingsworth.schematic.client.ClientData;
+import com.hollingsworth.schematic.common.util.SchematicExport;
 import com.hollingsworth.schematic.export.PerspectivePreset;
 import com.hollingsworth.schematic.export.WrappedScene;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -18,16 +24,18 @@ import java.util.concurrent.CompletableFuture;
 public class SceneExporter {
     private static final int GAMESCENE_PLACEHOLDER_SCALE = 2;
     public WrappedScene scene;
-
-    public SceneExporter(WrappedScene wrappedScene){
+    public StructureTemplate structureTemplate;
+    public SceneExporter(WrappedScene wrappedScene, StructureTemplate structureTemplate){
         this.scene = wrappedScene;
+        this.structureTemplate = structureTemplate;
     }
 
     public void exportLocally(String exportName) throws IOException {
 //        addPlaceholder(scene, exportName);
-        byte[] selectedImage = scene.exportAsPng(GAMESCENE_PLACEHOLDER_SCALE);
-        List<byte[]> images = new ArrayList<>();
+        WrappedScene.ImageExport selectedImage = scene.exportAsPng(GAMESCENE_PLACEHOLDER_SCALE);
+        List<WrappedScene.ImageExport> images = new ArrayList<>();
         images.add(selectedImage);
+        WrappedScene.ImageExport smallPreview = scene.exportPreviewPng();
         PerspectivePreset[] perspectivePresets = PerspectivePreset.values();
         // check which preset the scene is closest to
         float currentYaw = scene.scene.getCameraSettings().getRotationY();
@@ -56,16 +64,37 @@ public class SceneExporter {
 
                 try {
                     int count = 0;
-                    for(byte[] image : images) {
+                    List<Path> imageFiles = new ArrayList<>();
+                    for(WrappedScene.ImageExport image : images) {
                         ClientData.uploadStatus.set("Uploading " + exportName + count + ".png");
                         Files.createDirectories(Paths.get("./schematics/blockprints/images/"));
-                        Files.write(Paths.get("./schematics/blockprints/images/" + exportName + count++ +".png"), image);
+                        Path path = Paths.get("./schematics/blockprints/images/" + exportName + count +".png");
+                        Files.write(path, image.image());
+                        imageFiles.add(path);
+                        count++;
+                    }
+                    Path previewPath = Paths.get("./schematics/blockprints/" + exportName + "_preview.png");
+                    Files.write(previewPath, smallPreview.image());
+                    SchematicExport.SchematicExportResult result = SchematicExport.saveSchematic(Paths.get("./schematics/blockprints/structures/"), exportName, false, structureTemplate);
+                    var response = Upload.postUpload("test", "test");
+                    var preview = response.signedImages[0];
+                    var schematic = response.signedSchematic;
+                    ClientData.uploadStatus.set(Component.translatable("blockprints.uploading").getString());
+                    GoogleCloudStorage.uploadFileToGCS(URI.create(preview).toURL(), previewPath, "image/png");
+                    GoogleCloudStorage.uploadFileToGCS(URI.create(schematic).toURL(), result.file(), "application/octet-stream");
+                    for(int i = 1; i < response.signedImages.length; i++){
+                        if(i >= imageFiles.size()){
+                            break;
+                        }
+                        GoogleCloudStorage.uploadFileToGCS(URI.create(response.signedImages[i]).toURL(), imageFiles.get(i), "image/png");
+                    }
+                    if(Minecraft.getInstance().player != null){
+                        Minecraft.getInstance().player.sendSystemMessage(Component.translatable("blockprints.upload_complete"));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }, Util.backgroundExecutor()).whenComplete((t, a) ->{
-                System.out.println("done");
                 ClientData.uploadStatus.set("");
             });
 
@@ -81,10 +110,10 @@ public class SceneExporter {
         // For GameScenes, we create a placeholder PNG to show in place of the WebGL scene
         // while that is still loading.
         var imagePath = Paths.get("./schematics/" + exportName + ".png");
-        byte[] imageContent = scene.exportAsPng(GAMESCENE_PLACEHOLDER_SCALE);
+        WrappedScene.ImageExport imageContent = scene.exportAsPng(GAMESCENE_PLACEHOLDER_SCALE);
         if (imageContent != null) {
 //            Files.createDirectories(Paths.get("./schematics"));
-            Files.write(imagePath, imageContent, StandardOpenOption.CREATE);
+//            Files.write(imagePath, imageContent, StandardOpenOption.CREATE);
         }
     }
 
