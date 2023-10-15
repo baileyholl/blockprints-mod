@@ -18,5 +18,8 @@
   "blockprints.start_selecting": "Interact with a block to select a corner.",
   "blockprints.cancel_selection": "Press %s to cancel",
   "blockprints.uploading": "Uploading structure...",
-  "blockprints.upload_complete": "Upload complete, click here to view your structure!"
+  "blockprints.upload_complete": "Upload complete, click here to view your structure!",
+  "blockprints.saving": "Saving %s",
+  "blockprints.cannot_contact": "Could not contact Blockprints. Check your internet connection and try again.",
+  "blockprints.upload_failed": "Failed processing upload. Please check log."
 }
