@@ -89,20 +89,31 @@ public class SceneExporter {
                 if (response == null) {
                     ClientUtil.sendMessage( "blockprints.cannot_contact");
                 }
-                var preview = response.signedImages[0];
+                var preview = response.signedPreviewImage;
                 var schematic = response.signedSchematic;
                 ClientData.uploadStatus.set(Component.translatable("blockprints.uploading").getString());
-                GoogleCloudStorage.uploadFileToGCS(URI.create(preview).toURL(), previewPath, "image/png");
-                GoogleCloudStorage.uploadFileToGCS(URI.create(schematic).toURL(), result.file(), "application/octet-stream");
-                // Skip the first one as it has its own URL and is the preview.
-                for (int i = 1; i < response.signedImages.length; i++) {
+                var previewSuccess = GoogleCloudStorage.uploadFileToGCS(URI.create(preview).toURL(), previewPath, "image/png", response.imageFileSize);
+                var structureSuccess = GoogleCloudStorage.uploadFileToGCS(URI.create(schematic).toURL(), result.file(), "application/octet-stream", response.schematicFileSize);
+                if(!previewSuccess || !structureSuccess){
+                    ClientUtil.sendMessage("blockprints.upload_failed");
+                    return;
+                }
+                for (int i = 0; i < response.signedImages.length; i++) {
                     // Guard against server changes
                     if (i >= imageFiles.size()) {
                         break;
                     }
-                    GoogleCloudStorage.uploadFileToGCS(URI.create(response.signedImages[i]).toURL(), imageFiles.get(i), "image/png");
+                    if(!GoogleCloudStorage.uploadFileToGCS(URI.create(response.signedImages[i]).toURL(), imageFiles.get(i), "image/png", response.imageFileSize)){
+                        ClientUtil.sendMessage("blockprints.upload_failed");
+                        return;
+                    }
                 }
-                ClientUtil.sendMessage("blockprints.upload_complete");
+                ClientData.uploadStatus.set(Component.translatable("blockprints.confirming").getString());
+                if(Upload.postDoneUploading(response.id)) {
+                    ClientUtil.sendMessage("blockprints.upload_complete");
+                }else{
+                    ClientUtil.sendMessage("blockprints.upload_failed");
+                }
             }catch (Exception e){
                 e.printStackTrace();
                 ClientUtil.sendMessage(Component.translatable("blockprints.upload_failed"));

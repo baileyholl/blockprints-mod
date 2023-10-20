@@ -21,5 +21,6 @@
   "blockprints.upload_complete": "Upload complete, click here to view your structure!",
   "blockprints.saving": "Saving %s",
   "blockprints.cannot_contact": "Could not contact Blockprints. Check your internet connection and try again.",
-  "blockprints.upload_failed": "Failed processing upload. Please check log."
+  "blockprints.upload_failed": "Failed processing upload. Please check log.",
+  "blockprints.confirming": "Confirming uploads..."
 }

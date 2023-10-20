@@ -9,11 +9,12 @@ import java.net.http.HttpResponse;
 import java.nio.file.Path;
 
 public class GoogleCloudStorage {
-    public static boolean uploadFileToGCS(URL signedUrl, Path filePath, String contentType) throws IOException, InterruptedException {
+    public static boolean uploadFileToGCS(URL signedUrl, Path filePath, String contentType, int fileSize) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(signedUrl.toString()))
                 .header("Content-Type", contentType)
+                .header("x-goog-content-length-range", "0," + fileSize)
                 .PUT(HttpRequest.BodyPublishers.ofFile(filePath))
                 .build();
 
