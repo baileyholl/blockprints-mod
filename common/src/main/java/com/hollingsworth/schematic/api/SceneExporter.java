@@ -63,29 +63,30 @@ public class SceneExporter {
         return images;
     }
 
-    public void exportLocally(String exportName) throws IOException {
+    public void exportLocally(String name, String description) throws IOException {
         List<WrappedScene.ImageExport> images = getImages();
 
 
+        String finalExportName = sanitize(name);
         CompletableFuture.runAsync(() -> {
             try {
                 int count = 0;
                 List<Path> imageFiles = new ArrayList<>();
                 // Skip the first image
-                Path previewPath = Paths.get(IMAGE_FOLDER + exportName + "_preview.png");
+                Path previewPath = Paths.get(IMAGE_FOLDER + finalExportName + "_preview.png");
                 Files.write(previewPath, images.get(0).image());
                 List<WrappedScene.ImageExport> galleryImages = images.subList(1, images.size());
 
                 for (WrappedScene.ImageExport image : galleryImages) {
-                    ClientData.uploadStatus.set(Component.translatable("blockprints.saving", exportName + count + ".png").getString());
+                    ClientData.uploadStatus.set(Component.translatable("blockprints.saving", finalExportName + count + ".png").getString());
                     Files.createDirectories(Paths.get(IMAGE_FOLDER));
-                    Path path = Paths.get(IMAGE_FOLDER + exportName + count + ".png");
+                    Path path = Paths.get(IMAGE_FOLDER + finalExportName + count + ".png");
                     Files.write(path, image.image());
                     imageFiles.add(path);
                     count++;
                 }
-                SchematicExport.SchematicExportResult result = SchematicExport.saveSchematic(Paths.get(STRUCTURE_FOLDER), exportName, false, structureTemplate);
-                var response = Upload.postUpload("test", "test");
+                SchematicExport.SchematicExportResult result = SchematicExport.saveSchematic(Paths.get(STRUCTURE_FOLDER), finalExportName, false, structureTemplate);
+                var response = Upload.postUpload(name, description);
                 if (response == null) {
                     ClientUtil.sendMessage( "blockprints.cannot_contact");
                 }
@@ -123,33 +124,8 @@ public class SceneExporter {
         });
     }
 
-    // Creates the png
-    private void addPlaceholder(WrappedScene scene, String exportName)
-            throws IOException {
-
-        // For GameScenes, we create a placeholder PNG to show in place of the WebGL scene
-        // while that is still loading.
-        var imagePath = Paths.get("./schematics/" + exportName + ".png");
-        WrappedScene.ImageExport imageContent = scene.exportAsPng(GAMESCENE_PLACEHOLDER_SCALE);
-        if (imageContent != null) {
-//            Files.createDirectories(Paths.get("./schematics"));
-//            Files.write(imagePath, imageContent, StandardOpenOption.CREATE);
-        }
-    }
-
-    public void writeFile(Path path, byte[] content) throws IOException {
-        Files.createDirectories(path);
-        Files.write(path, content);
-    }
-
-    // creates the scene file
-    private String exportScene(WrappedScene scene, String baseName) throws IOException {
-        return "";
-//        var scenePath = exporter.getPageSpecificPathForWriting(baseName + ".scene.gz");
-//        var exporter = new SceneExporter(this.exporter);
-//        var sceneContent = exporter.export(scene.getScene());
-//        scenePath = CacheBusting.writeAsset(scenePath, sceneContent);
-//
-//        return this.exporter.getPathRelativeFromOutputFolder(scenePath);
+    // Convert a string into lowercase, remove all non-alphanumeric characters, and replace all spaces with underscores
+    public static String sanitize(String str) {
+        return str.toLowerCase().replaceAll("[^a-z0-9]", "_").replaceAll(" ", "_");
     }
 }

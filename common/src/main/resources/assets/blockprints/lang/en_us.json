@@ -22,5 +22,9 @@
   "blockprints.saving": "Saving %s",
   "blockprints.cannot_contact": "Could not contact Blockprints. Check your internet connection and try again.",
   "blockprints.upload_failed": "Failed processing upload. Please check log.",
-  "blockprints.confirming": "Confirming uploads..."
+  "blockprints.confirming": "Confirming uploads...",
+  "blockprints.name_too_long": "Name too long.",
+  "blockprints.description_too_long": "Description too long.",
+  "blockprints.name_too_short": "Name too short.",
+  "blockprints.description_too_short": "Description too short."
 }
