@@ -63,17 +63,14 @@ public class ClientData {
         ClientData.firstTarget = null;
         ClientData.secondTarget = null;
     }
-
+    public static BlockPos selectedPos = null;
     public static void renderBoundary(PoseStack poseStack){
         if (!ClientData.showBoundary)
             return;
         BlockPos firstPos = ClientData.firstTarget;
-        if (firstPos == null)
-            return;
-        BlockPos selectedPos = null;
         LocalPlayer player = Minecraft.getInstance().player;
         BlockHitResult trace = rayTraceRange(player.level(), player, 75);
-        if (trace != null && trace.getType() == HitResult.Type.BLOCK) {
+        if (trace.getType() == HitResult.Type.BLOCK) {
 
             BlockPos hit = trace.getBlockPos();
             boolean replaceable = player.level().getBlockState(hit)
@@ -83,8 +80,13 @@ public class ClientData {
                     .isVertical() && !replaceable)
                 hit = hit.relative(trace.getDirection());
             selectedPos = hit;
-        } else
+        } else {
             selectedPos = null;
+        }
+        if(firstPos == null && selectedPos != null){
+            renderBbox(new AABB(selectedPos), poseStack);
+            return;
+        }
         BlockPos secondPos = ClientData.secondTarget;
         if (secondPos == null) {
             secondPos = selectedPos;
@@ -100,25 +102,29 @@ public class ClientData {
             currentSelectionBox = new AABB(firstPos, secondPos).expandTowards(1, 1, 1);
         }
 
-        if(currentSelectionBox != null){
-            Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera()
-                    .getPosition();
-            boolean cameraInside = currentSelectionBox.contains(camera);
-            float inflate = cameraInside ? -1 / 128f : 1 / 128f;
+        renderBbox(currentSelectionBox, poseStack);
+    }
 
-            currentSelectionBox.move(camera.scale(-1));
-            currentSelectionBox = currentSelectionBox.move(-camera.x, -camera.y, -camera.z);
+    public static void renderBbox(AABB currentSelectionBox, PoseStack poseStack){
+        Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera()
+                .getPosition();
 
-            poseStack.pushPose();
-            VertexConsumer vertexconsumer = Constants.bufferSource.getBuffer(RenderType.lines());
-            LevelRenderer.renderLineBox(poseStack, vertexconsumer, currentSelectionBox, 0.9F, 0.9F, 0.9F, 1.0f);
-            Constants.bufferSource.endBatch();
-            poseStack.popPose();
-        }
+        currentSelectionBox.move(camera.scale(-1));
+        currentSelectionBox = currentSelectionBox.move(-camera.x, -camera.y, -camera.z);
+
+        poseStack.pushPose();
+        VertexConsumer vertexconsumer = Constants.bufferSource.getBuffer(RenderType.lines());
+        LevelRenderer.renderLineBox(poseStack, vertexconsumer, currentSelectionBox, 0.9F, 0.9F, 0.9F, 1.0f);
+        Constants.bufferSource.endBatch();
+        poseStack.popPose();
     }
 
     public static boolean positionClicked(BlockPos pos){
         if(!ClientData.showBoundary) {
+            return false;
+        }
+        pos = selectedPos;
+        if(pos == null){
             return false;
         }
         if(ClientData.firstTarget == null){

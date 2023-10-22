@@ -15,7 +15,7 @@ public class Upload {
         jsonObject.addProperty("name", name);
         jsonObject.addProperty("description", description);
         HttpRequest request =  RequestUtil.getBuilder()
-                .uri(RequestUtil.getRoute("/upload"))
+                .uri(RequestUtil.getRoute("/api/v1/upload"))
                 .POST(HttpRequest.BodyPublishers.ofString(jsonObject.toString())).build();
         try {
             var res = RequestUtil.CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -31,7 +31,7 @@ public class Upload {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("id", id);
         HttpRequest request = RequestUtil.getBuilder()
-                .uri(RequestUtil.getRoute("/upload/complete"))
+                .uri(RequestUtil.getRoute("/api/v1/upload/complete"))
                 .POST(HttpRequest.BodyPublishers.ofString(jsonObject.toString())).build();
         try {
             var res = RequestUtil.CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
