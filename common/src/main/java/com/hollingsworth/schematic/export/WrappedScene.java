@@ -24,7 +24,7 @@ import java.util.zip.GZIPInputStream;
 
 public class WrappedScene {
     @Nullable
-    private Scene scene;
+    public Scene scene;
 
     public void setScene(@Nullable Scene scene) {
         this.scene = scene;
@@ -59,11 +59,36 @@ public class WrappedScene {
         structureTemplate.placeInWorld(new FakeForwardingServerLevel(scene.getLevel()), BlockPos.ZERO, BlockPos.ZERO, settings, random, 0);
     }
 
-    public byte[] exportAsPng(float scale) {
+    public ImageExport exportAsPng(float scale) {
         if (scene == null) {
             return null;
         }
 
+        var prefSize = viewport.getPreferredSize();
+        var scaledSize = getSizeForExport(scale);
+        return exportAsPng(scaledSize.width(), scaledSize.height(), prefSize);
+    }
+
+    public ImageExport exportPreviewPng(){
+        if (scene == null) {
+            return null;
+        }
+        LytSize rescaledSize = getSizeForPreview();
+        return exportAsPng(rescaledSize.width(), rescaledSize.height(), viewport.getPreferredSize());
+    }
+
+    public ImageExport exportAsPng(int width, int height, LytSize viewportSize){
+        try (var osr = new OffScreenRenderer(width, height)) {
+            byte[] image =  osr.captureAsPng(() -> {
+                var renderer = GuidebookLevelRenderer.getInstance();
+                scene.getCameraSettings().setViewportSize(viewportSize);
+                renderer.render(scene.getLevel(), scene.getCameraSettings());
+            });
+            return new ImageExport(new LytSize(width, height), image);
+        }
+    }
+
+    public LytSize getSizeForExport(float scale){
         var prefSize = viewport.getPreferredSize();
         if (prefSize.width() <= 0 || prefSize.height() <= 0) {
             return null;
@@ -72,14 +97,24 @@ public class WrappedScene {
         // We only scale the viewport, not scaling the view matrix means the scene will still fill it
         var width = (int) Math.max(1, prefSize.width() * scale);
         var height = (int) Math.max(1, prefSize.height() * scale);
+        return new LytSize(width, height);
+    }
 
-        try (var osr = new OffScreenRenderer(width, height)) {
-            return osr.captureAsPng(() -> {
-                var renderer = GuidebookLevelRenderer.getInstance();
-                scene.getCameraSettings().setViewportSize(prefSize);
-                renderer.render(scene.getLevel(), scene.getCameraSettings());
-            });
+    public LytSize getSizeForPreview(){
+        var prefSize = viewport.getPreferredSize();
+        if (prefSize.width() <= 0 || prefSize.height() <= 0) {
+            return null;
         }
+
+        // Make a width and height where the max width is 400 and the max height is the same aspect ratio
+        var maxWidth = 400;
+        var originalWidth = prefSize.width();
+        var originalHeight = prefSize.height();
+
+        double scaleFactor = (double) maxWidth / originalWidth;
+        int newHeight = (int) (originalHeight * scaleFactor);
+        int newWidth = (int) (originalWidth * scaleFactor);
+        return new LytSize(newWidth, newHeight);
     }
 
     public void renderToCurrentTarget(LytSize size) {
@@ -128,6 +163,8 @@ public class WrappedScene {
         }
         return null;
     }
+
+    public record ImageExport(LytSize size, byte[] image){}
 
     class Viewport {
 

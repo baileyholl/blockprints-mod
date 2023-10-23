@@ -3,13 +3,13 @@ package com.hollingsworth.schematic.client;
 import com.hollingsworth.schematic.Constants;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -34,8 +34,10 @@ public class ClientEvents {
     }
 
     @SubscribeEvent
-    public static void keyEvent(final PlayerInteractEvent.RightClickBlock event) {
-        ClientData.positionClicked(event.getPos());
+    public static void rightClickEvent(final InputEvent.MouseButton.Pre event) {
+        if(InputConstants.MOUSE_BUTTON_RIGHT != event.getButton() || MINECRAFT.screen != null)
+            return;
+        ClientData.positionClicked(BlockPos.ZERO);
     }
 
     @SubscribeEvent

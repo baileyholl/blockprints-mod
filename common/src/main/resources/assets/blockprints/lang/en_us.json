@@ -16,6 +16,15 @@
   "blockprints.select_second": "Select second corner",
   "blockprints.confirm_selection": "Press %s to confirm selection",
   "blockprints.start_selecting": "Interact with a block to select a corner.",
-  "blockprints.cancel_selection": "Press %s to cancel"
-
+  "blockprints.cancel_selection": "Press %s to cancel",
+  "blockprints.uploading": "Uploading structure...",
+  "blockprints.upload_complete": "Upload complete, click here to view your structure!",
+  "blockprints.saving": "Saving %s",
+  "blockprints.cannot_contact": "Could not contact Blockprints. Check your internet connection and try again.",
+  "blockprints.upload_failed": "Failed processing upload. Please check log.",
+  "blockprints.confirming": "Confirming uploads...",
+  "blockprints.name_too_long": "Name too long.",
+  "blockprints.description_too_long": "Description too long.",
+  "blockprints.name_too_short": "Name too short.",
+  "blockprints.description_too_short": "Description too short."
 }

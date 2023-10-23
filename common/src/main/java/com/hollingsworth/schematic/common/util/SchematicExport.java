@@ -30,23 +30,7 @@ public class SchematicExport {
 		return structure;
 	}
 
-	/**
-	 * Save a schematic to a file from a world.
-	 * @param dir the directory the schematic will be created in
-	 * @param fileName the ideal name of the schematic, may not be the name of the created file
-	 * @param overwrite whether overwriting an existing schematic is allowed
-	 * @param level the level where the schematic structure is placed
-	 * @param first the first corner of the schematic area
-	 * @param second the second corner of the schematic area
-	 * @return a SchematicExportResult, or null if an error occurred.
-	 */
-	@Nullable
-	public static SchematicExportResult saveSchematic(Path dir, String fileName, boolean overwrite, Level level, BlockPos first, BlockPos second) {
-		BoundingBox bb = BoundingBox.fromCorners(first, second);
-		BlockPos origin = new BlockPos(bb.minX(), bb.minY(), bb.minZ());
-		BlockPos bounds = new BlockPos(bb.getXSpan(), bb.getYSpan(), bb.getZSpan());
-
-		StructureTemplate structure = getStructure(level, first, second);
+	public static SchematicExportResult saveSchematic(Path dir, String fileName, boolean overwrite, StructureTemplate structure){
 		CompoundTag data = structure.save(new CompoundTag());
 		String air = "minecraft:air";
 		String structureVoid = "minecraft:structure_void";
@@ -71,14 +55,30 @@ public class SchematicExport {
 			try (OutputStream out = Files.newOutputStream(file, StandardOpenOption.CREATE)) {
 				NbtIo.writeCompressed(data, out);
 			}
-			return new SchematicExportResult(file, dir, fileName, overwritten, origin, bounds);
+			return new SchematicExportResult(file, dir, fileName, overwritten);
 		} catch (IOException e) {
 			System.out.println("An error occurred while saving schematic [" + fileName + "]");
 			return null;
 		}
 	}
 
-	public record SchematicExportResult(Path file, Path dir, String fileName, boolean overwritten, BlockPos origin, BlockPos bounds) {
+	/**
+	 * Save a schematic to a file from a world.
+	 * @param dir the directory the schematic will be created in
+	 * @param fileName the ideal name of the schematic, may not be the name of the created file
+	 * @param overwrite whether overwriting an existing schematic is allowed
+	 * @param level the level where the schematic structure is placed
+	 * @param first the first corner of the schematic area
+	 * @param second the second corner of the schematic area
+	 * @return a SchematicExportResult, or null if an error occurred.
+	 */
+	@Nullable
+	public static SchematicExportResult saveSchematic(Path dir, String fileName, boolean overwrite, Level level, BlockPos first, BlockPos second) {
+		StructureTemplate structure = getStructure(level, first, second);
+		return saveSchematic(dir, fileName, overwrite, structure);
+	}
+
+	public record SchematicExportResult(Path file, Path dir, String fileName, boolean overwritten) {
 	}
 
 	public static String findFirstValidFilename(String name, Path folderPath, String extension) {

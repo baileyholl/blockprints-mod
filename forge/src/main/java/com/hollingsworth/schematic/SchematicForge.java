@@ -9,6 +9,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 @Mod(Constants.MOD_ID)
 public class SchematicForge {
@@ -30,6 +31,7 @@ public class SchematicForge {
 
         CafeItems.ITEMS.register(modEventBus);
         MinecraftForge.EVENT_BUS.register(this);
+        Constants.isDev = !FMLEnvironment.production;
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {

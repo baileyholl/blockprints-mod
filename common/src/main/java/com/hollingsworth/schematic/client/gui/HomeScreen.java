@@ -36,7 +36,7 @@ public class HomeScreen extends BaseSchematicScreen{
         GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.upload").getVisualOrderText(), bookLeft + 93, bookTop + 29);
         GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.download").getVisualOrderText(), bookLeft + 93, bookTop + 109);
         GuiUtils.drawOutlinedWordWrap(graphics, font, Component.translatable("blockprints.upload_desc"), bookLeft + 78, bookTop + 46, 150);
-        GuiUtils.drawOutlinedWordWrap(graphics, font, Component.translatable("blockprints.download_desc"), bookLeft + 76, bookTop + 124, 150);
+        GuiUtils.drawOutlinedWordWrap(graphics, font, Component.translatable("blockprints.download_desc"), bookLeft + 78, bookTop + 124, 150);
     }
 
     @Override
