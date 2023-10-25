@@ -12,6 +12,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
@@ -58,11 +59,11 @@ public class ScenePreview extends AbstractWidget {
         }
     }
 
-    public void renderTarget(){
+    public void renderTarget() {
         wrappedScene.renderToCurrentTarget(wrappedScene.getPreferredSize());
     }
 
-    public void removed(){
+    public void removed() {
         if (renderer != null) {
             renderer.close();
             renderer = null;
@@ -85,8 +86,8 @@ public class ScenePreview extends AbstractWidget {
             LytSize newDim = getScaledDimension(origDim, boundary);
             // Offset x and Y so the image is centered
             // center x and y on point 50, 50
-            int x = previewX + 143/2;
-            int y = previewY + 111/2;
+            int x = previewX + 143 / 2;
+            int y = previewY + 111 / 2;
             x -= newDim.width() / 2;
             y -= newDim.height() / 2;
 
@@ -139,6 +140,11 @@ public class ScenePreview extends AbstractWidget {
 
     @Override
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+
+    }
+
+    @Override
+    public void playDownSound(SoundManager $$0) {
 
     }
 }

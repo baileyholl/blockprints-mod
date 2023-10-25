@@ -24,6 +24,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -31,7 +32,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static com.hollingsworth.schematic.client.RaycastHelper.rayTraceRange;
 
 public class ClientData {
-    public static final AtomicReference<String> uploadStatus = new AtomicReference<>();
+    private static final AtomicReference<String> uploadStatus = new AtomicReference<>();
     public static boolean showBoundary;
     public static BlockPos firstTarget;
     public static BlockPos secondTarget;
@@ -40,31 +41,39 @@ public class ClientData {
     public static final KeyMapping CONFIRM = new KeyMapping("key." + Constants.MOD_ID + ".confirm_selection", GLFW.GLFW_KEY_ENTER, CATEGORY);
     public static final KeyMapping CANCEL = new KeyMapping("key." + Constants.MOD_ID + ".cancel_selection", GLFW.GLFW_KEY_BACKSPACE, CATEGORY);
     public static final KeyMapping[] KEYS = new KeyMapping[]{OPEN_MENU, CONFIRM, CANCEL};
-    public static void openMenu(){
+
+    public static void openMenu() {
         Minecraft.getInstance().setScreen(new HomeScreen());
     }
 
-    public static void onConfirmHit(){
-        if(!ClientData.showBoundary){
+
+    public static void setStatus(@NotNull Component component) {
+        uploadStatus.set(component.getString());
+    }
+
+    public static void onConfirmHit() {
+        if (!ClientData.showBoundary) {
             return;
         }
         ClientData.showBoundary = false;
-        if(ClientData.firstTarget != null && ClientData.secondTarget != null){
+        if (ClientData.firstTarget != null && ClientData.secondTarget != null) {
             StructureTemplate structure = SchematicExport.getStructure(Minecraft.getInstance().level, ClientData.firstTarget, ClientData.secondTarget);
             Minecraft.getInstance().setScreen(new UploadPreviewScreen(structure));
         }
     }
 
-    public static void onCancelHit(){
-        if(!ClientData.showBoundary){
+    public static void onCancelHit() {
+        if (!ClientData.showBoundary) {
             return;
         }
         ClientData.showBoundary = false;
         ClientData.firstTarget = null;
         ClientData.secondTarget = null;
     }
+
     public static BlockPos selectedPos = null;
-    public static void renderBoundary(PoseStack poseStack){
+
+    public static void renderBoundary(PoseStack poseStack) {
         if (!ClientData.showBoundary)
             return;
         BlockPos firstPos = ClientData.firstTarget;
@@ -83,7 +92,7 @@ public class ClientData {
         } else {
             selectedPos = null;
         }
-        if(firstPos == null && selectedPos != null){
+        if (firstPos == null && selectedPos != null) {
             renderBbox(new AABB(selectedPos), poseStack);
             return;
         }
@@ -95,17 +104,17 @@ public class ClientData {
         if (secondPos == null) {
             if (firstPos == null) {
                 currentSelectionBox = selectedPos == null ? null : new AABB(selectedPos);
-            }else{
+            } else {
                 currentSelectionBox = selectedPos == null ? new AABB(firstPos) : new AABB(firstPos, selectedPos).expandTowards(1, 1, 1);
             }
-        }else {
+        } else {
             currentSelectionBox = new AABB(firstPos, secondPos).expandTowards(1, 1, 1);
         }
 
         renderBbox(currentSelectionBox, poseStack);
     }
 
-    public static void renderBbox(AABB currentSelectionBox, PoseStack poseStack){
+    public static void renderBbox(AABB currentSelectionBox, PoseStack poseStack) {
         Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera()
                 .getPosition();
 
@@ -119,19 +128,19 @@ public class ClientData {
         poseStack.popPose();
     }
 
-    public static boolean positionClicked(BlockPos pos){
-        if(!ClientData.showBoundary) {
+    public static boolean positionClicked(BlockPos pos) {
+        if (!ClientData.showBoundary) {
             return false;
         }
         pos = selectedPos;
-        if(pos == null){
+        if (pos == null) {
             return false;
         }
-        if(ClientData.firstTarget == null){
+        if (ClientData.firstTarget == null) {
             ClientData.firstTarget = pos.immutable();
             Minecraft.getInstance().player.sendSystemMessage(Component.translatable(Constants.MOD_ID + ".select_second"));
             return true;
-        }else if(ClientData.secondTarget == null && !ClientData.firstTarget.equals(pos)){
+        } else if (ClientData.secondTarget == null && !ClientData.firstTarget.equals(pos)) {
             ClientData.secondTarget = pos.immutable();
             Minecraft.getInstance().player.sendSystemMessage(Component.translatable(Constants.MOD_ID + ".confirm_selection", CONFIRM.getTranslatedKeyMessage()));
             return true;
@@ -139,21 +148,21 @@ public class ClientData {
         return false;
     }
 
-    public static void renderBoundaryUI(GuiGraphics graphics, Window window){
+    public static void renderBoundaryUI(GuiGraphics graphics, Window window) {
         String status = uploadStatus.get();
-        if(status != null && !status.isEmpty()){
+        if (status != null && !status.isEmpty()) {
             GuiUtils.drawOutlinedText(Minecraft.getInstance().font, graphics, Component.literal(status).getVisualOrderText(), 0, 20);
         }
-        if(!showBoundary)
+        if (!showBoundary)
             return;
         float screenY = window.getGuiScaledHeight() / 2f;
         float screenX = window.getGuiScaledWidth() / 2f;
         float instructionY = window.getGuiScaledHeight() - 42;
         graphics.pose().pushPose();
         graphics.pose().translate(screenX, instructionY, 0);
-        if(firstTarget != null && secondTarget != null){
+        if (firstTarget != null && secondTarget != null) {
             GuiUtils.drawCenteredOutlinedText(Minecraft.getInstance().font, graphics, Component.translatable(Constants.MOD_ID + ".confirm_selection", CONFIRM.getTranslatedKeyMessage()).getVisualOrderText(), 0, 0);
-        }else{
+        } else {
             String compKey = firstTarget == null ? "select_first" : "select_second";
             GuiUtils.drawCenteredOutlinedText(Minecraft.getInstance().font, graphics, Component.translatable(Constants.MOD_ID + "." + compKey).getVisualOrderText(), 0, 0);
         }

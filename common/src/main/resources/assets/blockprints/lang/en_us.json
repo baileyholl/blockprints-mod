@@ -26,5 +26,10 @@
   "blockprints.name_too_long": "Name too long.",
   "blockprints.description_too_long": "Description too long.",
   "blockprints.name_too_short": "Name too short.",
-  "blockprints.description_too_short": "Description too short."
+  "blockprints.description_too_short": "Description too short.",
+  "blockprints.downloading_preview": "Downloading preview...",
+  "blockprints.download_not_found": "Download not found.",
+  "blockprints.download_failed": "Download failed. Check your internet connection and try again.",
+  "blockprints.download_success": "Schematic downloaded!",
+  "blockprints.downloading_schematic": "Downloading schematic..."
 }

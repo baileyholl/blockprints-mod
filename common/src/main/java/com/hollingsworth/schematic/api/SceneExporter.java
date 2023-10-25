@@ -28,12 +28,13 @@ public class SceneExporter {
     private static final int GAMESCENE_PLACEHOLDER_SCALE = 2;
     public WrappedScene scene;
     public StructureTemplate structureTemplate;
-    public SceneExporter(WrappedScene wrappedScene, StructureTemplate structureTemplate){
+
+    public SceneExporter(WrappedScene wrappedScene, StructureTemplate structureTemplate) {
         this.scene = wrappedScene;
         this.structureTemplate = structureTemplate;
     }
 
-    public List<WrappedScene.ImageExport> getImages(){
+    public List<WrappedScene.ImageExport> getImages() {
         List<WrappedScene.ImageExport> images = new ArrayList<>();
         images.add(scene.exportPreviewPng());
         images.add(scene.exportAsPng(GAMESCENE_PLACEHOLDER_SCALE));
@@ -54,8 +55,8 @@ public class SceneExporter {
                 closestDistance = distance;
             }
         }
-        for(PerspectivePreset preset : perspectivePresets){
-            if(preset != closest){
+        for (PerspectivePreset preset : perspectivePresets) {
+            if (preset != closest) {
                 scene.scene.getCameraSettings().setPerspectivePreset(preset);
                 images.add(scene.exportAsPng(GAMESCENE_PLACEHOLDER_SCALE));
             }
@@ -78,7 +79,7 @@ public class SceneExporter {
                 List<WrappedScene.ImageExport> galleryImages = images.subList(1, images.size());
 
                 for (WrappedScene.ImageExport image : galleryImages) {
-                    ClientData.uploadStatus.set(Component.translatable("blockprints.saving", finalExportName + count + ".png").getString());
+                    ClientData.setStatus(Component.translatable("blockprints.saving", finalExportName + count + ".png"));
                     Files.createDirectories(Paths.get(IMAGE_FOLDER));
                     Path path = Paths.get(IMAGE_FOLDER + finalExportName + count + ".png");
                     Files.write(path, image.image());
@@ -88,14 +89,14 @@ public class SceneExporter {
                 SchematicExport.SchematicExportResult result = SchematicExport.saveSchematic(Paths.get(STRUCTURE_FOLDER), finalExportName, false, structureTemplate);
                 var response = Upload.postUpload(name, description);
                 if (response == null) {
-                    ClientUtil.sendMessage( "blockprints.cannot_contact");
+                    ClientUtil.sendMessage("blockprints.cannot_contact");
                 }
                 var preview = response.signedPreviewImage;
                 var schematic = response.signedSchematic;
-                ClientData.uploadStatus.set(Component.translatable("blockprints.uploading").getString());
+                ClientData.setStatus(Component.translatable("blockprints.uploading"));
                 var previewSuccess = GoogleCloudStorage.uploadFileToGCS(URI.create(preview).toURL(), previewPath, "image/png", response.imageFileSize);
                 var structureSuccess = GoogleCloudStorage.uploadFileToGCS(URI.create(schematic).toURL(), result.file(), "application/octet-stream", response.schematicFileSize);
-                if(!previewSuccess || !structureSuccess){
+                if (!previewSuccess || !structureSuccess) {
                     ClientUtil.sendMessage("blockprints.upload_failed");
                     return;
                 }
@@ -104,23 +105,23 @@ public class SceneExporter {
                     if (i >= imageFiles.size()) {
                         break;
                     }
-                    if(!GoogleCloudStorage.uploadFileToGCS(URI.create(response.signedImages[i]).toURL(), imageFiles.get(i), "image/png", response.imageFileSize)){
+                    if (!GoogleCloudStorage.uploadFileToGCS(URI.create(response.signedImages[i]).toURL(), imageFiles.get(i), "image/png", response.imageFileSize)) {
                         ClientUtil.sendMessage("blockprints.upload_failed");
                         return;
                     }
                 }
-                ClientData.uploadStatus.set(Component.translatable("blockprints.confirming").getString());
-                if(Upload.postDoneUploading(response.id)) {
+                ClientData.setStatus(Component.translatable("blockprints.confirming"));
+                if (Upload.postDoneUploading(response.id)) {
                     ClientUtil.sendMessage("blockprints.upload_complete");
-                }else{
+                } else {
                     ClientUtil.sendMessage("blockprints.upload_failed");
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 ClientUtil.sendMessage(Component.translatable("blockprints.upload_failed"));
             }
-        }, Util.backgroundExecutor()).whenComplete((t, a) ->{
-            ClientData.uploadStatus.set("");
+        }, Util.backgroundExecutor()).whenComplete((t, a) -> {
+            ClientData.setStatus(Component.empty());
         });
     }
 
