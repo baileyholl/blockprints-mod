@@ -21,27 +21,32 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void keyEvent(final InputEvent.Key event) {
-        if (Minecraft.getInstance().player == null || InputConstants.PRESS != event.getAction() || MINECRAFT.screen != null )
+        if (Minecraft.getInstance().player == null || InputConstants.PRESS != event.getAction() || MINECRAFT.screen != null)
             return;
-        if(event.getKey() == ClientData.OPEN_MENU.getKey().getValue())
+        if (event.getKey() == ClientData.OPEN_MENU.getKey().getValue())
             ClientData.openMenu();
-        if(event.getKey() == ClientData.CONFIRM.getKey().getValue()){
+        if (event.getKey() == ClientData.CONFIRM.getKey().getValue()) {
             ClientData.onConfirmHit();
         }
-        if(event.getKey() == ClientData.CANCEL.getKey().getValue()){
+        if (event.getKey() == ClientData.CANCEL.getKey().getValue()) {
             ClientData.onCancelHit();
         }
     }
 
     @SubscribeEvent
     public static void rightClickEvent(final InputEvent.MouseButton.Pre event) {
-        if(InputConstants.MOUSE_BUTTON_RIGHT != event.getButton() || MINECRAFT.screen != null)
+        if (InputConstants.MOUSE_BUTTON_RIGHT != event.getButton() || MINECRAFT.screen != null)
             return;
         ClientData.positionClicked(BlockPos.ZERO);
     }
 
     @SubscribeEvent
     public static void renderLast(final RenderLevelStageEvent event) {
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
+//            StructureRenderer.buildRender(event.getPoseStack(), Minecraft.getInstance().player);
+//            StructureRenderer.drawRender(event.getPoseStack(), event.getProjectionMatrix(), Minecraft.getInstance().player);
+            return;
+        }
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY) {
             return;
         }
@@ -53,6 +58,6 @@ public class ClientEvents {
     public static void afterRenderOverlayLayer(RenderGuiOverlayEvent.Post event) {
         if (event.getOverlay() != VanillaGuiOverlay.CROSSHAIR.type())
             return;
-      ClientData.renderBoundaryUI(event.getGuiGraphics(), event.getWindow());
+        ClientData.renderBoundaryUI(event.getGuiGraphics(), event.getWindow());
     }
 }

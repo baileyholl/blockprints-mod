@@ -13,7 +13,7 @@ public class ShortTextField extends NoShadowTextField {
 
     @Override
     public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/textbox_small.png"), this.getX(), this.getY(), 0, 0, 95, 15, 95, 15);
+        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/diologue_small_editable.png"), this.getX(), this.getY(), 0, 0, 95, 17, 95, 17);
         super.renderWidget(graphics, mouseX, mouseY, partialTicks);
     }
 }

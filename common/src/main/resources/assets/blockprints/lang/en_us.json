@@ -1,8 +1,8 @@
 {
   "blockprints.upload": "Upload",
   "blockprints.download": "Download",
-  "blockprints.upload_desc": "Upload a schematic to BlockPrints!",
-  "blockprints.download_desc": "Download a schematic using a magic code from Blockprints.io",
+  "blockprints.upload_desc": "Upload a schematic to BlockPrints.io",
+  "blockprints.download_desc": "Download a schematic using a code from Blockprints.io",
   "blockprints.discord": "Join the Discord for support or show off your builds!",
   "blockprints.website": "Visit the website for schematic downloads!",
   "blockprints.preview": "Preview",
@@ -31,5 +31,7 @@
   "blockprints.download_not_found": "Download not found.",
   "blockprints.download_failed": "Download failed. Check your internet connection and try again.",
   "blockprints.download_success": "Schematic downloaded!",
-  "blockprints.downloading_schematic": "Downloading schematic..."
+  "blockprints.downloading_schematic": "Downloading schematic...",
+  "blockprints.build_list": "My Builds and Favorites",
+  "blockprints.build_list_desc": "View your builds and favorites across any world"
 }

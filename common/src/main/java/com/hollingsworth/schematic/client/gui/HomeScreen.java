@@ -7,7 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-public class HomeScreen extends BaseSchematicScreen{
+public class HomeScreen extends BaseSchematicScreen {
     public HomeScreen() {
         super();
     }
@@ -15,14 +15,17 @@ public class HomeScreen extends BaseSchematicScreen{
     @Override
     public void init() {
         super.init();
-        addRenderableWidget(new GuiImageButton(bookLeft + 73, bookTop + 25, 159, 63, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_large_blue.png"), b ->{
+        addRenderableWidget(new GuiImageButton(bookLeft + 41, bookTop + 41, 223, 47, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_navigation.png"), b -> {
             ClientData.showBoundary = true;
             ClientData.firstTarget = null;
             ClientData.secondTarget = null;
             Minecraft.getInstance().setScreen(null);
             Minecraft.getInstance().player.sendSystemMessage(Component.translatable(Constants.MOD_ID + ".start_selecting"));
         }));
-        addRenderableWidget(new GuiImageButton(bookLeft + 73, bookTop + 105, 159, 63, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_large_orange.png"), b ->{
+        addRenderableWidget(new GuiImageButton(bookLeft + 41, bookTop + 89, 223, 47, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_navigation.png"), b -> {
+            Minecraft.getInstance().setScreen(new EnterCodeScreen());
+        }));
+        addRenderableWidget(new GuiImageButton(bookLeft + 41, bookTop + 137, 223, 47, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_navigation.png"), b -> {
             Minecraft.getInstance().setScreen(new EnterCodeScreen());
         }));
     }
@@ -30,13 +33,21 @@ public class HomeScreen extends BaseSchematicScreen{
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.render(graphics, mouseX, mouseY, partialTicks);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_upload.png"), bookLeft + 76, bookTop + 27, 0, 0, 9, 11, 9, 11);
+        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/logo_container.png"), bookLeft + 5, bookTop + 7, 0, 0, 295, 24, 295, 24);
+        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/logo_blockprints.png"), bookLeft + 105, bookTop + 9, 0, 0, 96, 16, 96, 16);
 
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_download.png"), bookLeft + 76,bookTop + 107, 0, 0, 9, 11, 9, 11);
-        GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.upload").getVisualOrderText(), bookLeft + 93, bookTop + 29);
-        GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.download").getVisualOrderText(), bookLeft + 93, bookTop + 109);
-        GuiUtils.drawOutlinedWordWrap(graphics, font, Component.translatable("blockprints.upload_desc"), bookLeft + 78, bookTop + 46, 150);
-        GuiUtils.drawOutlinedWordWrap(graphics, font, Component.translatable("blockprints.download_desc"), bookLeft + 78, bookTop + 124, 150);
+
+        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_upload_large.png"), bookLeft + 51, bookTop + 48, 0, 0, 27, 33, 27, 33);
+
+        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_download_large.png"), bookLeft + 51, bookTop + 96, 0, 0, 27, 33, 27, 33);
+        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_build_list_large.png"), bookLeft + 49, bookTop + 144, 0, 0, 33, 33, 33, 33);
+        GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.upload").getVisualOrderText(), bookLeft + 91, bookTop + 45);
+        GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.download").getVisualOrderText(), bookLeft + 91, bookTop + 93);
+        GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.build_list").getVisualOrderText(), bookLeft + 91, bookTop + 141);
+
+        graphics.drawWordWrap(font, Component.translatable("blockprints.upload_desc"), bookLeft + 91, bookTop + 61, 150, 0);
+        graphics.drawWordWrap(font, Component.translatable("blockprints.download_desc"), bookLeft + 91, bookTop + 108, 150, 0);
+        graphics.drawWordWrap(font, Component.translatable("blockprints.build_list_desc"), bookLeft + 91, bookTop + 156, 150, 0);
     }
 
     @Override

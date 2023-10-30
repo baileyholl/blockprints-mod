@@ -257,6 +257,6 @@ public class NoScrollMultiText extends AbstractScrollWidget {
 
     @Override
     protected void renderBackground(GuiGraphics graphics) {
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/textbox_large.png"), x, y, 0, 0, width, height, width, height);
+        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/diologue_large_editable.png"), x, y, 0, 0, width, height, width, height);
     }
 }

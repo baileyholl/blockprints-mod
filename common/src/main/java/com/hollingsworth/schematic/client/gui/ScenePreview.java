@@ -93,7 +93,7 @@ public class ScenePreview extends AbstractWidget {
 
             innerBlit(graphics.pose(), renderer, x, x + newDim.width(), y, y + newDim.height(), 0);
         }
-        ModScreen.blitRect(graphics.pose(), x + 121, y + 5, 0, 0, 17, 17, 17, 17, new ResourceLocation(Constants.MOD_ID, "textures/gui/gimbal/gimbal_cardinal.png"), 150);
+        ModScreen.blitRect(graphics.pose(), x + 121, y + 3, 0, 0, 17, 17, 17, 17, new ResourceLocation(Constants.MOD_ID, "textures/gui/gimbal/gimbal_cardinal.png"), 150);
     }
 
     void innerBlit(PoseStack pose, OffScreenRenderer osr, int x1, int x2, int y1, int y2, int blitOffset) {
