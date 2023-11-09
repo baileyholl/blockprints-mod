@@ -18,8 +18,8 @@ import java.util.List;
 public class UploadPreviewScreen extends BaseSchematicScreen {
 
     ScenePreview scenePreview;
-    DecoratedSlider yawSlider;
-    DecoratedSlider pitchSlider;
+    HorizontalSlider yawSlider;
+    HorizontalSlider pitchSlider;
     ShortTextField nameField;
     NoScrollMultiText descriptionField;
     GuiImageButton uploadButton;
@@ -60,8 +60,8 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         addRenderableWidget(uploadButton);
         addRenderableWidget(nameField);
         addRenderableWidget(descriptionField);
-        this.yawSlider = new DecoratedSlider(bookLeft + 41, bookTop + 153, 95, 15, Component.empty(), Component.empty(), 0, 360, 225, 5, 1, false, this::setYaw);
-        this.pitchSlider = new DecoratedSlider(bookLeft + 41, bookTop + 169, 95, 15, Component.empty(), Component.empty(), 0, 90, 30, 5, 1, true, this::setPitch);
+        this.yawSlider = new HorizontalSlider(bookLeft + 41, bookTop + 153, Component.empty(), Component.empty(), 0, 360, 225, 5, 1, false, this::setYaw);
+        this.pitchSlider = new HorizontalSlider(bookLeft + 41, bookTop + 169, Component.empty(), Component.empty(), 0, 90, 30, 5, 1, true, this::setPitch);
         addRenderableWidget(yawSlider);
         addRenderableWidget(pitchSlider);
         this.scenePreview = new ScenePreview(bookLeft + 25, bookTop + 41, 100, 100, scene, wrappedScene);

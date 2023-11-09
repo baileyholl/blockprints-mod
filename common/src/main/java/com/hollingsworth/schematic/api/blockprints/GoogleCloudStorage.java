@@ -17,12 +17,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 public class GoogleCloudStorage {
-    //TODO: Add dev bucket
+
     public static String getBucketUrl() {
         if (Constants.isDev) {
-            return "https://storage.googleapis.com/schematic-mod/";
+            return "https://storage.googleapis.com/blockprints-dev/";
         }
-        return "https://storage.googleapis.com/schematic-mod/";
+        return "https://storage.googleapis.com/blockprints-prod/";
     }
 
     public static boolean uploadFileToGCS(URL signedUrl, Path filePath, String contentType, int fileSize) throws IOException, InterruptedException {

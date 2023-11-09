@@ -4,6 +4,7 @@ import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.api.blockprints.ApiResponse;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -22,6 +23,15 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
     String error = null;
     public boolean responseHandled = false;
     Response<T> response;
+    public Screen previousScreen = null;
+
+    public LoadingScreen(Supplier<ApiResponse<T>> future, Consumer<T> onSuccess, Screen previousScreen) {
+        super();
+        this.future = future;
+        this.onSuccess = onSuccess;
+        this.previousScreen = previousScreen;
+    }
+
 
     public LoadingScreen(Supplier<ApiResponse<T>> future, Consumer<T> onSuccess) {
         super();
@@ -69,7 +79,7 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
         }
         if ((ticksRunning == 20 * 5 || error != null) && !backAdded) {
             addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
-                Minecraft.getInstance().setScreen(new HomeScreen());
+                Minecraft.getInstance().setScreen(this.previousScreen != null ? previousScreen : new HomeScreen());
             }));
             backAdded = true;
         }
@@ -82,10 +92,7 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
 
     @Override
     public boolean shouldCloseOnEsc() {
-        if (canCancel()) {
-            return true;
-        }
-        return false;
+        return canCancel();
     }
 
     public boolean canCancel() {

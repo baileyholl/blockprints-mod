@@ -9,6 +9,7 @@
   "blockprints.preview": "Preview",
   "blockprints.name": "Enter Name",
   "blockprints.description": "Enter Description",
+  "blockprints.description_title": "Description",
   "key.category.blockprints.general": "Blockprints",
   "key.blockprints.open_menu": "Open Menu",
   "key.blockprints.cancel_selection": "Cancel Selection",
@@ -46,5 +47,11 @@
   "blockprints.loading": "Loading",
   "blockprints.error_loading": "We had trouble loading that. Please check your internet connection and try again. If this persists, reach out to the discord for help.",
   "blockprints.unexpected_error": "Unexpected error occured with message %s. If this persists, reach out to the discord for help.",
-  "blockprints.error_received": "Error received from server: %s"
+  "blockprints.error_received": "Error received from server: %s",
+  "blockprints.download_tooltip": "Download the structure file to your local instance.",
+  "blockprints.view_list": "View Block List",
+  "blockprints.blocks_missing_tooltip": "Blocks used in this build are missing. View the block list to see which blocks are missing.",
+  "blockprints.block_missing": "No block with ID %s found.",
+  "blockprints.block": "Block",
+  "blockprints.qty": "Qty."
 }

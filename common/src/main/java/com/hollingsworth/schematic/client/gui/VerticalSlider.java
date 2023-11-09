@@ -1,0 +1,61 @@
+package com.hollingsworth.schematic.client.gui;
+
+import com.hollingsworth.schematic.Constants;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import org.lwjgl.glfw.GLFW;
+
+import java.util.function.Consumer;
+
+public class VerticalSlider extends BaseSlider {
+    Consumer<Integer> onChange;
+
+    public VerticalSlider(int x, int y, double maxValue, double stepSize, int precision, Consumer<Integer> onChange) {
+        super(x, y, 15, 140, Component.empty(), Component.empty(), 0, maxValue, 0, stepSize, precision, false);
+        this.onChange = onChange;
+    }
+
+    public VerticalSlider(int x, int y, int width, int height, Component prefix, Component suffix, double minValue, double maxValue, double currentValue, boolean drawString) {
+        super(x, y, width, height, prefix, suffix, minValue, maxValue, currentValue, drawString);
+    }
+
+    @Override
+    protected void applyValue() {
+        super.applyValue();
+        onChange.accept(this.getValueInt());
+    }
+
+
+    @Override
+    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+//        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+        final Minecraft mc = Minecraft.getInstance();
+        guiGraphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/container_scroll.png"), x, y - 21, 0, 0, 15, 159, 15, 159);
+        guiGraphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/scroll_bar_vertical.png"), x + 3, y + (int) (this.value * (double) (this.height - 20)), 0, 0, 9, 15, 9, 15);
+//        GuiUtils.drawCenteredOutlinedText(mc.font, guiGraphics, Component.literal(String.valueOf(this.getValueInt())).getVisualOrderText(), x + 116, y + 4);
+
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        boolean flag = keyCode == GLFW.GLFW_KEY_LEFT;
+        if (flag || keyCode == GLFW.GLFW_KEY_RIGHT) {
+            if (this.minValue > this.maxValue)
+                flag = !flag;
+            float f = flag ? -1F : 1F;
+            if (stepSize <= 0D)
+                this.setSliderValue(this.value + (f / (this.height - 8)));
+            else
+                this.setValue(this.getValue() + f * this.stepSize);
+        }
+
+        return false;
+    }
+
+    @Override
+    public void setValueFromMouse(double mouseX, double mouseY) {
+        this.setSliderValue((mouseY - (this.getY() + 4)) / (this.height - 8));
+    }
+}

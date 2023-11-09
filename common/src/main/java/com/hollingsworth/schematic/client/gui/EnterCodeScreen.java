@@ -1,8 +1,7 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
-import com.hollingsworth.schematic.api.SchematicImporter;
-import com.hollingsworth.schematic.client.ClientData;
+import com.hollingsworth.schematic.api.blockprints.download.Download;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -11,7 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 public class EnterCodeScreen extends BaseSchematicScreen {
     public LongTextField codeField;
     public GuiImageButton submitButton;
-    public boolean isDownloading = false;
 
     public EnterCodeScreen() {
         super();
@@ -23,26 +21,16 @@ public class EnterCodeScreen extends BaseSchematicScreen {
     }
 
     @Override
-    public boolean shouldCloseOnEsc() {
-        return !isDownloading;
-    }
-
-    @Override
     public void init() {
         super.init();
         codeField = new LongTextField(font, bookLeft + 41, bookTop + 119, Component.empty());
         codeField.setMaxLength(100);
-        codeField.setValue("09703653-3f4c-4679-95be-5be71378a40a");
+        codeField.setValue("10638b87-b336-40a0-903f-42485e3fbf19");
         addRenderableWidget(codeField);
         submitButton = new GuiImageButton(bookLeft + 57, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
-            isDownloading = true;
-            SchematicImporter.downloadPreview(codeField.getValue()).whenCompleteAsync((result, error) -> {
-                isDownloading = false;
-                ClientData.setStatus(Component.empty());
-                if (result != null) {
-                    Minecraft.getInstance().setScreen(new DownloadScreen(result));
-                }
-            }, Minecraft.getInstance());
+            Minecraft.getInstance().setScreen(
+                    new LoadingScreen<>(() -> Download.downloadPreview(codeField.getValue()),
+                            (result) -> Minecraft.getInstance().setScreen(new DownloadScreen(this, result)), this));
         });
         addRenderableWidget(new GuiImageButton(bookLeft + 153, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
         }));
