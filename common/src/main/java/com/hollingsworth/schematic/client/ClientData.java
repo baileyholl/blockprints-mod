@@ -128,11 +128,11 @@ public class ClientData {
         poseStack.popPose();
     }
 
-    public static boolean positionClicked(BlockPos pos) {
+    public static boolean positionClicked() {
         if (!ClientData.showBoundary) {
             return false;
         }
-        pos = selectedPos;
+        BlockPos pos = selectedPos;
         if (pos == null) {
             return false;
         }

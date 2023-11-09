@@ -1,4 +1,5 @@
 {
+  "blockprints.home": "Return Home",
   "blockprints.upload": "Upload",
   "blockprints.download": "Download",
   "blockprints.upload_desc": "Upload a schematic to BlockPrints.io",
@@ -33,5 +34,17 @@
   "blockprints.download_success": "Schematic downloaded!",
   "blockprints.downloading_schematic": "Downloading schematic...",
   "blockprints.build_list": "My Builds and Favorites",
-  "blockprints.build_list_desc": "View your builds and favorites across any world"
+  "blockprints.build_list_desc": "View your builds and favorites across any world",
+  "blockprints.enter_code": "Enter Code",
+  "blockprints.builds": "Builds",
+  "blockprints.filter_own_builds": "View my uploads",
+  "blockprints.filter_favorites": "View my favorites",
+  "blockprints.filter_recent_builds": "View my recently downloaded",
+  "blockprints.copy": "Copy Share Code",
+  "blockprints.view": "View",
+  "blockprints.edit": "Edit",
+  "blockprints.loading": "Loading",
+  "blockprints.error_loading": "We had trouble loading that. Please check your internet connection and try again. If this persists, reach out to the discord for help.",
+  "blockprints.unexpected_error": "Unexpected error occured with message %s. If this persists, reach out to the discord for help.",
+  "blockprints.error_received": "Error received from server: %s"
 }

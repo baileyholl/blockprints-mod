@@ -1,7 +1,8 @@
 package com.hollingsworth.schematic.api;
 
-import com.hollingsworth.schematic.api.blockprints.Download;
 import com.hollingsworth.schematic.api.blockprints.GoogleCloudStorage;
+import com.hollingsworth.schematic.api.blockprints.download.Download;
+import com.hollingsworth.schematic.api.blockprints.download.DownloadResponse;
 import com.hollingsworth.schematic.client.ClientData;
 import com.hollingsworth.schematic.common.util.ClientUtil;
 import net.minecraft.Util;
@@ -53,10 +54,10 @@ public class SchematicImporter {
     }
 
     public static class PreviewDownloadResult {
-        public final Download.DownloadResponse downloadResponse;
+        public final DownloadResponse downloadResponse;
         public final Path imagePath;
 
-        public PreviewDownloadResult(Download.DownloadResponse downloadResponse, Path imagePath) {
+        public PreviewDownloadResult(DownloadResponse downloadResponse, Path imagePath) {
             this.downloadResponse = downloadResponse;
             this.imagePath = imagePath;
         }

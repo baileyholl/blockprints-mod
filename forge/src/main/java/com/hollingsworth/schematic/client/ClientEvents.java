@@ -3,7 +3,6 @@ package com.hollingsworth.schematic.client;
 import com.hollingsworth.schematic.Constants;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.InputEvent;
@@ -35,16 +34,14 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void rightClickEvent(final InputEvent.MouseButton.Pre event) {
-        if (InputConstants.MOUSE_BUTTON_RIGHT != event.getButton() || MINECRAFT.screen != null)
+        if (InputConstants.MOUSE_BUTTON_RIGHT != event.getButton() || MINECRAFT.screen != null || event.getAction() != InputConstants.RELEASE)
             return;
-        ClientData.positionClicked(BlockPos.ZERO);
+        ClientData.positionClicked();
     }
 
     @SubscribeEvent
     public static void renderLast(final RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
-//            StructureRenderer.buildRender(event.getPoseStack(), Minecraft.getInstance().player);
-//            StructureRenderer.drawRender(event.getPoseStack(), event.getProjectionMatrix(), Minecraft.getInstance().player);
             return;
         }
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY) {

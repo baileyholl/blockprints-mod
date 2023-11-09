@@ -6,6 +6,7 @@ import com.hollingsworth.schematic.export.CameraSettings;
 import com.hollingsworth.schematic.export.Scene;
 import com.hollingsworth.schematic.export.WrappedScene;
 import com.hollingsworth.schematic.export.level.GuidebookLevel;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -83,6 +84,9 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
             setYaw(315);
             setPitch(30);
         }));
+        addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
+            Minecraft.getInstance().setScreen(new HomeScreen());
+        }));
     }
 
     @Override
@@ -133,7 +137,6 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     public void drawBackgroundElements(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.drawBackgroundElements(graphics, mouseX, mouseY, partialTicks);
         graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/diologue_preview.png"), 25, 25, 0, 0, 143, 127, 143, 127);
-//        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/dialogue_long.png"), 25, 25, 0, 0, 143, 15, 143, 15);
         graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/diologue_title.png"), 185, 25, 0, 0, 95, 14, 95, 14);
         graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/diologue_title.png"), 185, 57, 0, 0, 95, 14, 95, 14);
         GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.preview").getVisualOrderText(), 25 + 143 / 2, 29);

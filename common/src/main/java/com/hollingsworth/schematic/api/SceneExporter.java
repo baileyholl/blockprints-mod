@@ -1,7 +1,7 @@
 package com.hollingsworth.schematic.api;
 
 import com.hollingsworth.schematic.api.blockprints.GoogleCloudStorage;
-import com.hollingsworth.schematic.api.blockprints.Upload;
+import com.hollingsworth.schematic.api.blockprints.upload.Upload;
 import com.hollingsworth.schematic.client.ClientData;
 import com.hollingsworth.schematic.common.util.ClientUtil;
 import com.hollingsworth.schematic.common.util.SchematicExport;
