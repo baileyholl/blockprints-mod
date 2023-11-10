@@ -25,6 +25,10 @@ public class ApiResponse<T> {
         this.error = component.getString();
     }
 
+    public boolean wasSuccessful() {
+        return error == null;
+    }
+
     public static ApiResponse<Boolean> success() {
         return new ApiResponse<>(true);
     }

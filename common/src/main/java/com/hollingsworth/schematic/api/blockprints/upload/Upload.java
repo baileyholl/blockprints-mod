@@ -11,7 +11,7 @@ import java.net.http.HttpResponse;
 
 public class Upload {
 
-    public static UploadResponse postUpload(String name, String description) {
+    public static ApiResponse<UploadResponse> postUpload(String name, String description) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("name", name);
         jsonObject.addProperty("description", description);
@@ -20,12 +20,15 @@ public class Upload {
                 .POST(HttpRequest.BodyPublishers.ofString(jsonObject.toString())).build();
         try {
             var res = RequestUtil.CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (!RequestUtil.responseSuccessful(res.statusCode())) {
+                return ApiResponse.parseServerError(res);
+            }
             JsonObject responseObj = JsonParser.parseString(res.body()).getAsJsonObject();
-            return new UploadResponse(responseObj);
+            return new ApiResponse<UploadResponse>(new UploadResponse(responseObj));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return ApiResponse.expectedFailure();
     }
 
     public static ApiResponse<Boolean> postEdit(String id, String name, String description) {
@@ -48,7 +51,7 @@ public class Upload {
     }
 
 
-    public static boolean postDoneUploading(String id) {
+    public static ApiResponse<Boolean> postDoneUploading(String id) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("id", id);
         HttpRequest request = RequestUtil.getBuilder()
@@ -56,11 +59,14 @@ public class Upload {
                 .POST(HttpRequest.BodyPublishers.ofString(jsonObject.toString())).build();
         try {
             var res = RequestUtil.CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            return res.statusCode() == 200;
+            if (!RequestUtil.responseSuccessful(res.statusCode())) {
+                return ApiResponse.parseServerError(res);
+            }
+            return new ApiResponse<>(true);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-        return false;
+        return ApiResponse.expectedFailure();
     }
 
 }

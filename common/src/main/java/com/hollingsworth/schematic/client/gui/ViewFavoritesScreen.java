@@ -17,7 +17,6 @@ public class ViewFavoritesScreen extends BaseSchematicScreen {
     public boolean showFavorites = true;
     public boolean showBuilds = true;
     public boolean showRecent = true;
-    public boolean isDownloading;
 
     public ViewFavoritesScreen(FavoritesResponse favoritesResponse) {
         super();

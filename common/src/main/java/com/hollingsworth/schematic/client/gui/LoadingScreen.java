@@ -2,6 +2,7 @@ package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.api.blockprints.ApiResponse;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -47,7 +48,7 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
     @Override
     public void init() {
         super.init();
-        CompletableFuture.<ApiResponse<T>>supplyAsync(future).<ApiResponse<T>>whenCompleteAsync((result, err) -> response = new Response<>(result, err), Minecraft.getInstance());
+        CompletableFuture.<ApiResponse<T>>supplyAsync(future, Util.backgroundExecutor()).<ApiResponse<T>>whenCompleteAsync((result, err) -> response = new Response<>(result, err), Minecraft.getInstance());
     }
 
     public void handleResponse() {
@@ -58,7 +59,7 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
         var result = response.response();
         var err = response.throwable();
         if (err != null) {
-            error = Component.translatable("blockprints.unexpected_error").getString();
+            error = Component.translatable("blockprints.unexpected_error", err.toString()).getString();
             addHomeButton();
         } else if (result.error != null) {
             error = result.error;

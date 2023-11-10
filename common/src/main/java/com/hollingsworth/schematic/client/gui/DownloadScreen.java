@@ -3,7 +3,6 @@ package com.hollingsworth.schematic.client.gui;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.api.blockprints.download.Download;
 import com.hollingsworth.schematic.api.blockprints.download.PreviewDownloadResult;
-import com.hollingsworth.schematic.client.ClientData;
 import com.hollingsworth.schematic.common.util.ClientUtil;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.ChatFormatting;
@@ -77,7 +76,6 @@ public class DownloadScreen extends BaseSchematicScreen {
                 } else {
                     ClientUtil.sendMessage("blockprints.download_failed");
                 }
-                ClientData.setStatus(Component.empty());
             }));
         }).withTooltip(hasMissing ? Component.translatable("blockprints.blocks_missing_tooltip").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)) : null)
                 .withTooltip(Component.translatable("blockprints.download_tooltip")));

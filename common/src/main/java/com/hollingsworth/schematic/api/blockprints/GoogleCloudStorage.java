@@ -54,6 +54,7 @@ public class GoogleCloudStorage {
         String sanitizedName = SceneExporter.sanitize(fileName);
         var uri = URI.create(getBucketUrl() + gcsPath);
         try (InputStream in = uri.toURL().openStream()) {
+
             var path = Paths.get(folder + "/" + sanitizedName + "/" + sanitizedName + ".nbt");
             Files.createDirectories(Paths.get(folder + "/" + sanitizedName));
             Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);

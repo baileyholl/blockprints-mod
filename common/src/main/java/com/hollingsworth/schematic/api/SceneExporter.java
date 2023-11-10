@@ -1,14 +1,11 @@
 package com.hollingsworth.schematic.api;
 
+import com.hollingsworth.schematic.api.blockprints.ApiResponse;
 import com.hollingsworth.schematic.api.blockprints.GoogleCloudStorage;
 import com.hollingsworth.schematic.api.blockprints.upload.Upload;
-import com.hollingsworth.schematic.client.ClientData;
-import com.hollingsworth.schematic.common.util.ClientUtil;
 import com.hollingsworth.schematic.common.util.SchematicExport;
 import com.hollingsworth.schematic.export.PerspectivePreset;
 import com.hollingsworth.schematic.export.WrappedScene;
-import net.minecraft.Util;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 import java.io.IOException;
@@ -18,7 +15,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 
 public class SceneExporter {
@@ -64,65 +60,50 @@ public class SceneExporter {
         return images;
     }
 
-    public void exportLocally(String name, String description) throws IOException {
-        List<WrappedScene.ImageExport> images = getImages();
-
-
+    public ApiResponse<Boolean> writeAndUpload(List<WrappedScene.ImageExport> images, String name, String description) {
         String finalExportName = sanitize(name);
-        CompletableFuture.runAsync(() -> {
-            try {
-                int count = 0;
-                List<Path> imageFiles = new ArrayList<>();
-                // Skip the first image
-                Path previewPath = Paths.get(IMAGE_FOLDER + finalExportName + "_preview.png");
-                Files.write(previewPath, images.get(0).image());
-                List<WrappedScene.ImageExport> galleryImages = images.subList(1, images.size());
+        try {
+            Files.createDirectories(Path.of(IMAGE_FOLDER));
+            int count = 0;
+            List<Path> imageFiles = new ArrayList<>();
+            // Skip the first image
+            Path previewPath = Paths.get(IMAGE_FOLDER + finalExportName + "_preview.png");
+            Files.write(previewPath, images.get(0).image());
+            List<WrappedScene.ImageExport> galleryImages = images.subList(1, images.size());
 
-                for (WrappedScene.ImageExport image : galleryImages) {
-                    ClientData.setStatus(Component.translatable("blockprints.saving", finalExportName + count + ".png"));
-                    Files.createDirectories(Paths.get(IMAGE_FOLDER));
-                    Path path = Paths.get(IMAGE_FOLDER + finalExportName + count + ".png");
-                    Files.write(path, image.image());
-                    imageFiles.add(path);
-                    count++;
-                }
-                SchematicExport.SchematicExportResult result = SchematicExport.saveSchematic(Paths.get(STRUCTURE_FOLDER), finalExportName, false, structureTemplate);
-                var response = Upload.postUpload(name, description);
-                if (response == null) {
-                    ClientUtil.sendMessage("blockprints.cannot_contact");
-                }
-                var preview = response.signedPreviewImage;
-                var schematic = response.signedSchematic;
-                ClientData.setStatus(Component.translatable("blockprints.uploading"));
-                var previewSuccess = GoogleCloudStorage.uploadFileToGCS(URI.create(preview).toURL(), previewPath, "image/png", response.imageFileSize);
-                var structureSuccess = GoogleCloudStorage.uploadFileToGCS(URI.create(schematic).toURL(), result.file(), "application/octet-stream", response.schematicFileSize);
-                if (!previewSuccess || !structureSuccess) {
-                    ClientUtil.sendMessage("blockprints.upload_failed");
-                    return;
-                }
-                for (int i = 0; i < response.signedImages.length; i++) {
-                    // Guard against server changes
-                    if (i >= imageFiles.size()) {
-                        break;
-                    }
-                    if (!GoogleCloudStorage.uploadFileToGCS(URI.create(response.signedImages[i]).toURL(), imageFiles.get(i), "image/png", response.imageFileSize)) {
-                        ClientUtil.sendMessage("blockprints.upload_failed");
-                        return;
-                    }
-                }
-                ClientData.setStatus(Component.translatable("blockprints.confirming"));
-                if (Upload.postDoneUploading(response.id)) {
-                    ClientUtil.sendMessage("blockprints.upload_complete");
-                } else {
-                    ClientUtil.sendMessage("blockprints.upload_failed");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                ClientUtil.sendMessage(Component.translatable("blockprints.upload_failed"));
+            for (WrappedScene.ImageExport image : galleryImages) {
+                Path path = Paths.get(IMAGE_FOLDER + finalExportName + count + ".png");
+                Files.write(path, image.image());
+                imageFiles.add(path);
+                count++;
             }
-        }, Util.backgroundExecutor()).whenComplete((t, a) -> {
-            ClientData.setStatus(Component.empty());
-        });
+            SchematicExport.SchematicExportResult result = SchematicExport.saveSchematic(Paths.get(STRUCTURE_FOLDER), finalExportName, false, structureTemplate);
+            var uploadResponse = Upload.postUpload(name, description);
+            if (!uploadResponse.wasSuccessful() || uploadResponse.response == null) {
+                return ApiResponse.unexpectedFailure();
+            }
+            var response = uploadResponse.response;
+            var preview = response.signedPreviewImage;
+            var schematic = response.signedSchematic;
+            var previewSuccess = GoogleCloudStorage.uploadFileToGCS(URI.create(preview).toURL(), previewPath, "image/png", response.imageFileSize);
+            var structureSuccess = GoogleCloudStorage.uploadFileToGCS(URI.create(schematic).toURL(), result.file(), "application/octet-stream", response.schematicFileSize);
+            if (!previewSuccess || !structureSuccess) {
+                return ApiResponse.unexpectedFailure();
+            }
+            for (int i = 0; i < response.signedImages.length; i++) {
+                // Guard against server changes
+                if (i >= imageFiles.size()) {
+                    break;
+                }
+                if (!GoogleCloudStorage.uploadFileToGCS(URI.create(response.signedImages[i]).toURL(), imageFiles.get(i), "image/png", response.imageFileSize)) {
+                    return ApiResponse.unexpectedFailure();
+                }
+            }
+            return Upload.postDoneUploading(response.id);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return ApiResponse.expectedFailure();
+        }
     }
 
     // Convert a string into lowercase, remove all non-alphanumeric characters, and replace all spaces with underscores

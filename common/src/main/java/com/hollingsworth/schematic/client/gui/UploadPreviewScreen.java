@@ -2,6 +2,7 @@ package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.api.SceneExporter;
+import com.hollingsworth.schematic.common.util.ClientUtil;
 import com.hollingsworth.schematic.export.CameraSettings;
 import com.hollingsworth.schematic.export.Scene;
 import com.hollingsworth.schematic.export.WrappedScene;
@@ -12,7 +13,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
-import java.io.IOException;
 import java.util.List;
 
 public class UploadPreviewScreen extends BaseSchematicScreen {
@@ -51,11 +51,13 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
                 return;
             }
             SceneExporter sceneExporter = new SceneExporter(wrappedScene, structureTemplate);
-            try {
-                sceneExporter.exportLocally(this.nameField.getValue(), this.descriptionField.getValue());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            List<WrappedScene.ImageExport> images = sceneExporter.getImages();
+
+
+            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> sceneExporter.writeAndUpload(images, this.nameField.getValue(), this.descriptionField.getValue()), (res) -> {
+                Minecraft.getInstance().setScreen(null);
+                ClientUtil.sendMessage(Component.translatable("blockprints.upload_complete"));
+            }));
         });
         addRenderableWidget(uploadButton);
         addRenderableWidget(nameField);
