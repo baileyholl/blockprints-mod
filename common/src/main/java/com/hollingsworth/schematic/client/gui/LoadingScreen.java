@@ -32,6 +32,11 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
         this.previousScreen = previousScreen;
     }
 
+    public LoadingScreen(Supplier<ApiResponse<T>> future, Consumer<T> onSuccess, Screen previousScreen, int ticksRunning) {
+        this(future, onSuccess, previousScreen);
+        this.ticksRunning = ticksRunning;
+    }
+
 
     public LoadingScreen(Supplier<ApiResponse<T>> future, Consumer<T> onSuccess) {
         super();

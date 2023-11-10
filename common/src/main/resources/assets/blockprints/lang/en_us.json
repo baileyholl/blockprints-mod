@@ -7,6 +7,7 @@
   "blockprints.discord": "Join the Discord for support or show off your builds!",
   "blockprints.website": "Visit the website for schematic downloads!",
   "blockprints.preview": "Preview",
+  "blockprints.set_preview": "Set Preview Image",
   "blockprints.name": "Enter Name",
   "blockprints.description": "Enter Description",
   "blockprints.description_title": "Description",
@@ -53,5 +54,6 @@
   "blockprints.blocks_missing_tooltip": "Blocks used in this build are missing. View the block list to see which blocks are missing.",
   "blockprints.block_missing": "No block with ID %s found.",
   "blockprints.block": "Block",
-  "blockprints.qty": "Qty."
+  "blockprints.qty": "Qty.",
+  "blockprints.save": "Save"
 }

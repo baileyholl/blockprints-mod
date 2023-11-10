@@ -1,6 +1,7 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
+import com.hollingsworth.schematic.api.blockprints.download.Download;
 import com.hollingsworth.schematic.api.blockprints.favorites.Favorite;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -18,12 +19,17 @@ public class FavoritesRow extends NestedWidget {
         this.favorite = favorite;
         this.viewBuildsScreen = screen;
         renderables.add(new GuiImageButton(x + 224, y + 1, 11, 11, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_edit.png"), button -> {
-
+            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Download.downloadPreview(favorite.id()), (build) -> {
+                Minecraft.getInstance().setScreen(new EditBuildScreen(viewBuildsScreen, build));
+            }, viewBuildsScreen));
         }).withTooltip(Component.translatable("blockprints.edit")));
         renderables.add(new GuiImageButton(x + 211, y + 1, 11, 11, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_copy.png"), button -> {
             Minecraft.getInstance().keyboardHandler.setClipboard(favorite.id());
         }).withTooltip(Component.translatable("blockprints.copy")));
         renderables.add(new GuiImageButton(x + 198, y + 1, 11, 11, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_view.png"), button -> {
+            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Download.downloadPreview(favorite.id()), (build) -> {
+                Minecraft.getInstance().setScreen(new DownloadScreen(viewBuildsScreen, build));
+            }, viewBuildsScreen));
         }).withTooltip(Component.translatable("blockprints.view")));
     }
 

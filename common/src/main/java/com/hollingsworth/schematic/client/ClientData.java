@@ -115,6 +115,9 @@ public class ClientData {
     }
 
     public static void renderBbox(AABB currentSelectionBox, PoseStack poseStack) {
+        if (currentSelectionBox == null) {
+            return;
+        }
         Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera()
                 .getPosition();
 

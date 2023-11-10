@@ -24,6 +24,14 @@ public class ViewBuildsScreen extends BaseSchematicScreen {
         this.favorites = favoritesResponse;
     }
 
+    public ViewBuildsScreen(FavoritesResponse favoritesResponse, boolean showFavorites, boolean showBuilds, boolean showRecent) {
+        super();
+        this.favorites = favoritesResponse;
+        this.showFavorites = showFavorites;
+        this.showBuilds = showBuilds;
+        this.showRecent = showRecent;
+    }
+
     @Override
     public void init() {
         super.init();
@@ -36,22 +44,16 @@ public class ViewBuildsScreen extends BaseSchematicScreen {
         ResourceLocation unchecked = new ResourceLocation(Constants.MOD_ID, "textures/gui/container_filter_unchecked.png");
         ResourceLocation checked = new ResourceLocation(Constants.MOD_ID, "textures/gui/container_filter_checked.png");
         addRenderableWidget(new ToggleImageButton(bookLeft + 206, bookTop + 29, 7, 7, unchecked, checked, b -> {
-            if (isDownloading)
-                return;
             this.showBuilds = !this.showBuilds;
             queryFavorites();
         }, () -> this.showBuilds).withTooltip(Component.translatable("blockprints.filter_own_builds")));
 
         addRenderableWidget(new ToggleImageButton(bookLeft + 224, bookTop + 29, 7, 7, unchecked, checked, b -> {
-            if (isDownloading)
-                return;
             this.showFavorites = !this.showFavorites;
             queryFavorites();
         }, () -> this.showFavorites).withTooltip(Component.translatable("blockprints.filter_favorites")));
 
         addRenderableWidget(new ToggleImageButton(bookLeft + 244, bookTop + 29, 7, 7, unchecked, checked, b -> {
-            if (isDownloading)
-                return;
             this.showRecent = !this.showRecent;
             queryFavorites();
         }, () -> this.showRecent).withTooltip(Component.translatable("blockprints.filter_recent_builds")));
@@ -65,8 +67,8 @@ public class ViewBuildsScreen extends BaseSchematicScreen {
 
     public void queryFavorites() {
         Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Favorites.getFavorites(showFavorites, showBuilds, showRecent), (favorites) -> {
-            Minecraft.getInstance().setScreen(new ViewBuildsScreen(favorites));
-        }));
+            Minecraft.getInstance().setScreen(new ViewBuildsScreen(favorites, showFavorites, showBuilds, showRecent));
+        }, null, 30));
     }
 
     @Override
