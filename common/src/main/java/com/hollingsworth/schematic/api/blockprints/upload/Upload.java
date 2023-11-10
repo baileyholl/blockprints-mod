@@ -24,11 +24,11 @@ public class Upload {
                 return ApiResponse.parseServerError(res);
             }
             JsonObject responseObj = JsonParser.parseString(res.body()).getAsJsonObject();
-            return new ApiResponse<UploadResponse>(new UploadResponse(responseObj));
+            return ApiResponse.success(new UploadResponse(responseObj));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return ApiResponse.expectedFailure();
+        return ApiResponse.connectionError();
     }
 
     public static ApiResponse<Boolean> postEdit(String id, String name, String description) {
@@ -46,7 +46,7 @@ public class Upload {
             return ApiResponse.success();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-            return ApiResponse.expectedFailure();
+            return ApiResponse.connectionError();
         }
     }
 
@@ -62,11 +62,11 @@ public class Upload {
             if (!RequestUtil.responseSuccessful(res.statusCode())) {
                 return ApiResponse.parseServerError(res);
             }
-            return new ApiResponse<>(true);
+            return ApiResponse.success();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-        return ApiResponse.expectedFailure();
+        return ApiResponse.connectionError();
     }
 
 }

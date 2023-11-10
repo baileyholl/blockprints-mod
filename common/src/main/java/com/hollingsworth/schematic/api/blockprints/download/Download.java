@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Path;
 
 public class Download {
 
@@ -35,20 +36,16 @@ public class Download {
     public static ApiResponse<PreviewDownloadResult> downloadPreview(String id) {
         var result = getSchematic(id);
         if (result == null) {
-            return new ApiResponse<PreviewDownloadResult>(Component.translatable("blockprints.download_not_found"));
+            return ApiResponse.error(Component.translatable("blockprints.download_not_found"));
         }
-        var downloaded = GoogleCloudStorage.downloadImage(result.previewImage, result.structureName);
-        if (downloaded == null) {
-            return new ApiResponse<PreviewDownloadResult>(Component.translatable("blockprints.download_not_found"));
+        var downloaded = GoogleCloudStorage.downloadImage(result.previewImage);
+        if (!downloaded.wasSuccessful()) {
+            return ApiResponse.error(Component.translatable("blockprints.download_not_found"));
         }
-        return new ApiResponse<PreviewDownloadResult>(new PreviewDownloadResult(result, downloaded));
+        return ApiResponse.success(new PreviewDownloadResult(result, downloaded.response));
     }
 
-    public static ApiResponse<Boolean> downloadSchematic(String link, String name) {
-        var downloaded = GoogleCloudStorage.downloadSchematic(link, name);
-        if (downloaded == null) {
-            return new ApiResponse<>(Component.translatable("blockprints.download_not_found"));
-        }
-        return new ApiResponse<Boolean>(true);
+    public static ApiResponse<Path> downloadSchematic(String link, String name) {
+        return GoogleCloudStorage.downloadSchematic(link, name);
     }
 }

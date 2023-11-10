@@ -10,30 +10,33 @@ public class ApiResponse<T> {
     public final T response;
     public final String error;
 
-    public ApiResponse(T response) {
+    private ApiResponse(T response) {
         this.response = response;
         this.error = null;
     }
 
-    public ApiResponse(String error) {
+    private ApiResponse(String error) {
         this.response = null;
         this.error = error;
-    }
-
-    public ApiResponse(Component component) {
-        this.response = null;
-        this.error = component.getString();
     }
 
     public boolean wasSuccessful() {
         return error == null;
     }
 
+    public static <T> ApiResponse<T> error(Component component) {
+        return new ApiResponse<>(component.getString());
+    }
+
     public static ApiResponse<Boolean> success() {
         return new ApiResponse<>(true);
     }
 
-    public static <F> ApiResponse<F> expectedFailure() {
+    public static <T> ApiResponse<T> success(T response) {
+        return new ApiResponse<>(response);
+    }
+
+    public static <F> ApiResponse<F> connectionError() {
         return new ApiResponse<>(Component.translatable("blockprints.error_loading").getString());
     }
 
@@ -46,7 +49,7 @@ public class ApiResponse<T> {
             JsonObject responseObj = JsonParser.parseString(error.body()).getAsJsonObject();
             String errorString = responseObj.get("error").getAsString();
             Component component = Component.translatable("blockprints.error_received", errorString);
-            return new ApiResponse<>(component);
+            return ApiResponse.error(component);
         } catch (Exception e) {
             return unexpectedFailure();
         }

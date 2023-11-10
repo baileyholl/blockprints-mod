@@ -3,7 +3,6 @@ package com.hollingsworth.schematic.api.blockprints;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.api.SceneExporter;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -41,16 +40,29 @@ public class GoogleCloudStorage {
         return response.statusCode() == 200;
     }
 
-    public static @Nullable Path downloadImage(String gcsPath, String fileName) {
-        return download(gcsPath, SceneExporter.IMAGE_FOLDER, fileName);
+    public static ApiResponse<byte[]> downloadImage(String gcsPath) {
+        return download(gcsPath);
     }
 
-    public static @Nullable Path downloadSchematic(String gcsPath, String fileName) {
-        return download(gcsPath, SceneExporter.STRUCTURE_FOLDER, fileName);
+    public static ApiResponse<Path> downloadSchematic(String gcsPath, String fileName) {
+        Path path = download(gcsPath, SceneExporter.STRUCTURE_FOLDER, fileName);
+        if (path == null) {
+            return ApiResponse.unexpectedFailure();
+        }
+        return ApiResponse.success(path);
     }
 
+    public static ApiResponse<byte[]> download(String gcsPath) {
+        var uri = URI.create(getBucketUrl() + gcsPath);
+        try (InputStream in = uri.toURL().openStream()) {
+            return ApiResponse.success(in.readAllBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ApiResponse.connectionError();
+        }
+    }
 
-    public static @Nullable Path download(String gcsPath, String folder, String fileName) {
+    public static Path download(String gcsPath, String folder, String fileName) {
         String sanitizedName = SceneExporter.sanitize(fileName);
         var uri = URI.create(getBucketUrl() + gcsPath);
         try (InputStream in = uri.toURL().openStream()) {

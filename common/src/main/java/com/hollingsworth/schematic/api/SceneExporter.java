@@ -102,7 +102,7 @@ public class SceneExporter {
             return Upload.postDoneUploading(response.id);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-            return ApiResponse.expectedFailure();
+            return ApiResponse.connectionError();
         }
     }
 

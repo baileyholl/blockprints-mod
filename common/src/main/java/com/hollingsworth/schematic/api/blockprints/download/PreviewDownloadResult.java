@@ -1,13 +1,11 @@
 package com.hollingsworth.schematic.api.blockprints.download;
 
-import java.nio.file.Path;
-
 public class PreviewDownloadResult {
     public final DownloadResponse downloadResponse;
-    public final Path imagePath;
+    public final byte[] image;
 
-    public PreviewDownloadResult(DownloadResponse downloadResponse, Path imagePath) {
+    public PreviewDownloadResult(DownloadResponse downloadResponse, byte[] image) {
         this.downloadResponse = downloadResponse;
-        this.imagePath = imagePath;
+        this.image = image;
     }
 }

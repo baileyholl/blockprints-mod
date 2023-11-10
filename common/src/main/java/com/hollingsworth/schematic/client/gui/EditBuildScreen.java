@@ -4,7 +4,6 @@ import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.api.blockprints.download.Download;
 import com.hollingsworth.schematic.api.blockprints.download.PreviewDownloadResult;
 import com.hollingsworth.schematic.api.blockprints.upload.Upload;
-import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -12,13 +11,11 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 
+import static com.hollingsworth.schematic.client.gui.DownloadScreen.PREVIEW_TEXTURE;
+
 public class EditBuildScreen extends BaseSchematicScreen {
-    public static final ResourceLocation PREVIEW_TEXTURE = new ResourceLocation(Constants.MOD_ID, "download_preview");
     DynamicTexture dynamicTexture;
     PreviewDownloadResult preview;
     Screen previousScreen;
@@ -42,10 +39,8 @@ public class EditBuildScreen extends BaseSchematicScreen {
     public void init() {
         super.init();
 
-        Path previewPath = preview.imagePath;
         try {
-            NativeImage nativeImage = NativeImage.read(Files.newInputStream(previewPath, StandardOpenOption.READ));
-            dynamicTexture = new DynamicTexture(nativeImage);
+            dynamicTexture = DownloadScreen.getTexture(preview);
             Minecraft.getInstance().getTextureManager().register(PREVIEW_TEXTURE, dynamicTexture);
             addRenderableWidget(new PreviewImage(bookLeft + 25, bookTop + 41, 100, 100, dynamicTexture, PREVIEW_TEXTURE));
         } catch (Exception e) {
@@ -100,8 +95,8 @@ public class EditBuildScreen extends BaseSchematicScreen {
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
+    public void removed() {
+        super.removed();
         Minecraft.getInstance().getTextureManager().release(PREVIEW_TEXTURE);
     }
 

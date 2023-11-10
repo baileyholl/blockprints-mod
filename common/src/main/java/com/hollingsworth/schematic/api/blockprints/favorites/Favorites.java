@@ -32,10 +32,10 @@ public class Favorites {
                 return ApiResponse.parseServerError(res);
             }
             JsonObject responseObj = JsonParser.parseString(res.body()).getAsJsonObject();
-            return new ApiResponse<>(new FavoritesResponse(responseObj));
+            return ApiResponse.success(new FavoritesResponse(responseObj));
         } catch (URISyntaxException | IOException | InterruptedException e) {
             e.printStackTrace();
-            return ApiResponse.expectedFailure();
+            return ApiResponse.connectionError();
         }
     }
 

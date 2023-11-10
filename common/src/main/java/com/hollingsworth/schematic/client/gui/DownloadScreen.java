@@ -16,10 +16,10 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import org.lwjgl.system.MemoryUtil;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,13 +56,19 @@ public class DownloadScreen extends BaseSchematicScreen {
                 (result) -> Minecraft.getInstance().setScreen(new DownloadScreen(previousScreen, result)), previousScreen);
     }
 
+    public static DynamicTexture getTexture(PreviewDownloadResult preview) throws IOException {
+        byte[] previewImage = preview.image;
+        ByteBuffer buffer = MemoryUtil.memAlloc(previewImage.length);
+        buffer.put(previewImage);
+        NativeImage nativeImage = NativeImage.read(buffer.flip());
+        return new DynamicTexture(nativeImage);
+    }
+
     @Override
     public void init() {
         super.init();
-        Path previewPath = preview.imagePath;
         try {
-            NativeImage nativeImage = NativeImage.read(Files.newInputStream(previewPath, StandardOpenOption.READ));
-            dynamicTexture = new DynamicTexture(nativeImage);
+            dynamicTexture = getTexture(preview);
             Minecraft.getInstance().getTextureManager().register(PREVIEW_TEXTURE, dynamicTexture);
             addRenderableWidget(new PreviewImage(bookLeft + 25, bookTop + 41, 100, 100, dynamicTexture, PREVIEW_TEXTURE));
         } catch (Exception e) {
@@ -71,7 +77,7 @@ public class DownloadScreen extends BaseSchematicScreen {
         addRenderableWidget(new GuiImageButton(bookRight - 119, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
             Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Download.downloadSchematic(preview.downloadResponse.schematicLink, preview.downloadResponse.structureName), result -> {
                 Minecraft.getInstance().setScreen(null);
-                if (result) {
+                if (result != null) {
                     ClientUtil.sendMessage("blockprints.download_success");
                 } else {
                     ClientUtil.sendMessage("blockprints.download_failed");
@@ -108,8 +114,8 @@ public class DownloadScreen extends BaseSchematicScreen {
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
+    public void removed() {
+        super.removed();
         Minecraft.getInstance().getTextureManager().release(PREVIEW_TEXTURE);
     }
 
