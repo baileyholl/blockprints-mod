@@ -11,7 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewBuildsScreen extends BaseSchematicScreen {
+public class ViewFavoritesScreen extends BaseSchematicScreen {
     protected FavoritesResponse favorites = null;
     List<FavoritesRow> favoritesRows = new ArrayList<>();
     public boolean showFavorites = true;
@@ -19,12 +19,24 @@ public class ViewBuildsScreen extends BaseSchematicScreen {
     public boolean showRecent = true;
     public boolean isDownloading;
 
-    public ViewBuildsScreen(FavoritesResponse favoritesResponse) {
+    public ViewFavoritesScreen(FavoritesResponse favoritesResponse) {
         super();
         this.favorites = favoritesResponse;
     }
 
-    public ViewBuildsScreen(FavoritesResponse favoritesResponse, boolean showFavorites, boolean showBuilds, boolean showRecent) {
+    public static LoadingScreen<FavoritesResponse> getTransition() {
+        return new LoadingScreen<>(Favorites::getFavorites, (favorites) -> {
+            Minecraft.getInstance().setScreen(new ViewFavoritesScreen(favorites));
+        });
+    }
+
+    public static LoadingScreen<FavoritesResponse> getTransition(boolean showFavorites, boolean showBuilds, boolean showRecent) {
+        return new LoadingScreen<>(() -> Favorites.getFavorites(showFavorites, showBuilds, showRecent), (favorites) -> {
+            Minecraft.getInstance().setScreen(new ViewFavoritesScreen(favorites, showFavorites, showBuilds, showRecent));
+        }, null, 30);
+    }
+
+    public ViewFavoritesScreen(FavoritesResponse favoritesResponse, boolean showFavorites, boolean showBuilds, boolean showRecent) {
         super();
         this.favorites = favoritesResponse;
         this.showFavorites = showFavorites;
@@ -66,9 +78,7 @@ public class ViewBuildsScreen extends BaseSchematicScreen {
     }
 
     public void queryFavorites() {
-        Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Favorites.getFavorites(showFavorites, showBuilds, showRecent), (favorites) -> {
-            Minecraft.getInstance().setScreen(new ViewBuildsScreen(favorites, showFavorites, showBuilds, showRecent));
-        }, null, 30));
+        Minecraft.getInstance().setScreen(ViewFavoritesScreen.getTransition(showFavorites, showBuilds, showRecent));
     }
 
     @Override

@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class ShortTextField extends NoShadowTextField {
     public ShortTextField(Font p_i232260_1_, int x, int y, Component p_i232260_6_) {
-        super(p_i232260_1_, x, y, 100, 15, p_i232260_6_);
+        super(p_i232260_1_, x, y, 90, 17, p_i232260_6_);
     }
 
     @Override

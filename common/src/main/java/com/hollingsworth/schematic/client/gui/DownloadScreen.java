@@ -52,6 +52,11 @@ public class DownloadScreen extends BaseSchematicScreen {
         }
     }
 
+    public static LoadingScreen<PreviewDownloadResult> getTransition(String schematicId, Screen previousScreen) {
+        return new LoadingScreen<>(() -> Download.downloadPreview(schematicId),
+                (result) -> Minecraft.getInstance().setScreen(new DownloadScreen(previousScreen, result)), previousScreen);
+    }
+
     @Override
     public void init() {
         super.init();
@@ -99,9 +104,9 @@ public class DownloadScreen extends BaseSchematicScreen {
         super.drawBackgroundElements(graphics, mouseX, mouseY, partialTicks);
         graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/diologue_preview.png"), 25, 25, 0, 0, 143, 127, 143, 127);
         graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/diologue_title_body.png"), 185, 25, 0, 0, 95, 127, 95, 127);
-        GuiUtils.drawCenteredStringNoShadow(font, graphics, Component.literal(preview.downloadResponse.structureName), 25 + 143 / 2, 29, Constants.WHITE);
-        graphics.drawWordWrap(font, Component.literal(preview.downloadResponse.description), 187, 44, 95, Constants.WHITE);
-        GuiUtils.drawCenteredStringNoShadow(font, graphics, Component.translatable("blockprints.description_title"), 185 + 94 / 2, 29, Constants.WHITE);
+        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.literal(preview.downloadResponse.structureName), 25 + 143 / 2, 29);
+        graphics.drawWordWrap(font, Component.literal(preview.downloadResponse.description), 187, 44, 95, 0);
+        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.description_title"), 185 + 94 / 2, 29);
     }
 
     @Override

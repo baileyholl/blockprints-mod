@@ -1,7 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
-import com.hollingsworth.schematic.api.blockprints.download.Download;
 import com.hollingsworth.schematic.api.blockprints.favorites.Favorite;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -12,24 +11,20 @@ import net.minecraft.resources.ResourceLocation;
 
 public class FavoritesRow extends NestedWidget {
     Favorite favorite;
-    ViewBuildsScreen viewBuildsScreen;
+    ViewFavoritesScreen viewBuildsScreen;
 
-    public FavoritesRow(int x, int y, Favorite favorite, ViewBuildsScreen screen) {
+    public FavoritesRow(int x, int y, Favorite favorite, ViewFavoritesScreen screen) {
         super(x, y, 236, 12, Component.empty());
         this.favorite = favorite;
         this.viewBuildsScreen = screen;
         renderables.add(new GuiImageButton(x + 224, y + 1, 11, 11, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_edit.png"), button -> {
-            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Download.downloadPreview(favorite.id()), (build) -> {
-                Minecraft.getInstance().setScreen(new EditBuildScreen(viewBuildsScreen, build));
-            }, viewBuildsScreen));
+            Minecraft.getInstance().setScreen(EditBuildScreen.getTransition(favorite.id(), viewBuildsScreen));
         }).withTooltip(Component.translatable("blockprints.edit")));
         renderables.add(new GuiImageButton(x + 211, y + 1, 11, 11, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_copy.png"), button -> {
             Minecraft.getInstance().keyboardHandler.setClipboard(favorite.id());
         }).withTooltip(Component.translatable("blockprints.copy")));
         renderables.add(new GuiImageButton(x + 198, y + 1, 11, 11, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_view.png"), button -> {
-            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Download.downloadPreview(favorite.id()), (build) -> {
-                Minecraft.getInstance().setScreen(new DownloadScreen(viewBuildsScreen, build));
-            }, viewBuildsScreen));
+            Minecraft.getInstance().setScreen(DownloadScreen.getTransition(favorite.id(), viewBuildsScreen));
         }).withTooltip(Component.translatable("blockprints.view")));
     }
 

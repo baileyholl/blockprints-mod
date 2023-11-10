@@ -121,17 +121,17 @@ public class NoScrollMultiText extends AbstractScrollWidget {
                 boolean $$12 = this.withinContentAreaTopBottom($$10, $$10 + 9);
                 if ($$6 && $$7 && $$5 >= $$11.beginIndex() && $$5 <= $$11.endIndex()) {
                     if ($$12) {
-                        $$8 = $$0.drawString(this.font, $$4.substring($$11.beginIndex(), $$5), this.getX() + this.innerPadding(), $$10, color) - 1;
+                        $$8 = $$0.drawString(this.font, $$4.substring($$11.beginIndex(), $$5), this.getX() + this.innerPadding(), $$10, color, false) - 1;
                         var10002 = $$10 - 1;
                         int var10003 = $$8 + 1;
                         var10004 = $$10 + 1;
                         Objects.requireNonNull(this.font);
                         $$0.fill($$8, var10002, var10003, var10004 + 9, -3092272);
-                        $$0.drawString(this.font, $$4.substring($$5, $$11.endIndex()), $$8, $$10, color);
+                        $$0.drawString(this.font, $$4.substring($$5, $$11.endIndex()), $$8, $$10, color, false);
                     }
                 } else {
                     if ($$12) {
-                        $$8 = $$0.drawString(this.font, $$4.substring($$11.beginIndex(), $$11.endIndex()), this.getX() + this.innerPadding(), $$10, color) - 1;
+                        $$8 = $$0.drawString(this.font, $$4.substring($$11.beginIndex(), $$11.endIndex()), this.getX() + this.innerPadding(), $$10, color, false) - 1;
                     }
 
                     $$9 = $$10;
@@ -143,7 +143,7 @@ public class NoScrollMultiText extends AbstractScrollWidget {
             if ($$6 && !$$7) {
                 Objects.requireNonNull(this.font);
                 if (this.withinContentAreaTopBottom($$9, $$9 + 9) && editable) {
-                    $$0.drawString(this.font, "_", $$8, $$9, color);
+                    $$0.drawString(this.font, "_", $$8, $$9, color, false);
                 }
             }
 
@@ -193,7 +193,7 @@ public class NoScrollMultiText extends AbstractScrollWidget {
         if (this.textField.hasCharacterLimit()) {
             int $$1 = this.textField.characterLimit();
             Component $$2 = Component.translatable("gui.multiLineEditBox.character_limit", new Object[]{this.textField.value().length(), $$1});
-            $$0.drawString(this.font, $$2, this.getX() + this.width - this.font.width($$2), this.getY() + this.height + 4, 10526880);
+            $$0.drawString(this.font, $$2, this.getX() + this.width - this.font.width($$2), this.getY() + this.height + 4, 10526880, false);
         }
 
     }

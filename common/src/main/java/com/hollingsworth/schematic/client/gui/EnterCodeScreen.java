@@ -1,7 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
-import com.hollingsworth.schematic.api.blockprints.download.Download;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -28,9 +27,7 @@ public class EnterCodeScreen extends BaseSchematicScreen {
         codeField.setValue("10638b87-b336-40a0-903f-42485e3fbf19");
         addRenderableWidget(codeField);
         submitButton = new GuiImageButton(bookLeft + 57, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
-            Minecraft.getInstance().setScreen(
-                    new LoadingScreen<>(() -> Download.downloadPreview(codeField.getValue()),
-                            (result) -> Minecraft.getInstance().setScreen(new DownloadScreen(this, result)), this));
+            Minecraft.getInstance().setScreen(DownloadScreen.getTransition(codeField.getValue(), this));
         });
         addRenderableWidget(new GuiImageButton(bookLeft + 153, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
         }));

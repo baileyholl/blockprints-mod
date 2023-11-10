@@ -25,6 +25,10 @@ public class ApiResponse<T> {
         this.error = component.getString();
     }
 
+    public static ApiResponse<Boolean> success() {
+        return new ApiResponse<>(true);
+    }
+
     public static <F> ApiResponse<F> expectedFailure() {
         return new ApiResponse<>(Component.translatable("blockprints.error_loading").getString());
     }

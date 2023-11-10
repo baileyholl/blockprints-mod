@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DownloadResponse {
+    public final String id;
     public final String previewImage;
     public final String playerName;
     public final String structureName;
@@ -19,6 +20,7 @@ public class DownloadResponse {
     public DownloadResponse(JsonObject jsonObject) {
         mods = new ArrayList<>();
         blockCounts = new ArrayList<>();
+        this.id = jsonObject.get("id").getAsString();
         this.previewImage = jsonObject.get("smallPreviewImage").getAsString();
         this.playerName = jsonObject.get("playerName").getAsString();
         this.structureName = jsonObject.get("name").getAsString();

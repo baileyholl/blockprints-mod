@@ -2,6 +2,7 @@ package com.hollingsworth.schematic.api.blockprints.upload;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.hollingsworth.schematic.api.blockprints.ApiResponse;
 import com.hollingsworth.schematic.api.blockprints.RequestUtil;
 
 import java.io.IOException;
@@ -26,6 +27,26 @@ public class Upload {
         }
         return null;
     }
+
+    public static ApiResponse<Boolean> postEdit(String id, String name, String description) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("name", name);
+        jsonObject.addProperty("description", description);
+        HttpRequest request = RequestUtil.getBuilder()
+                .uri(RequestUtil.getRoute("/api/v1/upload/" + id))
+                .PUT(HttpRequest.BodyPublishers.ofString(jsonObject.toString())).build();
+        try {
+            var res = RequestUtil.CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (!RequestUtil.responseSuccessful(res.statusCode())) {
+                return ApiResponse.parseServerError(res);
+            }
+            return ApiResponse.success();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return ApiResponse.expectedFailure();
+        }
+    }
+
 
     public static boolean postDoneUploading(String id) {
         JsonObject jsonObject = new JsonObject();

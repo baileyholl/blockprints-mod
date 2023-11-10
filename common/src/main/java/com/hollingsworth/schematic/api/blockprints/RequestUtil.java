@@ -11,8 +11,8 @@ public class RequestUtil {
 
     public static final HttpClient CLIENT = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build();
 
-    public static HttpRequest.Builder getBuilder(){
-        if(Minecraft.getInstance().getUser().getName().equals("Dev")){
+    public static HttpRequest.Builder getBuilder() {
+        if (Minecraft.getInstance().getUser().getName().equals("Dev")) {
             return HttpRequest.newBuilder()
                     .header("Content-Type", "application/json");
         }
@@ -21,12 +21,16 @@ public class RequestUtil {
                 .header("authorization", "Bearer " + Minecraft.getInstance().getUser().getAccessToken());
     }
 
-    public static String getDomain(){
+    public static String getDomain() {
         //TODO: Change this to the actual hosted domain
         return Constants.isDev || true ? "http://localhost:3000" : "";
     }
 
-    public static URI getRoute(String route){
+    public static boolean responseSuccessful(int code) {
+        return code / 100 == 2;
+    }
+
+    public static URI getRoute(String route) {
         return URI.create(getDomain() + route);
     }
 }

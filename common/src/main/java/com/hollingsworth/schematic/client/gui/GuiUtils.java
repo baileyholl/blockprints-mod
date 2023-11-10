@@ -36,6 +36,10 @@ public class GuiUtils {
         drawOutlinedText(font, graphics, component, x - halfWidthOfText(font, component), y);
     }
 
+    public static void drawCenteredOutlinedText(Font font, GuiGraphics graphics, Component component, int x, int y) {
+        drawCenteredOutlinedText(font, graphics, component.getVisualOrderText(), x, y);
+    }
+
     public static void drawOutlinedWordWrap(GuiGraphics graphics, Font font, Component component, int x, int y, int wrapLength) {
         for (Iterator var7 = font.split(component, wrapLength).iterator(); var7.hasNext(); y += 9) {
             FormattedCharSequence $$6 = (FormattedCharSequence) var7.next();

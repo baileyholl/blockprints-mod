@@ -55,5 +55,6 @@
   "blockprints.block_missing": "No block with ID %s found.",
   "blockprints.block": "Block",
   "blockprints.qty": "Qty.",
-  "blockprints.save": "Save"
+  "blockprints.save": "Save",
+  "blockprints.edit_success": "Edit successful!"
 }

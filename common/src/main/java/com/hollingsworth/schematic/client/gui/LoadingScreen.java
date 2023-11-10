@@ -54,6 +54,7 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
         if (response == null) {
             return;
         }
+        responseHandled = true;
         var result = response.response();
         var err = response.throwable();
         if (err != null) {

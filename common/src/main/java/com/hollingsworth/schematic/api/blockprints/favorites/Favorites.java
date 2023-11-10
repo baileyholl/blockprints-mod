@@ -28,7 +28,7 @@ public class Favorites {
                     .GET().build();
             var res = RequestUtil.CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
             var code = res.statusCode();
-            if (code / 100 != 2) {
+            if (!RequestUtil.responseSuccessful(code)) {
                 return ApiResponse.parseServerError(res);
             }
             JsonObject responseObj = JsonParser.parseString(res.body()).getAsJsonObject();

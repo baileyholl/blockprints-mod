@@ -1,7 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
-import com.hollingsworth.schematic.api.blockprints.favorites.Favorites;
 import com.hollingsworth.schematic.client.ClientData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -27,9 +26,7 @@ public class HomeScreen extends BaseSchematicScreen {
             Minecraft.getInstance().setScreen(new EnterCodeScreen());
         }));
         addRenderableWidget(new GuiImageButton(bookLeft + 41, bookTop + 137, 223, 47, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_navigation.png"), b -> {
-            Minecraft.getInstance().setScreen(new LoadingScreen<>(Favorites::getFavorites, (favorites) -> {
-                Minecraft.getInstance().setScreen(new ViewBuildsScreen(favorites));
-            }));
+            Minecraft.getInstance().setScreen(ViewFavoritesScreen.getTransition());
         }));
     }
 

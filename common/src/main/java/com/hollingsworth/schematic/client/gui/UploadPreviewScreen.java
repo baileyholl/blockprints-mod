@@ -133,6 +133,7 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         }
     }
 
+
     @Override
     public void drawBackgroundElements(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.drawBackgroundElements(graphics, mouseX, mouseY, partialTicks);

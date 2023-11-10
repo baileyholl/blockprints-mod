@@ -3,8 +3,7 @@ package com.hollingsworth.schematic.client.gui;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.api.blockprints.download.Download;
 import com.hollingsworth.schematic.api.blockprints.download.PreviewDownloadResult;
-import com.hollingsworth.schematic.client.ClientData;
-import com.hollingsworth.schematic.common.util.ClientUtil;
+import com.hollingsworth.schematic.api.blockprints.upload.Upload;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -16,6 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 
 public class EditBuildScreen extends BaseSchematicScreen {
     public static final ResourceLocation PREVIEW_TEXTURE = new ResourceLocation(Constants.MOD_ID, "download_preview");
@@ -24,11 +24,18 @@ public class EditBuildScreen extends BaseSchematicScreen {
     Screen previousScreen;
     ShortTextField nameField;
     NoScrollMultiText descriptionField;
+    GuiImageButton uploadButton;
 
     public EditBuildScreen(Screen previousScreen, PreviewDownloadResult preview) {
         super();
         this.previousScreen = previousScreen;
         this.preview = preview;
+    }
+
+    public static LoadingScreen<PreviewDownloadResult> getTransition(String code, Screen previousScreen) {
+        return new LoadingScreen<>(() -> Download.downloadPreview(code), (build) -> {
+            Minecraft.getInstance().setScreen(new EditBuildScreen(previousScreen, build));
+        }, previousScreen);
     }
 
     @Override
@@ -49,17 +56,22 @@ public class EditBuildScreen extends BaseSchematicScreen {
         descriptionField = new NoScrollMultiText(font, bookLeft + 185, bookTop + 71, 95, 81, Component.empty(), Component.empty());
         nameField.setValue(preview.downloadResponse.structureName);
         descriptionField.setValue(preview.downloadResponse.description);
-        addRenderableWidget(new GuiImageButton(bookRight - 119, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
-            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Download.downloadSchematic(preview.downloadResponse.schematicLink, preview.downloadResponse.structureName), result -> {
-                Minecraft.getInstance().setScreen(null);
-                if (result) {
-                    ClientUtil.sendMessage("blockprints.download_success");
+        uploadButton = new GuiImageButton(bookRight - 119, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
+            var name = nameField.getValue().trim();
+            var desc = descriptionField.getValue().trim();
+            // return if the name or description is too long or too short
+            if (name.length() > UploadPreviewScreen.MAX_NAME_LENGTH || name.length() < UploadPreviewScreen.MIN_NAME_LENGTH || desc.length() > UploadPreviewScreen.MAX_DESC_LENGTH || desc.length() < UploadPreviewScreen.MIN_DESC_LENGTH) {
+                return;
+            }
+            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Upload.postEdit(preview.downloadResponse.id, name, desc), (build) -> {
+                if (previousScreen instanceof ViewFavoritesScreen buildsScreen) {
+                    Minecraft.getInstance().setScreen(ViewFavoritesScreen.getTransition(buildsScreen.showFavorites, buildsScreen.showBuilds, buildsScreen.showRecent));
                 } else {
-                    ClientUtil.sendMessage("blockprints.download_failed");
+                    Minecraft.getInstance().setScreen(ViewFavoritesScreen.getTransition());
                 }
-                ClientData.setStatus(Component.empty());
-            }));
-        }));
+            }, this));
+        });
+        addRenderableWidget(uploadButton);
 
         addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
             Minecraft.getInstance().setScreen(previousScreen);
@@ -91,5 +103,26 @@ public class EditBuildScreen extends BaseSchematicScreen {
     public void onClose() {
         super.onClose();
         Minecraft.getInstance().getTextureManager().release(PREVIEW_TEXTURE);
+    }
+
+    @Override
+    public void collectTooltips(GuiGraphics stack, int mouseX, int mouseY, List<Component> tooltip) {
+        super.collectTooltips(stack, mouseX, mouseY, tooltip);
+        if (GuiUtils.isMouseInRelativeRange(mouseX, mouseY, uploadButton)) {
+            var name = nameField.getValue().trim();
+            var desc = descriptionField.getValue().trim();
+            if (name.length() > UploadPreviewScreen.MAX_NAME_LENGTH) {
+                tooltip.add(Component.translatable("blockprints.name_too_long"));
+            }
+            if (name.length() < UploadPreviewScreen.MIN_NAME_LENGTH) {
+                tooltip.add(Component.translatable("blockprints.name_too_short"));
+            }
+            if (desc.length() > UploadPreviewScreen.MAX_DESC_LENGTH) {
+                tooltip.add(Component.translatable("blockprints.description_too_long"));
+            }
+            if (desc.length() < UploadPreviewScreen.MIN_DESC_LENGTH) {
+                tooltip.add(Component.translatable("blockprints.description_too_short"));
+            }
+        }
     }
 }
