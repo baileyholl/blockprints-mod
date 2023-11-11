@@ -6,6 +6,12 @@ buildscript {
             url "https://repo.spongepowered.org/repository/maven-public/"
         }
         mavenCentral()
+        maven {
+            url "https://www.cursemaven.com"
+            content {
+                includeGroup "curse.maven"
+            }
+        }
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.0.+', changing: true
@@ -20,9 +26,17 @@ apply plugin: 'maven-publish'
 
 archivesBaseName = "${mod_name}-forge-${minecraft_version}"
 
+repositories {
+    maven {
+        url "https://www.cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+}
 minecraft {
     mappings channel: 'official', version: minecraft_version
-    
+
 
     // This location is hardcoded in Forge and can not be changed.
     // https://github.com/MinecraftForge/MinecraftForge/blob/be1698bb1554f9c8fa2f58e32b9ab70bc4385e60/fmlloader/src/main/java/net/minecraftforge/fml/loading/moddiscovery/ModFile.java#L123
@@ -97,7 +111,8 @@ dependencies {
         jarJar.ranged(it, "[0.2.0-beta.11,)")
     }
     implementation("org.bytedeco:ffmpeg-platform:6.0-1.5.9")
-    implementation fg.deobf("curse.maven:oauth-513857:4518842")
+    implementation fg.deobf("curse.maven:oauth-513857:4575495")
+    implementation fg.deobf("curse.maven:patchouli-306770:4636277")
 }
 
 tasks.withType(JavaCompile) {
