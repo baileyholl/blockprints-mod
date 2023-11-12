@@ -1,6 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
-import com.hollingsworth.schematic.Constants;
+import com.hollingsworth.schematic.ClientConstants;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -28,8 +28,8 @@ public class GuiUtils {
 
 
     public static void drawOutlinedText(Font font, GuiGraphics graphics, FormattedCharSequence component, int x, int y) {
-        font.drawInBatch8xOutline(component, x, y, DyeColor.WHITE.getTextColor(), DyeColor.BLACK.getTextColor(), graphics.pose().last().pose(), Constants.bufferSource, 15728880);
-        Constants.bufferSource.endBatch();
+        font.drawInBatch8xOutline(component, x, y, DyeColor.WHITE.getTextColor(), DyeColor.BLACK.getTextColor(), graphics.pose().last().pose(), ClientConstants.bufferSource, 15728880);
+        ClientConstants.bufferSource.endBatch();
     }
 
     public static void drawCenteredOutlinedText(Font font, GuiGraphics graphics, FormattedCharSequence component, int x, int y) {

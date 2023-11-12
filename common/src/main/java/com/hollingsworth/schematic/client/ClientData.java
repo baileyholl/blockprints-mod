@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.client;
 
+import com.hollingsworth.schematic.ClientConstants;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.client.gui.GuiUtils;
 import com.hollingsworth.schematic.client.gui.HomeScreen;
@@ -125,9 +126,9 @@ public class ClientData {
         currentSelectionBox = currentSelectionBox.move(-camera.x, -camera.y, -camera.z);
 
         poseStack.pushPose();
-        VertexConsumer vertexconsumer = Constants.bufferSource.getBuffer(RenderType.lines());
+        VertexConsumer vertexconsumer = ClientConstants.bufferSource.getBuffer(RenderType.lines());
         LevelRenderer.renderLineBox(poseStack, vertexconsumer, currentSelectionBox, 0.9F, 0.9F, 0.9F, 1.0f);
-        Constants.bufferSource.endBatch();
+        ClientConstants.bufferSource.endBatch();
         poseStack.popPose();
     }
 

@@ -2,6 +2,7 @@ package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.api.blockprints.favorites.Favorite;
+import com.hollingsworth.schematic.api.blockprints.favorites.Favorites;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -17,9 +18,23 @@ public class FavoritesRow extends NestedWidget {
         super(x, y, 236, 12, Component.empty());
         this.favorite = favorite;
         this.viewBuildsScreen = screen;
-        renderables.add(new GuiImageButton(x + 224, y + 1, 11, 11, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_edit.png"), button -> {
-            Minecraft.getInstance().setScreen(EditBuildScreen.getTransition(favorite.id(), viewBuildsScreen));
-        }).withTooltip(Component.translatable("blockprints.edit")));
+        if(favorite.isBuild()) {
+            renderables.add(new GuiImageButton(x + 224, y + 1, 11, 11, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_edit.png"), button -> {
+                Minecraft.getInstance().setScreen(EditBuildScreen.getTransition(favorite.id(), viewBuildsScreen));
+            }).withTooltip(Component.translatable("blockprints.edit")));
+        }else if(favorite.isFavorite()){
+            renderables.add(new GuiImageButton(x + 224, y + 1, 11, 11, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_remove_favorite.png"), button -> {
+                Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Favorites.removeFavorite(favorite.id()), (res) ->{
+                    Minecraft.getInstance().setScreen(ViewFavoritesScreen.getTransition(viewBuildsScreen.showFavorites, viewBuildsScreen.showBuilds, viewBuildsScreen.showRecent));
+                }));
+            }).withTooltip(Component.translatable("blockprints.remove_favorite")));
+        }else{
+            renderables.add(new GuiImageButton(x + 224, y + 1, 11, 11, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_add_favorite.png"), button -> {
+                Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Favorites.addFavorite(favorite.id()), (res) ->{
+                    Minecraft.getInstance().setScreen(ViewFavoritesScreen.getTransition(viewBuildsScreen.showFavorites, viewBuildsScreen.showBuilds, viewBuildsScreen.showRecent));
+                }));
+            }).withTooltip(Component.translatable("blockprints.add_favorite")));
+        }
         renderables.add(new GuiImageButton(x + 211, y + 1, 11, 11, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_copy.png"), button -> {
             Minecraft.getInstance().keyboardHandler.setClipboard(favorite.id());
         }).withTooltip(Component.translatable("blockprints.copy")));
@@ -36,7 +51,7 @@ public class FavoritesRow extends NestedWidget {
         } else if (viewBuildsScreen.showFavorites && favorite.isFavorite()) {
             graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_favorite_builds.png"), x + 4, y + 3, 0, 0, 7, 7, 7, 7);
         } else if (viewBuildsScreen.showRecent && favorite.isRecent()) {
-            graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_favorite_builds.png"), x + 4, y + 3, 0, 0, 7, 7, 7, 7);
+            graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_recent_builds.png"), x + 4, y + 3, 0, 0, 7, 7, 7, 7);
         }
     }
 

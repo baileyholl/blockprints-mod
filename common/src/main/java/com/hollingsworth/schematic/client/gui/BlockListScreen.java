@@ -51,7 +51,7 @@ public class BlockListScreen extends BaseSchematicScreen {
         }
         rows = new ArrayList<>();
         List<DownloadScreen.BlockListEntry> sliced = entries.subList(scroll, Math.min(scroll + 10, entries.size()));
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < Math.min(sliced.size(), 10); i++) {
             var entry = sliced.get(i);
             BlockEntryRow row = new BlockEntryRow(bookLeft + 25, bookTop + 43 + (i * 14), entry);
             rows.add(row);

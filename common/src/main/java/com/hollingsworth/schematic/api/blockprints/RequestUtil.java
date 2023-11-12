@@ -11,19 +11,26 @@ public class RequestUtil {
 
     public static final HttpClient CLIENT = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build();
 
-    public static HttpRequest.Builder getBuilder() {
+    public static HttpRequest.Builder getBuilder(boolean includeContentType){
+        HttpRequest.Builder req = null;
         if (Minecraft.getInstance().getUser().getName().equals("Dev")) {
-            return HttpRequest.newBuilder()
-                    .header("Content-Type", "application/json");
+            req = HttpRequest.newBuilder();
+        }else{
+            req = HttpRequest.newBuilder()
+                    .header("authorization", "Bearer " + Minecraft.getInstance().getUser().getAccessToken());
         }
-        return HttpRequest.newBuilder()
-                .header("Content-Type", "application/json")
-                .header("authorization", "Bearer " + Minecraft.getInstance().getUser().getAccessToken());
+        if(includeContentType){
+            req.header("Content-Type", "application/json");
+        }
+        return req;
+    }
+
+    public static HttpRequest.Builder getBuilder() {
+        return getBuilder(true);
     }
 
     public static String getDomain() {
-        //TODO: Change this to the actual hosted domain
-        return Constants.isDev || true ? "http://localhost:3000" : "";
+        return Constants.isDev ? "http://localhost:3000" : "https://api.blockprints.io";
     }
 
     public static boolean responseSuccessful(int code) {

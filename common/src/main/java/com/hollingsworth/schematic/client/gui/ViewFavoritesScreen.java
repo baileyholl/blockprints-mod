@@ -1,6 +1,7 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
+import com.hollingsworth.schematic.api.blockprints.favorites.Favorite;
 import com.hollingsworth.schematic.api.blockprints.favorites.Favorites;
 import com.hollingsworth.schematic.api.blockprints.favorites.FavoritesResponse;
 import net.minecraft.client.Minecraft;
@@ -12,15 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ViewFavoritesScreen extends BaseSchematicScreen {
-    protected FavoritesResponse favorites = null;
-    List<FavoritesRow> favoritesRows = new ArrayList<>();
+    protected FavoritesResponse res = null;
+    List<Favorite> favorites = new ArrayList<>();
+    List<FavoritesRow> rows = new ArrayList<>();
     public boolean showFavorites = true;
     public boolean showBuilds = true;
     public boolean showRecent = true;
-
+    int scroll = 0;
     public ViewFavoritesScreen(FavoritesResponse favoritesResponse) {
-        super();
-        this.favorites = favoritesResponse;
+        this(favoritesResponse, true, true, true);
     }
 
     public static LoadingScreen<FavoritesResponse> getTransition() {
@@ -37,20 +38,40 @@ public class ViewFavoritesScreen extends BaseSchematicScreen {
 
     public ViewFavoritesScreen(FavoritesResponse favoritesResponse, boolean showFavorites, boolean showBuilds, boolean showRecent) {
         super();
-        this.favorites = favoritesResponse;
+        this.favorites = favoritesResponse.favorites;
+        this.res = favoritesResponse;
         this.showFavorites = showFavorites;
         this.showBuilds = showBuilds;
         this.showRecent = showRecent;
+        // Sort by builds, then favorites, then recent
+        favorites.sort((o1, o2) -> {
+            if (o1.isBuild() && !o2.isBuild()) {
+                return -1;
+            } else if (!o1.isBuild() && o2.isBuild()) {
+                return 1;
+            } else if (o1.isFavorite() && !o2.isFavorite()) {
+                return -1;
+            } else if (!o1.isFavorite() && o2.isFavorite()) {
+                return 1;
+            } else if (o1.isRecent() && !o2.isRecent()) {
+                return -1;
+            } else if (!o1.isRecent() && o2.isRecent()) {
+                return 1;
+            } else {
+                return o1.name().compareTo(o2.name());
+            }
+        });
     }
 
     @Override
     public void init() {
         super.init();
-        for (int i = 0; i < favorites.favorites.size(); i++) {
-            FavoritesRow row = new FavoritesRow(bookLeft + 26, bookTop + 44 + (i * 14), favorites.favorites.get(i), this);
-            favoritesRows.add(row);
-            addRenderableWidget(row);
-        }
+        updateList();
+        int scrollSize = Math.max(0, favorites.size() - 10);
+        addRenderableWidget(new VerticalSlider(bookLeft + 265, bookTop + 46, scrollSize, 1, 1, count -> {
+            this.scroll = count;
+            updateList();
+        }));
 
         ResourceLocation unchecked = new ResourceLocation(Constants.MOD_ID, "textures/gui/container_filter_unchecked.png");
         ResourceLocation checked = new ResourceLocation(Constants.MOD_ID, "textures/gui/container_filter_checked.png");
@@ -74,6 +95,20 @@ public class ViewFavoritesScreen extends BaseSchematicScreen {
             Minecraft.getInstance().setScreen(new HomeScreen());
         }));
 
+    }
+
+    public void updateList() {
+        for (FavoritesRow row : rows) {
+            removeWidget(row);
+        }
+        rows = new ArrayList<>();
+        List<Favorite> sliced = favorites.subList(scroll, Math.min(scroll + 10, favorites.size()));
+        for (int i = 0; i < Math.min(sliced.size(), 10); i++) {
+            var entry = sliced.get(i);
+            FavoritesRow row = new FavoritesRow(bookLeft + 26, bookTop + 44 + (i * 14),  entry, this);
+            rows.add(row);
+            addRenderableWidget(row);
+        }
     }
 
     public void queryFavorites() {

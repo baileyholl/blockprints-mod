@@ -24,6 +24,7 @@ public class GoogleCloudStorage {
         return "https://storage.googleapis.com/blockprints-prod/";
     }
 
+    //TODO: convert to api response
     public static boolean uploadFileToGCS(URL signedUrl, Path filePath, String contentType, int fileSize) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()

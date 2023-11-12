@@ -48,4 +48,22 @@ public class Download {
     public static ApiResponse<Path> downloadSchematic(String link, String name) {
         return GoogleCloudStorage.downloadSchematic(link, name);
     }
+
+    public static ApiResponse<Boolean> pushRecentDownload(String id){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("id", id);
+        HttpRequest request = RequestUtil.getBuilder()
+                .uri(RequestUtil.getRoute("/api/v1/schematics/recent"))
+                .PUT(HttpRequest.BodyPublishers.ofString(jsonObject.toString())).build();
+        try{
+            var res = RequestUtil.CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (!RequestUtil.responseSuccessful(res.statusCode())) {
+                return ApiResponse.parseServerError(res);
+            }
+            return ApiResponse.success();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ApiResponse.connectionError();
+        }
+    }
 }

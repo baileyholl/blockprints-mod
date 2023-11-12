@@ -1,7 +1,5 @@
 package com.hollingsworth.schematic;
 
-import com.hollingsworth.schematic.common.item.CafeItems;
-import com.hollingsworth.schematic.common.network.Networking;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -21,21 +19,17 @@ public class SchematicForge {
         // project.
     
         // Use Forge to bootstrap the Common mod.
-        Constants.LOG.info("Hello Forge world!");
         SchematicMod.init();
 
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
-
-        CafeItems.ITEMS.register(modEventBus);
         MinecraftForge.EVENT_BUS.register(this);
-        Constants.isDev = !FMLEnvironment.production;
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        Networking.registerMessages();
+//        Networking.registerMessages();
     }
 
     @SubscribeEvent

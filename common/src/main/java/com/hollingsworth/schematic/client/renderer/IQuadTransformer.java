@@ -9,7 +9,6 @@ import java.util.List;
 /**
  * Transformer for {@link BakedQuad baked quads}.
  *
- * @see QuadTransformers
  */
 public interface IQuadTransformer {
     int STRIDE = DefaultVertexFormat.BLOCK.getIntegerSize();

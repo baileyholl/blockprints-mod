@@ -56,5 +56,7 @@
   "blockprints.block": "Block",
   "blockprints.qty": "Qty.",
   "blockprints.save": "Save",
-  "blockprints.edit_success": "Edit successful!"
+  "blockprints.edit_success": "Edit successful!",
+  "blockprints.add_favorite": "Add to Favorites",
+  "blockprints.remove_favorite": "Remove from Favorites"
 }

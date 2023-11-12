@@ -112,7 +112,6 @@ dependencies {
     }
     implementation("org.bytedeco:ffmpeg-platform:6.0-1.5.9")
     implementation fg.deobf("curse.maven:oauth-513857:4575495")
-    implementation fg.deobf("curse.maven:patchouli-306770:4636277")
 }
 
 tasks.withType(JavaCompile) {
