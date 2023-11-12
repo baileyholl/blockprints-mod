@@ -22,14 +22,14 @@ public class Networking {
     }
 
     public static void registerMessages() {
-        INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(Constants.MOD_ID, "network"), () -> "1.0", s -> true, s -> true);
-
-
-        INSTANCE.registerMessage(nextID(),
-                DownloadSchematic.class,
-                DownloadSchematic::encode,
-                DownloadSchematic::new,
-                MessageHandler::handle);
+//        INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(Constants.MOD_ID, "network"), () -> "1.0", s -> true, s -> true);
+//
+//
+//        INSTANCE.registerMessage(nextID(),
+//                DownloadSchematic.class,
+//                DownloadSchematic::encode,
+//                DownloadSchematic::new,
+//                MessageHandler::handle);
     }
 
     public static void sendToNearby(Level world, BlockPos pos, Object toSend) {

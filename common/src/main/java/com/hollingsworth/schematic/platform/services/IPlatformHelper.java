@@ -1,5 +1,10 @@
 package com.hollingsworth.schematic.platform.services;
 
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.state.BlockState;
+
 import java.nio.file.Path;
 
 public interface IPlatformHelper {
@@ -32,4 +37,6 @@ public interface IPlatformHelper {
      * @return True if in a development environment, false otherwise.
      */
     boolean isDevelopmentEnvironment();
+
+    public Iterable<RenderType> getRenderTypes(BakedModel bakedModel, BlockState blockstate, RandomSource rand);
 }

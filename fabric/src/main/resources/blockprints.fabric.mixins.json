@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "schematic.refmap.json",
   "mixins": [
+    "BufferBuilderAccessor",
     "EditBoxAccessor",
     "NativeImageAccessor"
   ],

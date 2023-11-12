@@ -1,6 +1,11 @@
 package com.hollingsworth.schematic.platform;
 
 import com.hollingsworth.schematic.platform.services.IPlatformHelper;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
 
@@ -26,5 +31,10 @@ public class ForgePlatformHelper implements IPlatformHelper {
     @Override
     public boolean isDevelopmentEnvironment() {
         return !FMLLoader.isProduction();
+    }
+
+    @Override
+    public Iterable<RenderType> getRenderTypes(BakedModel bakedModel, BlockState blockstate, RandomSource rand) {
+        return bakedModel.getRenderTypes(blockstate, rand, ModelData.EMPTY);
     }
 }

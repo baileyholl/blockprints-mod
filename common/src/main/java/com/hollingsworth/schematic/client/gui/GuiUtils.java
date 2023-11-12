@@ -1,6 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
-import com.hollingsworth.schematic.Constants;
+import com.hollingsworth.schematic.ClientConstants;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -13,7 +13,7 @@ import java.util.Objects;
 
 public class GuiUtils {
 
-    public static boolean isMouseInRelativeRange(int mouseX, int mouseY, AbstractWidget widget){
+    public static boolean isMouseInRelativeRange(int mouseX, int mouseY, AbstractWidget widget) {
         return isMouseInRelativeRange(mouseX, mouseY, widget.getX(), widget.getY(), widget.getWidth(), widget.getHeight());
     }
 
@@ -26,18 +26,23 @@ public class GuiUtils {
         graphics.drawString(font, component.getString(), x - halfWidthOfText(font, component.getVisualOrderText()), y, color, false);
     }
 
+
     public static void drawOutlinedText(Font font, GuiGraphics graphics, FormattedCharSequence component, int x, int y) {
-        font.drawInBatch8xOutline(component, x, y, DyeColor.WHITE.getTextColor(), DyeColor.BLACK.getTextColor(), graphics.pose().last().pose(),  Constants.bufferSource, 15728880);
-        Constants.bufferSource.endBatch();
+        font.drawInBatch8xOutline(component, x, y, DyeColor.WHITE.getTextColor(), DyeColor.BLACK.getTextColor(), graphics.pose().last().pose(), ClientConstants.bufferSource, 15728880);
+        ClientConstants.bufferSource.endBatch();
     }
 
     public static void drawCenteredOutlinedText(Font font, GuiGraphics graphics, FormattedCharSequence component, int x, int y) {
         drawOutlinedText(font, graphics, component, x - halfWidthOfText(font, component), y);
     }
 
+    public static void drawCenteredOutlinedText(Font font, GuiGraphics graphics, Component component, int x, int y) {
+        drawCenteredOutlinedText(font, graphics, component.getVisualOrderText(), x, y);
+    }
+
     public static void drawOutlinedWordWrap(GuiGraphics graphics, Font font, Component component, int x, int y, int wrapLength) {
-        for(Iterator var7 = font.split(component, wrapLength).iterator(); var7.hasNext(); y += 9) {
-            FormattedCharSequence $$6 = (FormattedCharSequence)var7.next();
+        for (Iterator var7 = font.split(component, wrapLength).iterator(); var7.hasNext(); y += 9) {
+            FormattedCharSequence $$6 = (FormattedCharSequence) var7.next();
             drawOutlinedText(font, graphics, $$6, x, y);
             Objects.requireNonNull(font);
         }
@@ -45,6 +50,6 @@ public class GuiUtils {
     }
 
     public static int halfWidthOfText(Font font, FormattedCharSequence component) {
-        return font.width(component)/2;
+        return font.width(component) / 2;
     }
 }

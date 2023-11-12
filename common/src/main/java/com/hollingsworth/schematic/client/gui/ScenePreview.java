@@ -12,6 +12,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
@@ -58,11 +59,11 @@ public class ScenePreview extends AbstractWidget {
         }
     }
 
-    public void renderTarget(){
+    public void renderTarget() {
         wrappedScene.renderToCurrentTarget(wrappedScene.getPreferredSize());
     }
 
-    public void removed(){
+    public void removed() {
         if (renderer != null) {
             renderer.close();
             renderer = null;
@@ -85,14 +86,14 @@ public class ScenePreview extends AbstractWidget {
             LytSize newDim = getScaledDimension(origDim, boundary);
             // Offset x and Y so the image is centered
             // center x and y on point 50, 50
-            int x = previewX + 143/2;
-            int y = previewY + 111/2;
+            int x = previewX + 143 / 2;
+            int y = previewY + 111 / 2;
             x -= newDim.width() / 2;
             y -= newDim.height() / 2;
 
             innerBlit(graphics.pose(), renderer, x, x + newDim.width(), y, y + newDim.height(), 0);
         }
-        ModScreen.blitRect(graphics.pose(), x + 121, y + 5, 0, 0, 17, 17, 17, 17, new ResourceLocation(Constants.MOD_ID, "textures/gui/gimbal/gimbal_cardinal.png"), 150);
+        ModScreen.blitRect(graphics.pose(), x + 121, y + 3, 0, 0, 17, 17, 17, 17, new ResourceLocation(Constants.MOD_ID, "textures/gui/gimbal/gimbal_cardinal.png"), 150);
     }
 
     void innerBlit(PoseStack pose, OffScreenRenderer osr, int x1, int x2, int y1, int y2, int blitOffset) {
@@ -139,6 +140,11 @@ public class ScenePreview extends AbstractWidget {
 
     @Override
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+
+    }
+
+    @Override
+    public void playDownSound(SoundManager $$0) {
 
     }
 }

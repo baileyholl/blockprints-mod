@@ -7,14 +7,17 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GuiImageButton extends ANButton implements ITooltipProvider {
 
     public ResourceLocation image;
     public int u, v, image_width, image_height;
-    public Component toolTip;
+    public List<Component> toolTip = new ArrayList<>();
     public boolean soundDisabled = false;
 
     public GuiImageButton(int x, int y, int w, int h, ResourceLocation image, OnPress onPress) {
@@ -36,13 +39,20 @@ public class GuiImageButton extends ANButton implements ITooltipProvider {
         this.image = image;
     }
 
-    public GuiImageButton withTooltip(Component toolTip) {
-        this.toolTip = toolTip;
+    public GuiImageButton withTooltip(@Nullable Component toolTip) {
+        if (toolTip == null)
+            return this;
+        this.toolTip.add(toolTip);
+        return this;
+    }
+
+    public GuiImageButton withTooltip(@NotNull List<Component> tooltip) {
+        this.toolTip = tooltip;
         return this;
     }
 
     @Override
-    public void render(GuiGraphics graphics,int parX, int parY, float partialTicks) {
+    public void render(GuiGraphics graphics, int parX, int parY, float partialTicks) {
         if (visible) {
             graphics.blit(image, x, y, u, v, width, height, image_width, image_height);
         }
@@ -51,7 +61,7 @@ public class GuiImageButton extends ANButton implements ITooltipProvider {
     @Override
     public void getTooltip(List<Component> tooltip) {
         if (toolTip != null)
-            tooltip.add(toolTip);
+            tooltip.addAll(toolTip);
     }
 
     @Override

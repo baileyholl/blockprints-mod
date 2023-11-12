@@ -69,10 +69,4 @@ public final class TintedVertexConsumer implements VertexConsumer {
         wrapped.unsetDefaultColor();
     }
 
-    //TODO Hope this works
-    public VertexFormat getVertexFormat() {
-        return DefaultVertexFormat.BLOCK;
-    }
-
-
 }

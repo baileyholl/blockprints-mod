@@ -3,7 +3,6 @@ package com.hollingsworth.schematic.client;
 import com.hollingsworth.schematic.Constants;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.InputEvent;
@@ -21,27 +20,30 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void keyEvent(final InputEvent.Key event) {
-        if (Minecraft.getInstance().player == null || InputConstants.PRESS != event.getAction() || MINECRAFT.screen != null )
+        if (Minecraft.getInstance().player == null || InputConstants.PRESS != event.getAction() || MINECRAFT.screen != null)
             return;
-        if(event.getKey() == ClientData.OPEN_MENU.getKey().getValue())
+        if (event.getKey() == ClientData.OPEN_MENU.getKey().getValue())
             ClientData.openMenu();
-        if(event.getKey() == ClientData.CONFIRM.getKey().getValue()){
+        if (event.getKey() == ClientData.CONFIRM.getKey().getValue()) {
             ClientData.onConfirmHit();
         }
-        if(event.getKey() == ClientData.CANCEL.getKey().getValue()){
+        if (event.getKey() == ClientData.CANCEL.getKey().getValue()) {
             ClientData.onCancelHit();
         }
     }
 
     @SubscribeEvent
     public static void rightClickEvent(final InputEvent.MouseButton.Pre event) {
-        if(InputConstants.MOUSE_BUTTON_RIGHT != event.getButton() || MINECRAFT.screen != null)
+        if (InputConstants.MOUSE_BUTTON_RIGHT != event.getButton() || MINECRAFT.screen != null || event.getAction() != InputConstants.RELEASE)
             return;
-        ClientData.positionClicked(BlockPos.ZERO);
+        ClientData.positionClicked();
     }
 
     @SubscribeEvent
     public static void renderLast(final RenderLevelStageEvent event) {
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
+            return;
+        }
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY) {
             return;
         }
@@ -53,6 +55,6 @@ public class ClientEvents {
     public static void afterRenderOverlayLayer(RenderGuiOverlayEvent.Post event) {
         if (event.getOverlay() != VanillaGuiOverlay.CROSSHAIR.type())
             return;
-      ClientData.renderBoundaryUI(event.getGuiGraphics(), event.getWindow());
+        ClientData.renderBoundaryUI(event.getGuiGraphics(), event.getWindow());
     }
 }
