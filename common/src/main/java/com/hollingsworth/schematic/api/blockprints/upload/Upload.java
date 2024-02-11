@@ -11,10 +11,11 @@ import java.net.http.HttpResponse;
 
 public class Upload {
 
-    public static ApiResponse<UploadResponse> postUpload(String name, String description) {
+    public static ApiResponse<UploadResponse> postUpload(String name, String description, boolean makePublic) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("name", name);
         jsonObject.addProperty("description", description);
+        jsonObject.addProperty("makePublic", makePublic);
         HttpRequest request = RequestUtil.getBuilder()
                 .uri(RequestUtil.getRoute("/api/v1/upload"))
                 .POST(HttpRequest.BodyPublishers.ofString(jsonObject.toString())).build();
@@ -31,10 +32,11 @@ public class Upload {
         return ApiResponse.connectionError();
     }
 
-    public static ApiResponse<Boolean> postEdit(String id, String name, String description) {
+    public static ApiResponse<Boolean> postEdit(String id, String name, String description, boolean makePublic) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("name", name);
         jsonObject.addProperty("description", description);
+        jsonObject.addProperty("makePublic", makePublic);
         HttpRequest request = RequestUtil.getBuilder()
                 .uri(RequestUtil.getRoute("/api/v1/upload/" + id))
                 .PUT(HttpRequest.BodyPublishers.ofString(jsonObject.toString())).build();

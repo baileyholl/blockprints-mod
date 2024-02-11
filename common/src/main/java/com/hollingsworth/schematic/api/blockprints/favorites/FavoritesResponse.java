@@ -7,13 +7,9 @@ import java.util.List;
 
 public class FavoritesResponse {
     public final List<Favorite> favorites;
-    public final String lastId;
-    public final int page;
 
     public FavoritesResponse(JsonObject jsonObject) {
         favorites = new ArrayList<>();
-        this.lastId = jsonObject.get("lastId").getAsString();
-        this.page = jsonObject.get("page").getAsInt();
         for (var favorite : jsonObject.get("favorites").getAsJsonArray()) {
             JsonObject object = favorite.getAsJsonObject();
             favorites.add(new Favorite(object.get("name").getAsString(),

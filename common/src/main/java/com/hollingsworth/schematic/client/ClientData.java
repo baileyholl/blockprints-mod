@@ -143,7 +143,7 @@ public class ClientData {
         if (ClientData.firstTarget == null) {
             ClientData.firstTarget = pos.immutable();
             Minecraft.getInstance().player.sendSystemMessage(Component.translatable(Constants.MOD_ID + ".select_second"));
-            return true;
+            return true;// test
         } else if (ClientData.secondTarget == null && !ClientData.firstTarget.equals(pos)) {
             ClientData.secondTarget = pos.immutable();
             Minecraft.getInstance().player.sendSystemMessage(Component.translatable(Constants.MOD_ID + ".confirm_selection", CONFIRM.getTranslatedKeyMessage()));
@@ -170,7 +170,9 @@ public class ClientData {
             String compKey = firstTarget == null ? "select_first" : "select_second";
             GuiUtils.drawCenteredOutlinedText(Minecraft.getInstance().font, graphics, Component.translatable(Constants.MOD_ID + "." + compKey).getVisualOrderText(), 0, 0);
         }
-        graphics.pose().translate(screenX, instructionY + 10, 0);
+        graphics.pose().popPose();
+        graphics.pose().pushPose();
+        graphics.pose().translate(screenX,  instructionY+ 10, 0);
         GuiUtils.drawCenteredOutlinedText(Minecraft.getInstance().font, graphics, Component.translatable(Constants.MOD_ID + ".cancel_selection", CANCEL.getTranslatedKeyMessage()).getVisualOrderText(), 0, 0);
         graphics.pose().popPose();
     }

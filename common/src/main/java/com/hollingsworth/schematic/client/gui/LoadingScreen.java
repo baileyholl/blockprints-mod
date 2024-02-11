@@ -60,9 +60,11 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
         var err = response.throwable();
         if (err != null) {
             error = Component.translatable("blockprints.unexpected_error", err.toString()).getString();
+            err.printStackTrace();
             addHomeButton();
         } else if (result.error != null) {
             error = result.error;
+            Constants.LOG.error("Error: " + result.error);
             addHomeButton();
         } else if (result.response != null) {
             onSuccess.accept(result.response);

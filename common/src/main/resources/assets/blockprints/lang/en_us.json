@@ -58,5 +58,7 @@
   "blockprints.save": "Save",
   "blockprints.edit_success": "Edit successful!",
   "blockprints.add_favorite": "Add to Favorites",
-  "blockprints.remove_favorite": "Remove from Favorites"
+  "blockprints.remove_favorite": "Remove from Favorites",
+  "blockprints.make_public": "Make Public",
+  "blockprints.make_public_tooltip": "Checking this will allow other users to view and download your build from Blockprints.io. If this is disabled, you can still share your build via the code in View Builds."
 }

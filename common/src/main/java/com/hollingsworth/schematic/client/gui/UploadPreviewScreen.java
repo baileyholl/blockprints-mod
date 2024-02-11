@@ -28,7 +28,7 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     public static final int MIN_NAME_LENGTH = 10;
     public static final int MAX_DESC_LENGTH = 1000;
     public static final int MIN_DESC_LENGTH = 20;
-
+    public boolean makePublic = false;
     public UploadPreviewScreen(StructureTemplate structureTemplate) {
         super();
         this.structureTemplate = structureTemplate;
@@ -43,7 +43,7 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         wrappedScene.placeStructure(structureTemplate);
         nameField = new ShortTextField(font, bookLeft + 185, bookTop + 39, Component.empty());
         descriptionField = new NoScrollMultiText(font, bookLeft + 185, bookTop + 71, 95, 81, Component.empty(), Component.empty());
-        uploadButton = new GuiImageButton(bookRight - 119, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
+        uploadButton = new GuiImageButton(bookRight - 119, bookTop + 169, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
             var name = nameField.getValue().trim();
             var desc = descriptionField.getValue().trim();
             // return if the name or description is too long or too short
@@ -54,7 +54,7 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
             List<WrappedScene.ImageExport> images = sceneExporter.getImages();
 
 
-            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> sceneExporter.writeAndUpload(images, this.nameField.getValue(), this.descriptionField.getValue()), (res) -> {
+            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> sceneExporter.writeAndUpload(images, this.nameField.getValue(), this.descriptionField.getValue(), this.makePublic), (res) -> {
                 Minecraft.getInstance().setScreen(null);
                 ClientUtil.sendMessage(Component.translatable("blockprints.upload_complete"));
             }));
@@ -89,6 +89,9 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
             Minecraft.getInstance().setScreen(new HomeScreen());
         }));
+        addRenderableWidget(new CheckBoxButton(bookRight - 119, bookTop + 153, b -> {
+            this.makePublic = !this.makePublic;
+        }, () -> this.makePublic).withTooltip(Component.translatable("blockprints.make_public_tooltip")));
     }
 
     @Override
@@ -110,8 +113,9 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     @Override
     public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.render(graphics, pMouseX, pMouseY, pPartialTick);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_upload.png"), bookRight - 116, bookTop + 155, 0, 0, 9, 11, 9, 11);
-        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.upload").getVisualOrderText(), bookRight - 67, bookTop + 157);
+        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_upload.png"), bookRight - 116, bookTop + 171, 0, 0, 9, 11, 9, 11);
+        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.make_public").getVisualOrderText(), bookRight - 67, bookTop + 157);
+        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.upload").getVisualOrderText(), bookRight - 67, bookTop + 173);
     }
 
     @Override

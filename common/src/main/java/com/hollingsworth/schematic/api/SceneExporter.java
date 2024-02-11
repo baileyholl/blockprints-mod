@@ -60,7 +60,7 @@ public class SceneExporter {
         return images;
     }
 
-    public ApiResponse<Boolean> writeAndUpload(List<WrappedScene.ImageExport> images, String name, String description) {
+    public ApiResponse<Boolean> writeAndUpload(List<WrappedScene.ImageExport> images, String name, String description, boolean makePublic) {
         String finalExportName = sanitize(name);
         try {
             Files.createDirectories(Path.of(IMAGE_FOLDER));
@@ -78,7 +78,7 @@ public class SceneExporter {
                 count++;
             }
             SchematicExport.SchematicExportResult result = SchematicExport.saveSchematic(Paths.get(STRUCTURE_FOLDER), finalExportName, false, structureTemplate);
-            var uploadResponse = Upload.postUpload(name, description);
+            var uploadResponse = Upload.postUpload(name, description, makePublic);
             if (!uploadResponse.wasSuccessful() || uploadResponse.response == null) {
                 return ApiResponse.unexpectedFailure();
             }

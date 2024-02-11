@@ -13,6 +13,7 @@ public class DownloadResponse {
     public final String playerName;
     public final String structureName;
     public final String description;
+    public final boolean isPublic;
     public final List<String> mods;
     public final String schematicLink;
     public final List<Tuple<ResourceLocation, Integer>> blockCounts;
@@ -26,6 +27,7 @@ public class DownloadResponse {
         this.structureName = jsonObject.get("name").getAsString();
         this.description = jsonObject.get("description").getAsString();
         this.schematicLink = jsonObject.get("schematic").getAsString();
+        this.isPublic = jsonObject.get("public").getAsBoolean();
         for (var mod : jsonObject.get("mods").getAsJsonArray()) {
             mods.add(mod.getAsString());
         }

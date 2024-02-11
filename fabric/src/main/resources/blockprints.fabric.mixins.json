@@ -10,7 +10,7 @@
     "NativeImageAccessor"
   ],
   "client": [
-    "ExampleMixin"
+    "fabric.ExampleMixin"
   ],
   "injectors": {
     "defaultRequire": 1

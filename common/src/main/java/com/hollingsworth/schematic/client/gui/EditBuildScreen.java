@@ -22,11 +22,13 @@ public class EditBuildScreen extends BaseSchematicScreen {
     ShortTextField nameField;
     NoScrollMultiText descriptionField;
     GuiImageButton uploadButton;
+    public boolean makePublic = false;
 
     public EditBuildScreen(Screen previousScreen, PreviewDownloadResult preview) {
         super();
         this.previousScreen = previousScreen;
         this.preview = preview;
+        this.makePublic = preview.downloadResponse.isPublic;
     }
 
     public static LoadingScreen<PreviewDownloadResult> getTransition(String code, Screen previousScreen) {
@@ -51,14 +53,14 @@ public class EditBuildScreen extends BaseSchematicScreen {
         descriptionField = new NoScrollMultiText(font, bookLeft + 185, bookTop + 71, 95, 81, Component.empty(), Component.empty());
         nameField.setValue(preview.downloadResponse.structureName);
         descriptionField.setValue(preview.downloadResponse.description);
-        uploadButton = new GuiImageButton(bookRight - 119, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
+        uploadButton = new GuiImageButton(bookRight - 119, bookTop + 169, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
             var name = nameField.getValue().trim();
             var desc = descriptionField.getValue().trim();
             // return if the name or description is too long or too short
             if (name.length() > UploadPreviewScreen.MAX_NAME_LENGTH || name.length() < UploadPreviewScreen.MIN_NAME_LENGTH || desc.length() > UploadPreviewScreen.MAX_DESC_LENGTH || desc.length() < UploadPreviewScreen.MIN_DESC_LENGTH) {
                 return;
             }
-            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Upload.postEdit(preview.downloadResponse.id, name, desc), (build) -> {
+            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Upload.postEdit(preview.downloadResponse.id, name, desc, this.makePublic), (build) -> {
                 if (previousScreen instanceof ViewFavoritesScreen buildsScreen) {
                     Minecraft.getInstance().setScreen(ViewFavoritesScreen.getTransition(buildsScreen.showFavorites, buildsScreen.showBuilds, buildsScreen.showRecent));
                 } else {
@@ -74,13 +76,18 @@ public class EditBuildScreen extends BaseSchematicScreen {
 
         addRenderableWidget(nameField);
         addRenderableWidget(descriptionField);
+        addRenderableWidget(new CheckBoxButton(bookRight - 119, bookTop + 153, b -> {
+            this.makePublic = !this.makePublic;
+        }, () -> this.makePublic).withTooltip(Component.translatable("blockprints.make_public_tooltip")));
+
     }
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.render(graphics, mouseX, mouseY, partialTicks);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_upload.png"), bookRight - 116, bookTop + 155, 0, 0, 9, 11, 9, 11);
-        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.save").getVisualOrderText(), bookRight - 67, bookTop + 157);
+        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_upload.png"), bookRight - 116, bookTop + 171, 0, 0, 9, 11, 9, 11);
+        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.make_public").getVisualOrderText(), bookRight - 67, bookTop + 157);
+        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.save").getVisualOrderText(), bookRight - 67, bookTop + 173);
     }
 
     @Override
