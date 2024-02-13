@@ -71,4 +71,20 @@ public class Upload {
         return ApiResponse.connectionError();
     }
 
+    public static ApiResponse<Boolean> postDelete(String id){
+        HttpRequest request = RequestUtil.getBuilder(false)
+                .uri(RequestUtil.getRoute("/api/v1/upload/" + id))
+                .DELETE().build();
+        try {
+            var res = RequestUtil.CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (!RequestUtil.responseSuccessful(res.statusCode())) {
+                return ApiResponse.parseServerError(res);
+            }
+            return ApiResponse.success();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return ApiResponse.connectionError();
+    }
+
 }

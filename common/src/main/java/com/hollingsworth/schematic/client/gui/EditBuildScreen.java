@@ -18,20 +18,21 @@ import static com.hollingsworth.schematic.client.gui.DownloadScreen.PREVIEW_TEXT
 public class EditBuildScreen extends BaseSchematicScreen {
     DynamicTexture dynamicTexture;
     PreviewDownloadResult preview;
-    Screen previousScreen;
+    ViewFavoritesScreen previousScreen;
     ShortTextField nameField;
     NoScrollMultiText descriptionField;
     GuiImageButton uploadButton;
+    GuiImageButton deleteButton;
     public boolean makePublic = false;
 
-    public EditBuildScreen(Screen previousScreen, PreviewDownloadResult preview) {
+    public EditBuildScreen(ViewFavoritesScreen previousScreen, PreviewDownloadResult preview) {
         super();
         this.previousScreen = previousScreen;
         this.preview = preview;
         this.makePublic = preview.downloadResponse.isPublic;
     }
 
-    public static LoadingScreen<PreviewDownloadResult> getTransition(String code, Screen previousScreen) {
+    public static LoadingScreen<PreviewDownloadResult> getTransition(String code, ViewFavoritesScreen previousScreen) {
         return new LoadingScreen<>(() -> Download.downloadPreview(code), (build) -> {
             Minecraft.getInstance().setScreen(new EditBuildScreen(previousScreen, build));
         }, previousScreen);
@@ -53,7 +54,7 @@ public class EditBuildScreen extends BaseSchematicScreen {
         descriptionField = new NoScrollMultiText(font, bookLeft + 185, bookTop + 71, 95, 81, Component.empty(), Component.empty());
         nameField.setValue(preview.downloadResponse.structureName);
         descriptionField.setValue(preview.downloadResponse.description);
-        uploadButton = new GuiImageButton(bookRight - 119, bookTop + 169, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
+        uploadButton = new GuiImageButton(bookRight - 119, bookTop + 169, 79, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_5.png"), b -> {
             var name = nameField.getValue().trim();
             var desc = descriptionField.getValue().trim();
             // return if the name or description is too long or too short
@@ -61,14 +62,15 @@ public class EditBuildScreen extends BaseSchematicScreen {
                 return;
             }
             Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Upload.postEdit(preview.downloadResponse.id, name, desc, this.makePublic), (build) -> {
-                if (previousScreen instanceof ViewFavoritesScreen buildsScreen) {
-                    Minecraft.getInstance().setScreen(ViewFavoritesScreen.getTransition(buildsScreen.showFavorites, buildsScreen.showBuilds, buildsScreen.showRecent));
-                } else {
-                    Minecraft.getInstance().setScreen(ViewFavoritesScreen.getTransition());
-                }
+                Minecraft.getInstance().setScreen(ViewFavoritesScreen.getTransition(previousScreen));
             }, this));
         });
+        deleteButton = new GuiImageButton(bookRight - 39, bookTop + 169, 15, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_delete.png"), b -> {
+            Minecraft.getInstance().setScreen(new ConfirmDeleteScreen(preview, ViewFavoritesScreen.getTransition(previousScreen), this));
+
+        }).withTooltip(Component.translatable("blockprints.delete_tooltip"));
         addRenderableWidget(uploadButton);
+        addRenderableWidget(deleteButton);
 
         addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
             Minecraft.getInstance().setScreen(previousScreen);
@@ -87,7 +89,7 @@ public class EditBuildScreen extends BaseSchematicScreen {
         super.render(graphics, mouseX, mouseY, partialTicks);
         graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_upload.png"), bookRight - 116, bookTop + 171, 0, 0, 9, 11, 9, 11);
         GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.make_public").getVisualOrderText(), bookRight - 67, bookTop + 157);
-        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.save").getVisualOrderText(), bookRight - 67, bookTop + 173);
+        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.save").getVisualOrderText(), bookRight - 70, bookTop + 173);
     }
 
     @Override
