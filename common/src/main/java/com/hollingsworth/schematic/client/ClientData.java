@@ -59,7 +59,7 @@ public class ClientData {
         ClientData.showBoundary = false;
         if (ClientData.firstTarget != null && ClientData.secondTarget != null) {
             StructureTemplate structure = SchematicExport.getStructure(Minecraft.getInstance().level, ClientData.firstTarget, ClientData.secondTarget);
-            Minecraft.getInstance().setScreen(new UploadPreviewScreen(structure));
+            Minecraft.getInstance().setScreen(new UploadPreviewScreen(structure, ClientData.firstTarget, ClientData.secondTarget));
         }
     }
 

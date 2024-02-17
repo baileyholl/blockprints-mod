@@ -9,6 +9,7 @@ import com.hollingsworth.schematic.export.WrappedScene;
 import com.hollingsworth.schematic.export.level.GuidebookLevel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
@@ -29,9 +30,13 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     public static final int MAX_DESC_LENGTH = 1000;
     public static final int MIN_DESC_LENGTH = 20;
     public boolean makePublic = false;
-    public UploadPreviewScreen(StructureTemplate structureTemplate) {
+    public BlockPos start;
+    public BlockPos end;
+    public UploadPreviewScreen(StructureTemplate structureTemplate, BlockPos start, BlockPos end) {
         super();
         this.structureTemplate = structureTemplate;
+        this.start = start;
+        this.end = end;
     }
 
     @Override
@@ -54,7 +59,7 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
             List<WrappedScene.ImageExport> images = sceneExporter.getImages();
 
 
-            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> sceneExporter.writeAndUpload(images, this.nameField.getValue(), this.descriptionField.getValue(), this.makePublic), (res) -> {
+            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> sceneExporter.writeAndUpload(images, this.nameField.getValue(), this.descriptionField.getValue(), this.makePublic, start, end), (res) -> {
                 Minecraft.getInstance().setScreen(null);
                 ClientUtil.sendMessage(Component.translatable("blockprints.upload_complete"));
             }));

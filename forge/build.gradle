@@ -27,10 +27,17 @@ apply plugin: 'maven-publish'
 archivesBaseName = "${mod_name}-forge-${minecraft_version}"
 
 repositories {
+
     maven {
         url "https://www.cursemaven.com"
         content {
             includeGroup "curse.maven"
+        }
+    }
+    repositories {
+        maven {
+            name = 'tterrag maven'
+            url = 'https://maven.tterrag.com/'
         }
     }
 }
@@ -112,6 +119,10 @@ dependencies {
     }
     implementation("org.bytedeco:ffmpeg-platform:6.0-1.5.9")
     implementation fg.deobf("curse.maven:oauth-513857:4575495")
+
+    implementation fg.deobf("com.simibubi.create:create-1.20.1:0.5.1.d-9:slim"){ transitive = false }
+    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-1.20:${flywheel_version}")
+    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
 }
 
 tasks.withType(JavaCompile) {

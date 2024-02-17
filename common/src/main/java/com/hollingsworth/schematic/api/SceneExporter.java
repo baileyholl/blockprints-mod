@@ -6,6 +6,7 @@ import com.hollingsworth.schematic.api.blockprints.upload.Upload;
 import com.hollingsworth.schematic.common.util.SchematicExport;
 import com.hollingsworth.schematic.export.PerspectivePreset;
 import com.hollingsworth.schematic.export.WrappedScene;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 import java.io.IOException;
@@ -60,7 +61,7 @@ public class SceneExporter {
         return images;
     }
 
-    public ApiResponse<Boolean> writeAndUpload(List<WrappedScene.ImageExport> images, String name, String description, boolean makePublic) {
+    public ApiResponse<Boolean> writeAndUpload(List<WrappedScene.ImageExport> images, String name, String description, boolean makePublic, BlockPos start, BlockPos end) {
         String finalExportName = sanitize(name);
         try {
             Files.createDirectories(Path.of(IMAGE_FOLDER));
@@ -77,7 +78,7 @@ public class SceneExporter {
                 imageFiles.add(path);
                 count++;
             }
-            SchematicExport.SchematicExportResult result = SchematicExport.saveSchematic(Paths.get(STRUCTURE_FOLDER), finalExportName, false, structureTemplate);
+            SchematicExport.SchematicExportResult result = SchematicExport.saveSchematic(Paths.get(STRUCTURE_FOLDER), finalExportName, false, structureTemplate, start, end);
             var uploadResponse = Upload.postUpload(name, description, makePublic);
             if (!uploadResponse.wasSuccessful() || uploadResponse.response == null) {
                 return ApiResponse.unexpectedFailure();

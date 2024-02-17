@@ -5,8 +5,11 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -25,7 +28,6 @@ public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override
     public boolean isModLoaded(String modId) {
-
         return FabricLoader.getInstance().isModLoaded(modId);
     }
 
@@ -39,5 +41,10 @@ public class FabricPlatformHelper implements IPlatformHelper {
     @Override
     public Iterable<RenderType> getRenderTypes(BakedModel bakedModel, BlockState blockstate, RandomSource rand) {
         return List.of(ItemBlockRenderTypes.getRenderType(blockstate, true));
+    }
+
+    @Override
+    public void appendCreateGlue(Level level, AABB aabb, CompoundTag tag) {
+        //todo implement
     }
 }

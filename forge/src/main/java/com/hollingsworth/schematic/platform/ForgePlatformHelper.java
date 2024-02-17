@@ -1,10 +1,15 @@
 package com.hollingsworth.schematic.platform;
 
+import com.hollingsworth.schematic.Constants;
+import com.hollingsworth.schematic.compat.CreateCompat;
 import com.hollingsworth.schematic.platform.services.IPlatformHelper;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
@@ -36,5 +41,12 @@ public class ForgePlatformHelper implements IPlatformHelper {
     @Override
     public Iterable<RenderType> getRenderTypes(BakedModel bakedModel, BlockState blockstate, RandomSource rand) {
         return bakedModel.getRenderTypes(blockstate, rand, ModelData.EMPTY);
+    }
+
+    @Override
+    public void appendCreateGlue(Level level, AABB aabb, CompoundTag tag) {
+        if(Constants.isCreateLoaded){
+            CreateCompat.appendGlue(level, aabb, tag);
+        }
     }
 }

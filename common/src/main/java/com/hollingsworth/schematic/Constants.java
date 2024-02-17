@@ -11,4 +11,5 @@ public class Constants {
 	public static final int WHITE = 16777215;
 	// TODO: link on fabric
 	public static boolean isDev;
+	public static boolean isCreateLoaded;
 }

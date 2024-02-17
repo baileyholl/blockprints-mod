@@ -79,19 +79,19 @@ subprojects {
 
 forgix {
     group = rootProject.properties.group
-    mergedJarName = "Schematic-merged-${minecraft_version}-${version}.jar"
+    mergedJarName = "Blockprints-merged-${minecraft_version}-${version}.jar"
     outputDir = "build/libs" // This is the output directory of the merged jar from the root project. If this property is not defined then by default it's set to "Merged".
 
     forge {
         projectName = "forge" // This is the name of the forge project. If this property is not defined then by default it'll set to "forge" since that's the name the Architectury Template uses.
-        jarLocation = "build/libs/Schematic-forge-${minecraft_version}-${version}.jar" // This is the location of the forge jar from the forge project. If this property is not defined then by default it fetches the jar with the shortest name.
+        jarLocation = "build/libs/Blockprints-forge-${minecraft_version}-${version}.jar" // This is the location of the forge jar from the forge project. If this property is not defined then by default it fetches the jar with the shortest name.
 
-        mixin "schematic.mixins.json"
-        mixin "schematic.forge.mixins.json"
+        mixin "blockprints.mixins.json"
+        mixin "blockprints.forge.mixins.json"
     }
 
     fabric {
         projectName = "fabric" // This is the name of the fabric project. If this property is not defined then by default it'll set to "fabric" since that's the name the Architectury Template uses.
-        jarLocation = "build/libs/Schematic-fabric-${minecraft_version}-${version}.jar" // This is the location of the fabric jar from the fabric project. If this property is not defined then by default it fetches the jar with the shortest name.
+        jarLocation = "build/libs/Blockprints-fabric-${minecraft_version}-${version}.jar" // This is the location of the fabric jar from the fabric project. If this property is not defined then by default it fetches the jar with the shortest name.
     }
 }

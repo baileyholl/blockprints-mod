@@ -2,8 +2,11 @@ package com.hollingsworth.schematic.platform.services;
 
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
 import java.nio.file.Path;
 
@@ -39,4 +42,6 @@ public interface IPlatformHelper {
     boolean isDevelopmentEnvironment();
 
     public Iterable<RenderType> getRenderTypes(BakedModel bakedModel, BlockState blockstate, RandomSource rand);
+
+    public void appendCreateGlue(Level level, AABB aabb, CompoundTag tag);
 }
