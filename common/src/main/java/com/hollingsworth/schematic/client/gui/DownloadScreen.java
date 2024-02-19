@@ -77,7 +77,7 @@ public class DownloadScreen extends BaseSchematicScreen {
             e.printStackTrace();
         }
         addRenderableWidget(new GuiImageButton(bookRight - 119, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
-            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Download.downloadSchematic(preview.downloadResponse.schematicLink, preview.downloadResponse.structureName), result -> {
+            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Download.downloadSchematic(preview.downloadResponse.id, preview.downloadResponse.structureName), result -> {
 
                 Minecraft.getInstance().setScreen(null);
                 if (result != null) {
@@ -85,12 +85,6 @@ public class DownloadScreen extends BaseSchematicScreen {
                 } else {
                     ClientUtil.sendMessage("blockprints.download_failed");
                 }
-                CompletableFuture.supplyAsync(() -> Download.pushRecentDownload(preview.downloadResponse.id), Util.backgroundExecutor()).whenCompleteAsync((res, err) -> {
-                    if (!res.wasSuccessful()) {
-                        Constants.LOG.error("Failed to push recent download");
-                    }
-                });
-
             }));
         }).withTooltip(hasMissing ? Component.translatable("blockprints.blocks_missing_tooltip").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)) : null)
                 .withTooltip(Component.translatable("blockprints.download_tooltip")));

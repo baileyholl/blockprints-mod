@@ -7,7 +7,7 @@ import net.minecraft.util.Tuple;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DownloadResponse {
+public class GetSchematicResponse {
     public final String id;
     public final String previewImage;
     public final String playerName;
@@ -18,7 +18,7 @@ public class DownloadResponse {
     public final String schematicLink;
     public final List<Tuple<ResourceLocation, Integer>> blockCounts;
 
-    public DownloadResponse(JsonObject jsonObject) {
+    public GetSchematicResponse(JsonObject jsonObject) {
         mods = new ArrayList<>();
         blockCounts = new ArrayList<>();
         this.id = jsonObject.get("id").getAsString();

@@ -20,7 +20,7 @@ import java.util.List;
 
 public class SceneExporter {
     public static final String IMAGE_FOLDER = "./schematics/blockprints/images/";
-    public static final String STRUCTURE_FOLDER = "./schematics/blockprints/structures/";
+    public static final String STRUCTURE_FOLDER = "./schematics/";
 
     private static final int GAMESCENE_PLACEHOLDER_SCALE = 2;
     public WrappedScene scene;

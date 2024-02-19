@@ -42,20 +42,11 @@ public class GoogleCloudStorage {
     }
 
     public static ApiResponse<byte[]> downloadImage(String gcsPath) {
-        return download(gcsPath);
+        return GoogleCloudStorage.downloadRawUrl(URI.create(getBucketUrl() + gcsPath));
     }
 
-    public static ApiResponse<Path> downloadSchematic(String gcsPath, String fileName) {
-        Path path = download(gcsPath, SceneExporter.STRUCTURE_FOLDER, fileName);
-        if (path == null) {
-            return ApiResponse.unexpectedFailure();
-        }
-        return ApiResponse.success(path);
-    }
-
-    public static ApiResponse<byte[]> download(String gcsPath) {
-        var uri = URI.create(getBucketUrl() + gcsPath);
-        try (InputStream in = uri.toURL().openStream()) {
+    public static ApiResponse<byte[]> downloadRawUrl(URI url) {
+        try (InputStream in = url.toURL().openStream()) {
             return ApiResponse.success(in.readAllBytes());
         } catch (IOException e) {
             e.printStackTrace();
@@ -63,12 +54,10 @@ public class GoogleCloudStorage {
         }
     }
 
-    public static Path download(String gcsPath, String folder, String fileName) {
+    public static Path downloadFromUrl(URI uri, String folder, String fileName, String extension){
         String sanitizedName = SceneExporter.sanitize(fileName);
-        var uri = URI.create(getBucketUrl() + gcsPath);
         try (InputStream in = uri.toURL().openStream()) {
-
-            var path = Paths.get(folder + "/" + sanitizedName + "/" + sanitizedName + ".nbt");
+            var path = Paths.get(folder + "/"+ sanitizedName + extension);
             Files.createDirectories(Paths.get(folder + "/" + sanitizedName));
             Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
             return path;
