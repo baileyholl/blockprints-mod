@@ -19,6 +19,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -68,7 +69,6 @@ public class StructureRenderer {
         BlockHitResult lookingAt = RaycastHelper.getLookingAt(player, true);
 //        BlockPos anchorPos = GadgetNBT.getAnchorPos(gadget);
         BlockPos renderPos = lookingAt.getBlockPos();// anchorPos.equals(GadgetNBT.nullPos) ? lookingAt.getBlockPos() : anchorPos;
-        BaseMode mode = GadgetNBT.getMode(gadget);
 
         DimBlockPos boundTo = GadgetNBT.getBoundPos(gadget);
         if (boundTo != null && boundTo.levelKey.equals(player.level().dimension()))
@@ -78,18 +78,18 @@ public class StructureRenderer {
 //        if (gadget.getItem() instanceof GadgetCopyPaste || gadget.getItem() instanceof GadgetCutPaste) {
             renderPos = renderPos.above();
             renderPos.offset(GadgetNBT.getRelativePaste(gadget));
-            if (mode.getId().getPath().equals("copy") || mode.getId().getPath().equals("cut")) {
-                drawCopyBox(poseStack, mode.getId().getPath());
-                return;
-            }
+//            if (mode.getId().getPath().equals("copy") || mode.getId().getPath().equals("cut")) {
+//                drawCopyBox(poseStack, );
+//                return;
+//            }
 //        }
 
         //Start drawing the Render and cache it, used for both Building and Copy/Paste
-        if (shouldUpdateRender(player, gadget))
+        if (shouldUpdateRender(player))
             generateRender(player.level(), renderPos, 0.5f, statePosCache, vertexBuffers);
     }
 
-    public static boolean shouldUpdateRender(Player player, ItemStack gadget) {
+    public static boolean shouldUpdateRender(Player player) {
 //        ArrayList<StatePos> buildList;
 //        BaseMode mode = GadgetNBT.getMode(gadget);
 //        BlockHitResult lookingAt = RaycastHelper.getLookingAt(player, true);
@@ -166,7 +166,7 @@ public class StructureRenderer {
                 if (renderState.getFluidState().isEmpty()) {
                     //modelBlockRenderer.tesselateBlock(level, ibakedmodel, renderState, pos.pos.offset(renderPos).above(255), matrix, direVertexConsumer, false, random, renderState.getSeed(pos.pos.offset(renderPos)), OverlayTexture.NO_OVERLAY, ModelData.EMPTY, renderType);
                     try {
-                        modelBlockRenderer.tesselateBlock(fakeRenderingWorld, ibakedmodel, renderState, pos.pos.offset(renderPos).above(255), matrix, direVertexConsumer, false, random, renderState.getSeed(pos.pos.offset(renderPos)), OverlayTexture.NO_OVERLAY, ibakedmodel.getModelData(fakeRenderingWorld, pos.pos, renderState, ModelData.EMPTY), renderType);
+                        modelBlockRenderer.tesselateBlock(fakeRenderingWorld, ibakedmodel, renderState, pos.pos.offset(renderPos).above(255), matrix, direVertexConsumer, false, random, renderState.getSeed(pos.pos.offset(renderPos)), OverlayTexture.NO_OVERLAY);
                     } catch (Exception e) {
                         //System.out.println(e);
                     }
@@ -192,13 +192,11 @@ public class StructureRenderer {
         }
     }
 
-    public static void drawCopyBox(PoseStack matrix, String mode) {
+    public static void drawCopyBox(PoseStack matrix, BlockPos start, BlockPos end) {
         Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         matrix.pushPose();
         matrix.translate(-projectedView.x(), -projectedView.y(), -projectedView.z());
-        BlockPos start = GadgetNBT.getCopyStartPos(gadget);
-        BlockPos end = GadgetNBT.getCopyEndPos(gadget);
-        Color color = mode.equals("copy") ? Color.GREEN : Color.RED;
+        Color color = Color.GREEN;// mode.equals("copy") ? Color.GREEN : Color.RED;
         DireRenderMethods.renderCopy(matrix, start, end, color);
         matrix.popPose();
     }
@@ -216,10 +214,10 @@ public class StructureRenderer {
         BlockRenderDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
         BakedModel ibakedmodel = dispatcher.getBlockModel(state);
         for (Direction direction : Direction.values()) {
-            if (!ibakedmodel.getQuads(state, direction, RandomSource.create(), ModelData.EMPTY, null).isEmpty()) {
+            if (!ibakedmodel.getQuads(state, direction, RandomSource.create()).isEmpty()) {
                 return true;
             }
-            if (!ibakedmodel.getQuads(state, null, RandomSource.create(), ModelData.EMPTY, null).isEmpty()) {
+            if (!ibakedmodel.getQuads(state, null, RandomSource.create()).isEmpty()) {
                 return true;
             }
         }
@@ -227,35 +225,35 @@ public class StructureRenderer {
     }
 
     //Draw what we've cached
-    public static void drawRender(PoseStack poseStack, Matrix4f projectionMatrix, Player player) {
+    public static void drawRender(BlockPos anchorPos, PoseStack poseStack, Matrix4f projectionMatrix, Player player) {
         if (vertexBuffers == null || statePosCache == null) {
             return;
         }
         MultiBufferSource.BufferSource buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
         Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         BlockHitResult lookingAt = RaycastHelper.getLookingAt(player, true);
-        BlockPos anchorPos = GadgetNBT.getAnchorPos(gadget);
-        BlockPos renderPos = anchorPos.equals(GadgetNBT.nullPos) ? lookingAt.getBlockPos() : anchorPos;
+        BlockPos renderPos = anchorPos == null ? lookingAt.getBlockPos() : anchorPos;
         BlockState lookingAtState = player.level().getBlockState(renderPos);
 
-        if ((lookingAtState.isAir() && anchorPos.equals(GadgetNBT.nullPos)) || lookingAtState.getBlock().equals(Registration.RenderBlock.get()))
+        if (lookingAtState.isAir() && anchorPos == null)
             return;
         ArrayList<StatePos> buildList = new ArrayList<>();
-        var mode = GadgetNBT.getMode(gadget);
-        if (gadget.getItem() instanceof GadgetBuilding || gadget.getItem() instanceof GadgetExchanger) {
-            BlockState renderBlockState = GadgetNBT.getGadgetBlockState(gadget);
-            if (renderBlockState.isAir()) return;
-            buildList = mode.collect(lookingAt.getDirection(), player, renderPos, renderBlockState);
-
-            if (buildList.isEmpty()) return;
-        } else if (gadget.getItem() instanceof GadgetCopyPaste || gadget.getItem() instanceof GadgetCutPaste) {
-            if (mode.getId().getPath().equals("copy") || mode.getId().getPath().equals("cut")) {
-                return; //This is handlded above
-            }
-            if (!GadgetNBT.hasCopyUUID(gadget) || !copyPasteUUIDCache.equals(GadgetNBT.getCopyUUID(gadget)))
-                return;
-            renderPos = renderPos.above().offset(GadgetNBT.getRelativePaste(gadget));
-        }
+//        var mode = GadgetNBT.getMode(gadget);
+//        if (gadget.getItem() instanceof GadgetBuilding || gadget.getItem() instanceof GadgetExchanger) {
+//            BlockState renderBlockState = GadgetNBT.getGadgetBlockState(gadget);
+//            if (renderBlockState.isAir()) return;
+//            buildList = mode.collect(lookingAt.getDirection(), player, renderPos, renderBlockState);
+//
+//            if (buildList.isEmpty()) return;
+//        }
+//        else if (gadget.getItem() instanceof GadgetCopyPaste || gadget.getItem() instanceof GadgetCutPaste) {
+//            if (mode.getId().getPath().equals("copy") || mode.getId().getPath().equals("cut")) {
+//                return; //This is handlded above
+//            }
+//            if (!GadgetNBT.hasCopyUUID(gadget) || !copyPasteUUIDCache.equals(GadgetNBT.getCopyUUID(gadget)))
+//                return;
+//            renderPos = renderPos.above().offset(GadgetNBT.getRelativePaste(gadget));
+//        }
         //Sort every <X> Frames to prevent screendoor effect
         if (sortCounter > 20) {
             sortAll(renderPos);
@@ -330,30 +328,30 @@ public class StructureRenderer {
         }*/
 
         //Red Overlay for missing Items
-        boolean hasBound = GadgetNBT.getBoundPos(gadget) != null;
-        BlockState renderBlockState = GadgetNBT.getGadgetBlockState(gadget);
-        if (!player.isCreative() && !hasBound && renderBlockState.getFluidState().isEmpty()) {
-
-//            ItemStack findStack = GadgetUtils.getItemForBlock(renderBlockState, player.level(), BlockPos.ZERO, player);
-//            int availableItems = BuildingUtils.countItemStacks(player, findStack);
-//            int energyStored = BuildingUtils.getEnergyStored(gadget);
-//            int energyCost = BuildingUtils.getEnergyCost(gadget);
-            for (StatePos statePos : buildList) {
-//                if (availableItems <= 0 || energyStored < energyCost) {
-                matrix.pushPose();
-                matrix.translate(-projectedView.x(), -projectedView.y(), -projectedView.z());
-                matrix.translate(renderPos.getX(), renderPos.getY(), renderPos.getZ());
-                VertexConsumer builder = buffersource.getBuffer(DireRenderTypes.MissingBlockOverlay);
-                //if (hasBound)
-                //    MyRenderMethods.renderBoxSolid(evt.getPoseStack().last().pose(), builder, statePos.pos, 1, 1, 0, 0.35f);
-                //else
-                DireRenderMethods.renderBoxSolid(poseStack.last().pose(), builder, statePos.pos, 1, 0, 0, 0.35f);
-                matrix.popPose();
-//              }
-//                availableItems--;
-//                energyStored -= energyCost;
-            }
-        }
+//        boolean hasBound = GadgetNBT.getBoundPos(gadget) != null;
+//        BlockState renderBlockState = GadgetNBT.getGadgetBlockState(gadget);
+//        if (!player.isCreative() && !hasBound && renderBlockState.getFluidState().isEmpty()) {
+//
+////            ItemStack findStack = GadgetUtils.getItemForBlock(renderBlockState, player.level(), BlockPos.ZERO, player);
+////            int availableItems = BuildingUtils.countItemStacks(player, findStack);
+////            int energyStored = BuildingUtils.getEnergyStored(gadget);
+////            int energyCost = BuildingUtils.getEnergyCost(gadget);
+//            for (StatePos statePos : buildList) {
+////                if (availableItems <= 0 || energyStored < energyCost) {
+//                matrix.pushPose();
+//                matrix.translate(-projectedView.x(), -projectedView.y(), -projectedView.z());
+//                matrix.translate(renderPos.getX(), renderPos.getY(), renderPos.getZ());
+//                VertexConsumer builder = buffersource.getBuffer(DireRenderTypes.MissingBlockOverlay);
+//                //if (hasBound)
+//                //    MyRenderMethods.renderBoxSolid(evt.getPoseStack().last().pose(), builder, statePos.pos, 1, 1, 0, 0.35f);
+//                //else
+//                DireRenderMethods.renderBoxSolid(poseStack.last().pose(), builder, statePos.pos, 1, 0, 0, 0.35f);
+//                matrix.popPose();
+////              }
+////                availableItems--;
+////                energyStored -= energyCost;
+//            }
+//        }
     }
 
     //Sort all the RenderTypes
