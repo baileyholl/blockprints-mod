@@ -2,6 +2,7 @@ package com.hollingsworth.schematic.client.renderer;
 
 import com.google.common.collect.ImmutableMap;
 import com.hollingsworth.schematic.common.util.Color;
+import com.hollingsworth.schematic.mixin.ItemRendererAccessor;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -30,7 +31,7 @@ public class DireRenderMethods {
     public static void renderBETransparent(BlockState pState, PoseStack pPoseStack, MultiBufferSource pBufferSource, int pPackedLight, int pPackedOverlay, float alpha) {
         MultiplyAlphaRenderTypeBuffer multiplyAlphaRenderTypeBuffer = new MultiplyAlphaRenderTypeBuffer(pBufferSource, alpha);
         ItemStack stack = new ItemStack(pState.getBlock());
-        net.minecraftforge.client.extensions.common.IClientItemExtensions.of(stack).getCustomRenderer().renderByItem(stack, ItemDisplayContext.NONE, pPoseStack, multiplyAlphaRenderTypeBuffer, pPackedLight, pPackedOverlay);
+        ((ItemRendererAccessor)Minecraft.getInstance().getItemRenderer()).getBlockEntityRenderer().renderByItem(stack, ItemDisplayContext.NONE, pPoseStack, multiplyAlphaRenderTypeBuffer, pPackedLight, pPackedOverlay);
     }
 
     public static class MultiplyAlphaRenderTypeBuffer implements MultiBufferSource {
@@ -47,7 +48,7 @@ public class DireRenderMethods {
             RenderType localType = type;
             if (localType instanceof RenderType.CompositeRenderType) {
                 // all of this requires a lot of AT's so be aware of that on ports
-                ResourceLocation texture = ((RenderStateShard.TextureStateShard) ((RenderType.CompositeRenderType) localType).state.textureState).texture
+                ResourceLocation texture = ((RenderStateShard.TextureStateShard) ((RenderType.CompositeRenderType) localType).state().textureState).texture
                         .orElse(InventoryMenu.BLOCK_ATLAS);
 
                 localType = entityTranslucentCull(texture);
@@ -62,7 +63,7 @@ public class DireRenderMethods {
     public static void renderBESquished(BlockState pState, PoseStack pPoseStack, MultiBufferSource pBufferSource, int pPackedLight, int pPackedOverlay, float alpha) {
         SquishedRenderTypeBuffer multiplyAlphaRenderTypeBuffer = new SquishedRenderTypeBuffer(pBufferSource, alpha, pPoseStack.last().pose());
         ItemStack stack = new ItemStack(pState.getBlock());
-        net.minecraftforge.client.extensions.common.IClientItemExtensions.of(stack).getCustomRenderer().renderByItem(stack, ItemDisplayContext.NONE, pPoseStack, multiplyAlphaRenderTypeBuffer, pPackedLight, pPackedOverlay);
+        ((ItemRendererAccessor)Minecraft.getInstance().getItemRenderer()).getBlockEntityRenderer().renderByItem(stack, ItemDisplayContext.NONE, pPoseStack, multiplyAlphaRenderTypeBuffer, pPackedLight, pPackedOverlay);
     }
 
     public static class SquishedRenderTypeBuffer implements MultiBufferSource {
@@ -81,7 +82,7 @@ public class DireRenderMethods {
             RenderType localType = type;
             if (localType instanceof RenderType.CompositeRenderType) {
                 // all of this requires a lot of AT's so be aware of that on ports
-                ResourceLocation texture = ((RenderStateShard.TextureStateShard) ((RenderType.CompositeRenderType) localType).state.textureState).texture
+                ResourceLocation texture = ((RenderStateShard.TextureStateShard) ((RenderType.CompositeRenderType) localType).state().textureState).texture
                         .orElse(InventoryMenu.BLOCK_ATLAS);
 
                 localType = entityTranslucentCull(texture);

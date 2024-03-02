@@ -35,6 +35,7 @@ import static com.hollingsworth.schematic.client.RaycastHelper.rayTraceRange;
 public class ClientData {
     private static final AtomicReference<String> uploadStatus = new AtomicReference<>();
     public static boolean showBoundary;
+    public static BlockPos anchorRenderPos;
     public static BlockPos firstTarget;
     public static BlockPos secondTarget;
     private static final String CATEGORY = "key.category." + Constants.MOD_ID + ".general";

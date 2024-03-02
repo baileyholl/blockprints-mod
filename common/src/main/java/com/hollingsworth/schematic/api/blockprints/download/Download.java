@@ -78,6 +78,6 @@ public class Download {
             return ApiResponse.error(Component.translatable("blockprints.download_not_found"));
         }
 
-        return ApiResponse.success(GoogleCloudStorage.downloadFromUrl(uri, SceneExporter.STRUCTURE_FOLDER, name, ".nbt"));
+        return ApiResponse.success(GoogleCloudStorage.downloadFromUrl(uri, SceneExporter.STRUCTURE_FOLDER, name + "_" + schematicId, ".nbt"));
     }
 }

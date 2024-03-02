@@ -2,6 +2,7 @@ package com.hollingsworth.schematic.client.renderer;
 
 import com.hollingsworth.schematic.client.RaycastHelper;
 import com.hollingsworth.schematic.common.util.Color;
+import com.hollingsworth.schematic.common.util.DimPos;
 import com.hollingsworth.schematic.platform.Services;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -35,12 +37,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class StructureRenderer {
-    private static ArrayList<StatePos> statePosCache;
+    public static ArrayList<StatePos> statePosCache;
     private static int sortCounter = 0;
-    //public static UUID gadgetUUIDCache = UUID.randomUUID(); //The Unique ID of the gadget who's data we're caching. If this differs, it means the player swapped to another gadget
-    public static UUID copyPasteUUIDCache = UUID.randomUUID(); //A unique ID of the copy/paste, which we'll use to determine if we need to request an update from the server Its initialized as random to avoid having to null check it
-
     private static FakeRenderingWorld fakeRenderingWorld;
+    public static BoundingBox boundingBox;
 
     //Cached SortStates used for re-sorting every so often
     private static final Map<RenderType, BufferBuilder.SortState> sortStates = new HashMap<>();
@@ -58,35 +58,23 @@ public class StructureRenderer {
         return buffer;
     }
 
-    public static void clearBuffers() { //Prevents leaks
-        for (Map.Entry<RenderType, VertexBuffer> entry : vertexBuffers.entrySet()) {
-            entry.getValue().close();
-        }
-    }
-
     //Start rendering - this is the most expensive part, so we render it, then cache it, and draw it over and over (much cheaper)
     public static void buildRender(PoseStack poseStack, Player player) {
         BlockHitResult lookingAt = RaycastHelper.getLookingAt(player, true);
 //        BlockPos anchorPos = GadgetNBT.getAnchorPos(gadget);
         BlockPos renderPos = lookingAt.getBlockPos();// anchorPos.equals(GadgetNBT.nullPos) ? lookingAt.getBlockPos() : anchorPos;
+        renderPos = renderPos.above();
+        DimPos boundTo = new DimPos(player.level.dimension(), renderPos);
+        if (boundTo != null && boundTo.levelKey().equals(player.level().dimension())) {
+            drawBoundBox(poseStack, boundTo.pos());
+        }
 
-        DimBlockPos boundTo = GadgetNBT.getBoundPos(gadget);
-        if (boundTo != null && boundTo.levelKey.equals(player.level().dimension()))
-            drawBoundBox(poseStack, boundTo.blockPos);
 
-
-//        if (gadget.getItem() instanceof GadgetCopyPaste || gadget.getItem() instanceof GadgetCutPaste) {
-            renderPos = renderPos.above();
-            renderPos.offset(GadgetNBT.getRelativePaste(gadget));
-//            if (mode.getId().getPath().equals("copy") || mode.getId().getPath().equals("cut")) {
-//                drawCopyBox(poseStack, );
-//                return;
-//            }
-//        }
-
+        renderPos = renderPos.above();
         //Start drawing the Render and cache it, used for both Building and Copy/Paste
-        if (shouldUpdateRender(player))
+        if (shouldUpdateRender(player)) {
             generateRender(player.level(), renderPos, 0.5f, statePosCache, vertexBuffers);
+        }
     }
 
     public static boolean shouldUpdateRender(Player player) {
@@ -152,10 +140,6 @@ public class StructureRenderer {
             BakedModel ibakedmodel = dispatcher.getBlockModel(renderState);
             matrix.pushPose();
             matrix.translate(pos.pos.getX(), pos.pos.getY(), pos.pos.getZ());
-            if (isExchanging) {
-                matrix.translate(-0.0005f, -0.0005f, -0.0005f); //For Exchanger
-                matrix.scale(1.001f, 1.001f, 1.001f); //For Exchanger
-            }
 
             for (RenderType renderType : Services.PLATFORM.getRenderTypes(ibakedmodel, renderState, random)) {
                 //Flowers render weirdly so we use a custom renderer to make them look better. Glass and Flowers are both cutouts, so we only want this for non-cube blocks
@@ -198,6 +182,7 @@ public class StructureRenderer {
         matrix.translate(-projectedView.x(), -projectedView.y(), -projectedView.z());
         Color color = Color.GREEN;// mode.equals("copy") ? Color.GREEN : Color.RED;
         DireRenderMethods.renderCopy(matrix, start, end, color);
+
         matrix.popPose();
     }
 
@@ -206,7 +191,13 @@ public class StructureRenderer {
         matrix.pushPose();
         matrix.translate(-projectedView.x(), -projectedView.y(), -projectedView.z());
         Color color = Color.BLUE;
-        DireRenderMethods.renderCopy(matrix, blockPos, blockPos, color);
+        if(boundingBox != null){
+            BlockPos min = new BlockPos(boundingBox.minX(), boundingBox.minY(), boundingBox.minZ());
+            BlockPos max = new BlockPos(boundingBox.maxX(), boundingBox.maxY(), boundingBox.maxZ());
+            min = min.offset(blockPos);
+            max = max.offset(blockPos);
+            DireRenderMethods.renderCopy(matrix, min, max, color);
+        }
         matrix.popPose();
     }
 
@@ -237,6 +228,7 @@ public class StructureRenderer {
 
         if (lookingAtState.isAir() && anchorPos == null)
             return;
+        renderPos = renderPos.above();
         ArrayList<StatePos> buildList = new ArrayList<>();
 //        var mode = GadgetNBT.getMode(gadget);
 //        if (gadget.getItem() instanceof GadgetBuilding || gadget.getItem() instanceof GadgetExchanger) {

@@ -3,10 +3,15 @@ package com.hollingsworth.schematic.api;
 import com.hollingsworth.schematic.api.blockprints.ApiResponse;
 import com.hollingsworth.schematic.api.blockprints.GoogleCloudStorage;
 import com.hollingsworth.schematic.api.blockprints.upload.Upload;
+import com.hollingsworth.schematic.client.ClientData;
+import com.hollingsworth.schematic.client.renderer.StatePos;
+import com.hollingsworth.schematic.client.renderer.StructureRenderer;
 import com.hollingsworth.schematic.common.util.SchematicExport;
 import com.hollingsworth.schematic.export.PerspectivePreset;
 import com.hollingsworth.schematic.export.WrappedScene;
+import com.hollingsworth.schematic.mixin.StructureTemplateAccessor;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 import java.io.IOException;
@@ -79,6 +84,14 @@ public class SceneExporter {
                 count++;
             }
             SchematicExport.SchematicExportResult result = SchematicExport.saveSchematic(Paths.get(STRUCTURE_FOLDER), finalExportName, false, structureTemplate, start, end);
+            var accessor = (StructureTemplateAccessor)structureTemplate;
+            var palette = accessor.getPalettes().get(0);
+            StructureRenderer.statePosCache = new ArrayList<>();
+            for(StructureTemplate.StructureBlockInfo blockInfo : palette.blocks()){
+                StructureRenderer.statePosCache.add(new StatePos(blockInfo.state(), blockInfo.pos()));
+            }
+            StructureRenderer.boundingBox = structureTemplate.getBoundingBox(new StructurePlaceSettings(), new BlockPos(0, 0, 0));
+
             var uploadResponse = Upload.postUpload(name, description, makePublic);
             if (!uploadResponse.wasSuccessful() || uploadResponse.response == null) {
                 return ApiResponse.unexpectedFailure();

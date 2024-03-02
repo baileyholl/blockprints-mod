@@ -7,7 +7,9 @@
   "mixins": [
     "BufferBuilderAccessor",
     "EditBoxAccessor",
-    "NativeImageAccessor"
+    "ItemRendererAccessor",
+    "NativeImageAccessor",
+    "StructureTemplateAccessor"
   ],
   "client": [
     "fabric.ExampleMixin"

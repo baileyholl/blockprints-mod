@@ -9,7 +9,10 @@
   "client": [
     "ExampleMixin",
     "EditBoxAccessor",
-    "NativeImageAccessor"
+    "NativeImageAccessor",
+    "ItemRendererAccessor",
+    "BufferBuilderAccessor",
+    "StructureTemplateAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
