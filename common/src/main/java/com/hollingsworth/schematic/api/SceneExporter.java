@@ -83,20 +83,18 @@ public class SceneExporter {
                 imageFiles.add(path);
                 count++;
             }
-            SchematicExport.SchematicExportResult result = SchematicExport.saveSchematic(Paths.get(STRUCTURE_FOLDER), finalExportName, false, structureTemplate, start, end);
-            var accessor = (StructureTemplateAccessor)structureTemplate;
-            var palette = accessor.getPalettes().get(0);
-            StructureRenderer.statePosCache = new ArrayList<>();
-            for(StructureTemplate.StructureBlockInfo blockInfo : palette.blocks()){
-                StructureRenderer.statePosCache.add(new StatePos(blockInfo.state(), blockInfo.pos()));
-            }
-            StructureRenderer.boundingBox = structureTemplate.getBoundingBox(new StructurePlaceSettings(), new BlockPos(0, 0, 0));
-
             var uploadResponse = Upload.postUpload(name, description, makePublic);
             if (!uploadResponse.wasSuccessful() || uploadResponse.response == null) {
                 return ApiResponse.unexpectedFailure();
             }
             var response = uploadResponse.response;
+            String localStructureName = sanitize(finalExportName + '_' + response.id);
+            SchematicExport.SchematicExportResult result = SchematicExport.saveSchematic(Paths.get(STRUCTURE_FOLDER), localStructureName, false, structureTemplate, start, end);
+
+            if(result == null){
+                return ApiResponse.unexpectedFailure();
+            }
+
             var preview = response.signedPreviewImage;
             var schematic = response.signedSchematic;
             var previewSuccess = GoogleCloudStorage.uploadFileToGCS(URI.create(preview).toURL(), previewPath, "image/png", response.imageFileSize);

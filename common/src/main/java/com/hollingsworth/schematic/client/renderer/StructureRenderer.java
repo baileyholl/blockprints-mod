@@ -1,8 +1,10 @@
 package com.hollingsworth.schematic.client.renderer;
 
 import com.hollingsworth.schematic.client.RaycastHelper;
+import com.hollingsworth.schematic.client.RenderStructureHandler;
 import com.hollingsworth.schematic.common.util.Color;
 import com.hollingsworth.schematic.common.util.DimPos;
+import com.hollingsworth.schematic.mixin.StructureTemplateAccessor;
 import com.hollingsworth.schematic.platform.Services;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -24,6 +26,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -49,6 +53,21 @@ public class StructureRenderer {
     //A map of RenderType -> Vertex Buffer to buffer the different render types.
     private static final Map<RenderType, VertexBuffer> vertexBuffers = RenderType.chunkBufferLayers().stream().collect(Collectors.toMap((renderType) -> renderType, (type) -> new VertexBuffer(VertexBuffer.Usage.STATIC)));
 
+    public static void loadFromStructure(StructureTemplate structureTemplate){
+        var accessor = (StructureTemplateAccessor)structureTemplate;
+        var palettes = accessor.getPalettes();
+        if(palettes.isEmpty()){
+            return;
+        }
+        var palette = palettes.get(0);
+        StructureRenderer.statePosCache = new ArrayList<>();
+        for(StructureTemplate.StructureBlockInfo blockInfo : palette.blocks()){
+            StructureRenderer.statePosCache.add(new StatePos(blockInfo.state(), blockInfo.pos()));
+        }
+        StructureRenderer.boundingBox = structureTemplate.getBoundingBox(new StructurePlaceSettings(), new BlockPos(0, 0, 0));
+
+    }
+
     //Get the buffer from the map, and ensure its building
     public static DireBufferBuilder getBuffer(RenderType renderType) {
         final DireBufferBuilder buffer = builders.get(renderType);
@@ -61,8 +80,10 @@ public class StructureRenderer {
     //Start rendering - this is the most expensive part, so we render it, then cache it, and draw it over and over (much cheaper)
     public static void buildRender(PoseStack poseStack, Player player) {
         BlockHitResult lookingAt = RaycastHelper.getLookingAt(player, true);
-//        BlockPos anchorPos = GadgetNBT.getAnchorPos(gadget);
-        BlockPos renderPos = lookingAt.getBlockPos();// anchorPos.equals(GadgetNBT.nullPos) ? lookingAt.getBlockPos() : anchorPos;
+        BlockPos renderPos = RenderStructureHandler.anchorPos == null ? lookingAt.getBlockPos() : RenderStructureHandler.anchorPos;
+        if(renderPos == null){
+            return;
+        }
         renderPos = renderPos.above();
         DimPos boundTo = new DimPos(player.level.dimension(), renderPos);
         if (boundTo != null && boundTo.levelKey().equals(player.level().dimension())) {
@@ -125,6 +146,9 @@ public class StructureRenderer {
      * This method creates a Map<RenderType, VertexBuffer> when given an ArrayList<StatePos> statePosCache - its used both here to draw in-game AND in the TemplateManagerGUI.java class
      */
     public static void generateRender(Level level, BlockPos renderPos, float transparency, ArrayList<StatePos> statePosCache, Map<RenderType, VertexBuffer> vertexBuffers) {
+        if(!RenderStructureHandler.showRender){
+            return;
+        }
         boolean isExchanging = false;
         if (statePosCache == null || statePosCache.isEmpty()) return;
         fakeRenderingWorld = new FakeRenderingWorld(level, statePosCache, renderPos);
@@ -187,6 +211,9 @@ public class StructureRenderer {
     }
 
     public static void drawBoundBox(PoseStack matrix, BlockPos blockPos) {
+        if(!RenderStructureHandler.showRender){
+            return;
+        }
         Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         matrix.pushPose();
         matrix.translate(-projectedView.x(), -projectedView.y(), -projectedView.z());
@@ -217,7 +244,7 @@ public class StructureRenderer {
 
     //Draw what we've cached
     public static void drawRender(BlockPos anchorPos, PoseStack poseStack, Matrix4f projectionMatrix, Player player) {
-        if (vertexBuffers == null || statePosCache == null) {
+        if (vertexBuffers == null || statePosCache == null || !RenderStructureHandler.showRender) {
             return;
         }
         MultiBufferSource.BufferSource buffersource = Minecraft.getInstance().renderBuffers().bufferSource();

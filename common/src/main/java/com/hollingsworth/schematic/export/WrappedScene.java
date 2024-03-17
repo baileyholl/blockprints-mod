@@ -74,6 +74,9 @@ public class WrappedScene {
             return null;
         }
         LytSize rescaledSize = getSizeForPreview();
+        if(rescaledSize == null){
+            return null;
+        }
         return exportAsPng(rescaledSize.width(), rescaledSize.height(), viewport.getPreferredSize());
     }
 
@@ -100,7 +103,7 @@ public class WrappedScene {
         return new LytSize(width, height);
     }
 
-    public LytSize getSizeForPreview(){
+    public @Nullable LytSize getSizeForPreview(){
         var prefSize = viewport.getPreferredSize();
         if (prefSize.width() <= 0 || prefSize.height() <= 0) {
             return null;

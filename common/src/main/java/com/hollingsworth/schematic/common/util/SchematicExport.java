@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,7 +33,7 @@ public class SchematicExport {
 		return structure;
 	}
 
-	public static SchematicExportResult saveSchematic(Path dir, String fileName, boolean overwrite, StructureTemplate structure, BlockPos start, BlockPos end){
+	public static @Nullable SchematicExportResult saveSchematic(Path dir, String fileName, boolean overwrite, StructureTemplate structure, BlockPos start, BlockPos end){
 		BoundingBox bb = BoundingBox.fromCorners(start, end);
 		BlockPos origin = new BlockPos(bb.minX(), bb.minY(), bb.minZ());
 		BlockPos bounds = new BlockPos(bb.getXSpan(), bb.getYSpan(), bb.getZSpan());
