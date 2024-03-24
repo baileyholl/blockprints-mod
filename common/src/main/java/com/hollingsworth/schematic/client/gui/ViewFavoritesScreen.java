@@ -100,6 +100,10 @@ public class ViewFavoritesScreen extends BaseSchematicScreen {
         addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
             Minecraft.getInstance().setScreen(new HomeScreen());
         }));
+        addRenderableWidget(new GuiImageButton(bookLeft + 25, bookTop + 9, 79, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_5.png"), b -> {
+            Minecraft.getInstance().setScreen(new ManageVisualScreen());
+        })).withTooltip(Component.translatable("blockprints.visualize_list_tooltip"));
+
 
     }
 
@@ -122,8 +126,10 @@ public class ViewFavoritesScreen extends BaseSchematicScreen {
     }
 
     @Override
-    public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+        super.render(graphics, mouseX, mouseY, partialTicks);
+        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_visualize.png"), bookLeft + 28, bookTop + 13, 0, 0, 9, 7, 9, 7);
+        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.visual_list").getVisualOrderText(), bookLeft + 70, bookTop + 13);
     }
 
     @Override

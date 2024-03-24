@@ -83,7 +83,7 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
         if (anim > 50) {
             anim = 0;
         }
-        if (ticksRunning > 30 && response != null && !responseHandled) {
+        if (response != null && !responseHandled) {
             handleResponse();
         }
         if ((ticksRunning == 20 * 5 || error != null) && !backAdded) {

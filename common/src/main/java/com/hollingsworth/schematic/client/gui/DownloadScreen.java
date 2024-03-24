@@ -1,23 +1,18 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
-import com.hollingsworth.schematic.api.blockprints.ApiResponse;
 import com.hollingsworth.schematic.api.blockprints.download.Download;
 import com.hollingsworth.schematic.api.blockprints.download.PreviewDownloadResult;
 import com.hollingsworth.schematic.client.ClientData;
-import com.hollingsworth.schematic.client.renderer.StatePos;
-import com.hollingsworth.schematic.client.renderer.StructureRenderer;
 import com.hollingsworth.schematic.common.util.ClientUtil;
 import com.hollingsworth.schematic.common.util.FileUtils;
 import com.hollingsworth.schematic.mixin.StructureTemplateAccessor;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -25,7 +20,6 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import org.lwjgl.system.MemoryUtil;
 
@@ -36,7 +30,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import static com.hollingsworth.schematic.api.SceneExporter.STRUCTURE_FOLDER;
@@ -118,7 +111,7 @@ public class DownloadScreen extends BaseSchematicScreen {
                 if(palettes.isEmpty()){
                     Minecraft.getInstance().player.sendSystemMessage(Component.translatable(Constants.MOD_ID + ".invalid_file"));
                 }else {
-                    ClientData.startStructureRenderer(structureTemplate);
+                    ClientData.startStructureRenderer(structureTemplate, preview.downloadResponse.structureName, preview.downloadResponse.id);
                 }
                 Minecraft.getInstance().setScreen(null);
             };
@@ -154,6 +147,7 @@ public class DownloadScreen extends BaseSchematicScreen {
         super.render(graphics, mouseX, mouseY, partialTicks);
         graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_download.png"), bookRight - 116, bookTop + 155, 0, 0, 9, 11, 9, 11);
         graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_list.png"), bookLeft + 28, bookTop + 157, 0, 0, 9, 7, 9, 7);
+        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_visualize.png"), bookLeft + 28, bookTop + 157 + 16, 0, 0, 9, 7, 9, 7);
         GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.download").getVisualOrderText(), bookRight - 67, bookTop + 157);
         GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.view_list").getVisualOrderText(), bookLeft + 34 + 143 / 2, bookTop + 157);
         GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.visualize").getVisualOrderText(), bookLeft + 34 + 143 / 2, bookTop + 157 + 16);

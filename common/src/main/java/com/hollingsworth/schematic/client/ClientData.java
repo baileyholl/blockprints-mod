@@ -33,8 +33,8 @@ public class ClientData {
         RenderStructureHandler.cancelRender();
     }
 
-    public static void startStructureRenderer(StructureTemplate structureTemplate){
-        RenderStructureHandler.startRender(structureTemplate);
+    public static void startStructureRenderer(StructureTemplate structureTemplate, String name, String blockprintsId){
+        RenderStructureHandler.startRender(structureTemplate, name, blockprintsId);
         AreaCaptureHandler.cancelCapture();
     }
 
@@ -53,9 +53,11 @@ public class ClientData {
     }
 
     public static void renderAfterTransparentBlocks(PoseStack poseStack, Matrix4f projectionMatrix){
-        StructureRenderer.buildRender(poseStack, Minecraft.getInstance().player);
-        StructureRenderer.drawRender(RenderStructureHandler.anchorPos, poseStack, projectionMatrix, Minecraft.getInstance().player);
-    }
+        for(var data : StructureRenderer.structures){
+            StructureRenderer.buildRender(data, poseStack, Minecraft.getInstance().player);
+            StructureRenderer.drawRender(data, poseStack, projectionMatrix, Minecraft.getInstance().player);
+        }
+   }
 
 
     public static void rightClickEvent() {

@@ -4,10 +4,12 @@ import com.hollingsworth.schematic.client.RaycastHelper;
 import com.hollingsworth.schematic.client.RenderStructureHandler;
 import com.hollingsworth.schematic.common.util.Color;
 import com.hollingsworth.schematic.common.util.DimPos;
-import com.hollingsworth.schematic.mixin.StructureTemplateAccessor;
 import com.hollingsworth.schematic.platform.Services;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexBuffer;
+import com.mojang.blaze3d.vertex.VertexSorting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -20,14 +22,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -35,38 +32,18 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class StructureRenderer {
-    public static ArrayList<StatePos> statePosCache;
+    public static ArrayList<StructureRenderData> structures = new ArrayList<>();
     private static int sortCounter = 0;
     private static FakeRenderingWorld fakeRenderingWorld;
-    public static BoundingBox boundingBox;
 
-    //Cached SortStates used for re-sorting every so often
-    private static final Map<RenderType, BufferBuilder.SortState> sortStates = new HashMap<>();
     //A map of RenderType -> DireBufferBuilder, so we can draw the different render types in proper order later
     private static final Map<RenderType, DireBufferBuilder> builders = RenderType.chunkBufferLayers().stream().collect(Collectors.toMap((renderType) -> renderType, (type) -> new DireBufferBuilder(type.bufferSize())));
     //A map of RenderType -> Vertex Buffer to buffer the different render types.
     private static final Map<RenderType, VertexBuffer> vertexBuffers = RenderType.chunkBufferLayers().stream().collect(Collectors.toMap((renderType) -> renderType, (type) -> new VertexBuffer(VertexBuffer.Usage.STATIC)));
-
-    public static void loadFromStructure(StructureTemplate structureTemplate){
-        var accessor = (StructureTemplateAccessor)structureTemplate;
-        var palettes = accessor.getPalettes();
-        if(palettes.isEmpty()){
-            return;
-        }
-        var palette = palettes.get(0);
-        StructureRenderer.statePosCache = new ArrayList<>();
-        for(StructureTemplate.StructureBlockInfo blockInfo : palette.blocks()){
-            StructureRenderer.statePosCache.add(new StatePos(blockInfo.state(), blockInfo.pos()));
-        }
-        StructureRenderer.boundingBox = structureTemplate.getBoundingBox(new StructurePlaceSettings(), new BlockPos(0, 0, 0));
-
-    }
 
     //Get the buffer from the map, and ensure its building
     public static DireBufferBuilder getBuffer(RenderType renderType) {
@@ -78,23 +55,23 @@ public class StructureRenderer {
     }
 
     //Start rendering - this is the most expensive part, so we render it, then cache it, and draw it over and over (much cheaper)
-    public static void buildRender(PoseStack poseStack, Player player) {
+    public static void buildRender(StructureRenderData data, PoseStack poseStack, Player player) {
         BlockHitResult lookingAt = RaycastHelper.getLookingAt(player, true);
-        BlockPos renderPos = RenderStructureHandler.anchorPos == null ? lookingAt.getBlockPos() : RenderStructureHandler.anchorPos;
+        BlockPos renderPos = data.anchorPos == null ? lookingAt.getBlockPos() : data.anchorPos;
         if(renderPos == null){
             return;
         }
         renderPos = renderPos.above();
         DimPos boundTo = new DimPos(player.level.dimension(), renderPos);
         if (boundTo != null && boundTo.levelKey().equals(player.level().dimension())) {
-            drawBoundBox(poseStack, boundTo.pos());
+            drawBoundBox(data, poseStack, boundTo.pos());
         }
 
 
         renderPos = renderPos.above();
         //Start drawing the Render and cache it, used for both Building and Copy/Paste
         if (shouldUpdateRender(player)) {
-            generateRender(player.level(), renderPos, 0.5f, statePosCache, vertexBuffers);
+            generateRender(data, player.level(), renderPos, 0.5f, data.statePosCache, vertexBuffers);
         }
     }
 
@@ -145,7 +122,7 @@ public class StructureRenderer {
     /**
      * This method creates a Map<RenderType, VertexBuffer> when given an ArrayList<StatePos> statePosCache - its used both here to draw in-game AND in the TemplateManagerGUI.java class
      */
-    public static void generateRender(Level level, BlockPos renderPos, float transparency, ArrayList<StatePos> statePosCache, Map<RenderType, VertexBuffer> vertexBuffers) {
+    public static void generateRender(StructureRenderData data, Level level, BlockPos renderPos, float transparency, ArrayList<StatePos> statePosCache, Map<RenderType, VertexBuffer> vertexBuffers) {
         if(!RenderStructureHandler.showRender){
             return;
         }
@@ -192,7 +169,7 @@ public class StructureRenderer {
             RenderType renderType = entry.getKey();
             DireBufferBuilder direBufferBuilder = getBuffer(renderType);
             direBufferBuilder.setQuadSorting(VertexSorting.byDistance(sortPos));
-            sortStates.put(renderType, direBufferBuilder.getSortState());
+            data.sortStates.put(renderType, direBufferBuilder.getSortState());
             VertexBuffer vertexBuffer = vertexBuffers.get(entry.getKey());
             vertexBuffer.bind();
             vertexBuffer.upload(direBufferBuilder.end());
@@ -210,7 +187,7 @@ public class StructureRenderer {
         matrix.popPose();
     }
 
-    public static void drawBoundBox(PoseStack matrix, BlockPos blockPos) {
+    public static void drawBoundBox(StructureRenderData data, PoseStack matrix, BlockPos blockPos) {
         if(!RenderStructureHandler.showRender){
             return;
         }
@@ -218,6 +195,7 @@ public class StructureRenderer {
         matrix.pushPose();
         matrix.translate(-projectedView.x(), -projectedView.y(), -projectedView.z());
         Color color = Color.BLUE;
+        var boundingBox = data.boundingBox;
         if(boundingBox != null){
             BlockPos min = new BlockPos(boundingBox.minX(), boundingBox.minY(), boundingBox.minZ());
             BlockPos max = new BlockPos(boundingBox.maxX(), boundingBox.maxY(), boundingBox.maxZ());
@@ -243,10 +221,11 @@ public class StructureRenderer {
     }
 
     //Draw what we've cached
-    public static void drawRender(BlockPos anchorPos, PoseStack poseStack, Matrix4f projectionMatrix, Player player) {
-        if (vertexBuffers == null || statePosCache == null || !RenderStructureHandler.showRender) {
+    public static void drawRender(StructureRenderData data, PoseStack poseStack, Matrix4f projectionMatrix, Player player) {
+        if (vertexBuffers == null || !RenderStructureHandler.showRender) {
             return;
         }
+        BlockPos anchorPos = data.anchorPos;
         MultiBufferSource.BufferSource buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
         Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         BlockHitResult lookingAt = RaycastHelper.getLookingAt(player, true);
@@ -275,7 +254,7 @@ public class StructureRenderer {
 //        }
         //Sort every <X> Frames to prevent screendoor effect
         if (sortCounter > 20) {
-            sortAll(renderPos);
+            sortAll(data, renderPos);
             sortCounter = 0;
         } else {
             sortCounter++;
@@ -316,8 +295,8 @@ public class StructureRenderer {
         BlockRenderDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
         DireRenderMethods.MultiplyAlphaRenderTypeBuffer multiplyAlphaRenderTypeBuffer = new DireRenderMethods.MultiplyAlphaRenderTypeBuffer(buffersource, 0.5f);
         //If any of the blocks in the render didn't have a model (like chests) we draw them here. This renders AND draws them, so more expensive than caching, but I don't think we have a choice
-        fakeRenderingWorld = new FakeRenderingWorld(player.level(), statePosCache, renderPos);
-        for (StatePos pos : statePosCache.stream().filter(pos -> !isModelRender(pos.state)).toList()) {
+        fakeRenderingWorld = new FakeRenderingWorld(player.level(), data.statePosCache, renderPos);
+        for (StatePos pos : data.statePosCache.stream().filter(pos -> !isModelRender(pos.state)).toList()) {
             if (pos.state.isAir()) continue;
             matrix.pushPose();
             matrix.translate(-projectedView.x(), -projectedView.y(), -projectedView.z());
@@ -374,10 +353,10 @@ public class StructureRenderer {
     }
 
     //Sort all the RenderTypes
-    public static void sortAll(BlockPos lookingAt) {
-        for (Map.Entry<RenderType, BufferBuilder.SortState> entry : sortStates.entrySet()) {
+    public static void sortAll(StructureRenderData data, BlockPos lookingAt) {
+        for (Map.Entry<RenderType, BufferBuilder.SortState> entry : data.sortStates.entrySet()) {
             RenderType renderType = entry.getKey();
-            BufferBuilder.RenderedBuffer renderedBuffer = sort(lookingAt, renderType);
+            BufferBuilder.RenderedBuffer renderedBuffer = sort(data, lookingAt, renderType);
             VertexBuffer vertexBuffer = vertexBuffers.get(renderType);
             vertexBuffer.bind();
             vertexBuffer.upload(renderedBuffer);
@@ -386,15 +365,15 @@ public class StructureRenderer {
     }
 
     //Sort the render type we pass in - using DireBufferBuilder because we want to sort in the opposite direction from normal
-    public static BufferBuilder.RenderedBuffer sort(BlockPos lookingAt, RenderType renderType) {
+    public static BufferBuilder.RenderedBuffer sort(StructureRenderData data, BlockPos lookingAt, RenderType renderType) {
         Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         Vec3 subtracted = projectedView.subtract(lookingAt.getX(), lookingAt.getY(), lookingAt.getZ());
         Vector3f sortPos = new Vector3f((float) subtracted.x, (float) subtracted.y, (float) subtracted.z);
         DireBufferBuilder bufferBuilder = getBuffer(renderType);
-        BufferBuilder.SortState sortState = sortStates.get(renderType);
+        BufferBuilder.SortState sortState = data.sortStates.get(renderType);
         bufferBuilder.restoreSortState(sortState);
         bufferBuilder.setQuadSorting(VertexSorting.byDistance(sortPos));
-        sortStates.put(renderType, bufferBuilder.getSortState());
+        data.sortStates.put(renderType, bufferBuilder.getSortState());
         return bufferBuilder.end();
     }
 }

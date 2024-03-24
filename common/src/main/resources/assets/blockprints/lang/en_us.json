@@ -65,5 +65,9 @@
   "blockprints.delete_confirm": "Delete it!",
   "blockprints.visualize": "Visualze In-World",
   "blockprints.already_downloaded_tooltip": "This file has already been downloaded at %s. Download it again?",
-  "blockprints.visualize_download": "Download and visualize"
+  "blockprints.visualize_download": "Download and visualize",
+  "blockprints.remove_visual": "Remove Visual",
+  "blockprints.visual_list": "Visual List",
+  "blockprints.visualize_list_tooltip": "Manage, remove, and edit placed visualizations.",
+  "blockprints.visualizations": "Visualizations"
 }
