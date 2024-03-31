@@ -112,6 +112,7 @@ public class DownloadScreen extends BaseSchematicScreen {
                     Minecraft.getInstance().player.sendSystemMessage(Component.translatable(Constants.MOD_ID + ".invalid_file"));
                 }else {
                     ClientData.startStructureRenderer(structureTemplate, preview.downloadResponse.structureName, preview.downloadResponse.id);
+                    Minecraft.getInstance().player.sendSystemMessage(Component.translatable(Constants.MOD_ID + ".start_placing", ClientData.ROTATE_LEFT.getTranslatedKeyMessage(), ClientData.ROTATE_RIGHT.getTranslatedKeyMessage(), ClientData.CONFIRM.getTranslatedKeyMessage(), ClientData.CANCEL.getTranslatedKeyMessage()));
                 }
                 Minecraft.getInstance().setScreen(null);
             };

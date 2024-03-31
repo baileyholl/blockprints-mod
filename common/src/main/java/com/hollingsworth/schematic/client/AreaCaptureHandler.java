@@ -144,10 +144,6 @@ public class AreaCaptureHandler {
     }
 
     public static void renderBoundaryUI(GuiGraphics graphics, Window window) {
-        String status = ClientData.uploadStatus.get();
-        if (status != null && !status.isEmpty()) {
-            GuiUtils.drawOutlinedText(Minecraft.getInstance().font, graphics, Component.literal(status).getVisualOrderText(), 0, 20);
-        }
         if (!showBoundary)
             return;
         float screenY = window.getGuiScaledHeight() / 2f;

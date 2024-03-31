@@ -1,7 +1,6 @@
 package com.hollingsworth.schematic.client;
 
 import com.hollingsworth.schematic.Constants;
-import com.hollingsworth.schematic.client.renderer.StructureRenderer;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
@@ -30,6 +29,12 @@ public class ClientEvents {
         }
         if (event.getKey() == ClientData.CANCEL.getKey().getValue()) {
             ClientData.onCancelHit();
+        }
+        if(event.getKey() == ClientData.ROTATE_LEFT.getKey().getValue()){
+            ClientData.onRotateHit(false);
+        }
+        if(event.getKey() == ClientData.ROTATE_RIGHT.getKey().getValue()){
+            ClientData.onRotateHit(true);
         }
     }
 

@@ -22,6 +22,8 @@ public class ClientData {
     public static final KeyMapping OPEN_MENU = new KeyMapping("key." + Constants.MOD_ID + ".open_menu", GLFW.GLFW_KEY_GRAVE_ACCENT, CATEGORY);
     public static final KeyMapping CONFIRM = new KeyMapping("key." + Constants.MOD_ID + ".confirm_selection", GLFW.GLFW_KEY_ENTER, CATEGORY);
     public static final KeyMapping CANCEL = new KeyMapping("key." + Constants.MOD_ID + ".cancel_selection", GLFW.GLFW_KEY_BACKSPACE, CATEGORY);
+    public static final KeyMapping ROTATE_LEFT = new KeyMapping("key." + Constants.MOD_ID + ".rotate_left", GLFW.GLFW_KEY_LEFT, CATEGORY);
+    public static final KeyMapping ROTATE_RIGHT = new KeyMapping("key." + Constants.MOD_ID + ".rotate_right", GLFW.GLFW_KEY_RIGHT, CATEGORY);
     public static final KeyMapping[] KEYS = new KeyMapping[]{OPEN_MENU, CONFIRM, CANCEL};
 
     public static void openMenu() {
@@ -48,6 +50,14 @@ public class ClientData {
         RenderStructureHandler.onCancelHit();
     }
 
+    public static void onRotateHit(boolean clockwise) {
+        RenderStructureHandler.onRotateHit(clockwise);
+    }
+
+    public static void onMirrorHit() {
+        RenderStructureHandler.onMirrorHit();
+    }
+
     public static void renderAfterSky(PoseStack poseStack) {
         AreaCaptureHandler.renderBoundary(poseStack);
     }
@@ -67,5 +77,6 @@ public class ClientData {
 
     public static void renderGUIOverlayEvent(GuiGraphics graphics, Window window) {
         AreaCaptureHandler.renderBoundaryUI(graphics, window);
+        RenderStructureHandler.renderInstructions(graphics, window);
     }
 }
