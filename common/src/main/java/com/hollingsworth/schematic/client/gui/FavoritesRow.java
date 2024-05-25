@@ -5,8 +5,6 @@ import com.hollingsworth.schematic.api.blockprints.favorites.Favorite;
 import com.hollingsworth.schematic.api.blockprints.favorites.Favorites;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -53,25 +51,5 @@ public class FavoritesRow extends NestedWidget {
         } else if (viewBuildsScreen.showRecent && favorite.isRecent()) {
             graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_recent_builds.png"), x + 4, y + 3, 0, 0, 7, 7, 7, 7);
         }
-    }
-
-    @Override
-    public void onClick(double $$0, double $$1) {
-        super.onClick($$0, $$1);
-    }
-
-    @Override
-    public boolean mouseClicked(double $$0, double $$1, int $$2) {
-        return super.mouseClicked($$0, $$1, $$2);
-    }
-
-    @Override
-    public void playDownSound(SoundManager $$0) {
-
-    }
-
-    @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-
     }
 }

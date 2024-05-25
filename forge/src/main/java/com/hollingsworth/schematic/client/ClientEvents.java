@@ -30,24 +30,31 @@ public class ClientEvents {
         if (event.getKey() == ClientData.CANCEL.getKey().getValue()) {
             ClientData.onCancelHit();
         }
+        if(event.getKey() == ClientData.ROTATE_LEFT.getKey().getValue()){
+            ClientData.onRotateHit(false);
+        }
+        if(event.getKey() == ClientData.ROTATE_RIGHT.getKey().getValue()){
+            ClientData.onRotateHit(true);
+        }
     }
 
     @SubscribeEvent
     public static void rightClickEvent(final InputEvent.MouseButton.Pre event) {
         if (InputConstants.MOUSE_BUTTON_RIGHT != event.getButton() || MINECRAFT.screen != null || event.getAction() != InputConstants.RELEASE)
             return;
-        ClientData.positionClicked();
+        ClientData.rightClickEvent();
     }
 
     @SubscribeEvent
     public static void renderLast(final RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
+            ClientData.renderAfterTransparentBlocks(event.getPoseStack(), event.getProjectionMatrix());
             return;
         }
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY) {
             return;
         }
-        ClientData.renderBoundary(event.getPoseStack());
+        ClientData.renderAfterSky(event.getPoseStack());
     }
 
     @SubscribeEvent
@@ -55,6 +62,7 @@ public class ClientEvents {
     public static void afterRenderOverlayLayer(RenderGuiOverlayEvent.Post event) {
         if (event.getOverlay() != VanillaGuiOverlay.CROSSHAIR.type())
             return;
-        ClientData.renderBoundaryUI(event.getGuiGraphics(), event.getWindow());
+        ClientData.renderGUIOverlayEvent(event.getGuiGraphics(), event.getWindow());
+
     }
 }

@@ -3,6 +3,7 @@ package com.hollingsworth.schematic.client.gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
@@ -27,6 +28,21 @@ public class NestedWidget extends AbstractWidget implements NestedRenderables {
 
     @Override
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+
+    }
+
+    @Override
+    public void onClick(double $$0, double $$1) {
+        super.onClick($$0, $$1);
+    }
+
+    @Override
+    public boolean mouseClicked(double $$0, double $$1, int $$2) {
+        return super.mouseClicked($$0, $$1, $$2);
+    }
+
+    @Override
+    public void playDownSound(SoundManager $$0) {
 
     }
 }

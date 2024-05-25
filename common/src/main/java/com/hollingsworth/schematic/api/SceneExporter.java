@@ -3,10 +3,15 @@ package com.hollingsworth.schematic.api;
 import com.hollingsworth.schematic.api.blockprints.ApiResponse;
 import com.hollingsworth.schematic.api.blockprints.GoogleCloudStorage;
 import com.hollingsworth.schematic.api.blockprints.upload.Upload;
+import com.hollingsworth.schematic.client.ClientData;
+import com.hollingsworth.schematic.client.renderer.StatePos;
+import com.hollingsworth.schematic.client.renderer.StructureRenderer;
 import com.hollingsworth.schematic.common.util.SchematicExport;
 import com.hollingsworth.schematic.export.PerspectivePreset;
 import com.hollingsworth.schematic.export.WrappedScene;
+import com.hollingsworth.schematic.mixin.StructureTemplateAccessor;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 import java.io.IOException;
@@ -78,12 +83,18 @@ public class SceneExporter {
                 imageFiles.add(path);
                 count++;
             }
-            SchematicExport.SchematicExportResult result = SchematicExport.saveSchematic(Paths.get(STRUCTURE_FOLDER), finalExportName, false, structureTemplate, start, end);
             var uploadResponse = Upload.postUpload(name, description, makePublic);
             if (!uploadResponse.wasSuccessful() || uploadResponse.response == null) {
                 return ApiResponse.unexpectedFailure();
             }
             var response = uploadResponse.response;
+            String localStructureName = sanitize(finalExportName + '_' + response.id);
+            SchematicExport.SchematicExportResult result = SchematicExport.saveSchematic(Paths.get(STRUCTURE_FOLDER), localStructureName, false, structureTemplate, start, end);
+
+            if(result == null){
+                return ApiResponse.unexpectedFailure();
+            }
+
             var preview = response.signedPreviewImage;
             var schematic = response.signedSchematic;
             var previewSuccess = GoogleCloudStorage.uploadFileToGCS(URI.create(preview).toURL(), previewPath, "image/png", response.imageFileSize);

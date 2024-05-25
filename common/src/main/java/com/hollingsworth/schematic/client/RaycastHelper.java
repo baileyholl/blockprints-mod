@@ -5,11 +5,13 @@ import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.ClipContext.Block;
 import net.minecraft.world.level.ClipContext.Fluid;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.function.Predicate;
@@ -166,6 +168,17 @@ public class RaycastHelper {
 		}
 
 		return new PredicateTraceResult();
+	}
+
+	public static BlockHitResult getLookingAt(Player player, boolean shouldRayTrace) {
+		return getLookingAt(player, shouldRayTrace ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE);
+	}
+
+	public static BlockHitResult getLookingAt(Player player, ClipContext.Fluid rayTraceFluid) {
+		double rayTraceRange = 25;
+		HitResult result = player.pick(rayTraceRange, 0f, rayTraceFluid != ClipContext.Fluid.NONE);
+
+		return (BlockHitResult) result;
 	}
 
 	public static class PredicateTraceResult {

@@ -65,7 +65,7 @@ public class StatePos {
         return blockStateMap;
     }
 
-    public static ArrayList<StatePos> rotate90Degrees(ArrayList<StatePos> list, ArrayList<TagPos> tagListMutable) {
+    public static ArrayList<StatePos> rotate(ArrayList<StatePos> list, ArrayList<TagPos> tagListMutable, Rotation rotation) {
         ArrayList<StatePos> rotatedList = new ArrayList<>();
         if (list == null || list.isEmpty()) {
             return rotatedList;
@@ -79,8 +79,8 @@ public class StatePos {
         for (StatePos statePos : list) {
             BlockPos oldPos = statePos.pos;
             BlockState oldState = statePos.state;
-            BlockState newState = oldState.rotate(Rotation.CLOCKWISE_90);
-            BlockPos newPos = new BlockPos(-oldPos.getZ(), oldPos.getY(), oldPos.getX());
+            BlockState newState = oldState.rotate(rotation);
+            BlockPos newPos = oldPos.rotate(rotation);
 
             if (tags && tagMap.get(statePos.pos) != null) {
                 CompoundTag tempTag = tagMap.get(statePos.pos);

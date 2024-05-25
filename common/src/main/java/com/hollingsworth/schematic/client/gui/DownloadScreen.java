@@ -3,27 +3,37 @@ package com.hollingsworth.schematic.client.gui;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.api.blockprints.download.Download;
 import com.hollingsworth.schematic.api.blockprints.download.PreviewDownloadResult;
+import com.hollingsworth.schematic.client.ClientData;
 import com.hollingsworth.schematic.common.util.ClientUtil;
+import com.hollingsworth.schematic.common.util.FileUtils;
+import com.hollingsworth.schematic.mixin.StructureTemplateAccessor;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+
+import static com.hollingsworth.schematic.api.SceneExporter.STRUCTURE_FOLDER;
+import static com.hollingsworth.schematic.api.SceneExporter.sanitize;
 
 public class DownloadScreen extends BaseSchematicScreen {
     public static final ResourceLocation PREVIEW_TEXTURE = new ResourceLocation(Constants.MOD_ID, "download_preview");
@@ -76,25 +86,61 @@ public class DownloadScreen extends BaseSchematicScreen {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        addRenderableWidget(new GuiImageButton(bookRight - 119, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
-            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Download.downloadSchematic(preview.downloadResponse.id, preview.downloadResponse.structureName), result -> {
 
+        var downloadButton = new GuiImageButton(bookRight - 119, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
+            startDownload(path ->{
                 Minecraft.getInstance().setScreen(null);
-                if (result != null) {
+                if (path != null) {
                     ClientUtil.sendMessage("blockprints.download_success");
                 } else {
                     ClientUtil.sendMessage("blockprints.download_failed");
                 }
-            }));
-        }).withTooltip(hasMissing ? Component.translatable("blockprints.blocks_missing_tooltip").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)) : null)
-                .withTooltip(Component.translatable("blockprints.download_tooltip")));
-
+            });
+        });
+        var fileName = sanitize(preview.downloadResponse.structureName + "_" + preview.downloadResponse.id) +".nbt";
+        var path = Paths.get(STRUCTURE_FOLDER, fileName);
+        var alreadyDownloaded = Files.exists(path);
         addRenderableWidget(new GuiImageButton(bookLeft + 25, bookTop + 153, 143, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_9.png"), b -> {
             Minecraft.getInstance().setScreen(new BlockListScreen(this, entries));
         }));
+        var visualizeButton = new GuiImageButton(bookLeft + 25, bookTop + 153 + 16, 143, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_9.png"), b -> {
+            Consumer<Path> onPath = (templatePath) ->{
+                StructureTemplate structureTemplate = FileUtils.loadStructureTemplate(Minecraft.getInstance().level.holderLookup(Registries.BLOCK), templatePath);
+                var accessor = (StructureTemplateAccessor)structureTemplate;
+                var palettes = accessor.getPalettes();
+                if(palettes.isEmpty()){
+                    Minecraft.getInstance().player.sendSystemMessage(Component.translatable(Constants.MOD_ID + ".invalid_file"));
+                }else {
+                    ClientData.startStructureRenderer(structureTemplate, preview.downloadResponse.structureName, preview.downloadResponse.id);
+                    Minecraft.getInstance().player.sendSystemMessage(Component.translatable(Constants.MOD_ID + ".start_placing", ClientData.ROTATE_LEFT.getTranslatedKeyMessage(), ClientData.ROTATE_RIGHT.getTranslatedKeyMessage(), ClientData.CONFIRM.getTranslatedKeyMessage(), ClientData.CANCEL.getTranslatedKeyMessage()));
+                }
+                Minecraft.getInstance().setScreen(null);
+            };
+
+            if(!alreadyDownloaded){
+                startDownload(onPath);
+            }else{
+                onPath.accept(path);
+            }
+        });
+
+        if(alreadyDownloaded){
+            downloadButton.withTooltip(Component.translatable("blockprints.already_downloaded_tooltip", STRUCTURE_FOLDER + fileName).withStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
+        }else{
+            downloadButton.withTooltip(hasMissing ? Component.translatable("blockprints.blocks_missing_tooltip").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)) : null)
+                    .withTooltip(Component.translatable("blockprints.download_tooltip"));
+            visualizeButton.withTooltip(Component.translatable("blockprints.visualize_download"));
+        }
+
+        addRenderableWidget(visualizeButton);
+        addRenderableWidget(downloadButton);
         addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
             Minecraft.getInstance().setScreen(previousScreen);
         }));
+    }
+
+    public void startDownload(Consumer<Path> callback){
+        Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Download.downloadSchematic(preview.downloadResponse.id, preview.downloadResponse.structureName), callback));
     }
 
     @Override
@@ -102,8 +148,10 @@ public class DownloadScreen extends BaseSchematicScreen {
         super.render(graphics, mouseX, mouseY, partialTicks);
         graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_download.png"), bookRight - 116, bookTop + 155, 0, 0, 9, 11, 9, 11);
         graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_list.png"), bookLeft + 28, bookTop + 157, 0, 0, 9, 7, 9, 7);
+        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_visualize.png"), bookLeft + 28, bookTop + 157 + 16, 0, 0, 9, 7, 9, 7);
         GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.download").getVisualOrderText(), bookRight - 67, bookTop + 157);
         GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.view_list").getVisualOrderText(), bookLeft + 34 + 143 / 2, bookTop + 157);
+        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.visualize").getVisualOrderText(), bookLeft + 34 + 143 / 2, bookTop + 157 + 16);
     }
 
     @Override

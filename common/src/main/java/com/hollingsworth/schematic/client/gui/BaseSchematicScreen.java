@@ -24,7 +24,7 @@ public class BaseSchematicScreen extends ModScreen {
         super.init();
         addRenderableWidget(new GuiImageButton(bookRight - 23, bookBottom - 23, 15, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_discord.png"), b -> {
             try {
-                Util.getPlatform().openUri(new URI("https://discord.gg/PFQTgq3z"));
+                Util.getPlatform().openUri(new URI("https://discord.gg/yT84NQdg6A"));
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
             }

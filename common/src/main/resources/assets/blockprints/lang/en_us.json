@@ -5,7 +5,7 @@
   "blockprints.upload_desc": "Upload a schematic to BlockPrints.io",
   "blockprints.download_desc": "Download a schematic using a code from Blockprints.io",
   "blockprints.discord": "Join the Discord for support or show off your builds!",
-  "blockprints.website": "Visit the website for schematic downloads!",
+  "blockprints.website": "Blockprints.io is under construction! Check back later for searching and viewing builds.",
   "blockprints.preview": "Preview",
   "blockprints.set_preview": "Set Preview Image",
   "blockprints.name": "Enter Name",
@@ -62,5 +62,13 @@
   "blockprints.make_public": "Make Public",
   "blockprints.make_public_tooltip": "Checking this will allow other users to view and download your build from Blockprints.io. If this is disabled, you can still share your build via the code in View Builds.",
   "blockprints.delete_tooltip": "Delete this build from Blockprints.io. This action cannot be undone.",
-  "blockprints.delete_confirm": "Delete it!"
+  "blockprints.delete_confirm": "Delete it!",
+  "blockprints.visualize": "Visualze In-World",
+  "blockprints.already_downloaded_tooltip": "This file has already been downloaded at %s. Download it again?",
+  "blockprints.visualize_download": "Download and visualize",
+  "blockprints.remove_visual": "Remove Visual",
+  "blockprints.visual_list": "Visual List",
+  "blockprints.visualize_list_tooltip": "Manage, remove, and edit placed visualizations.",
+  "blockprints.visualizations": "Visualizations",
+  "blockprints.start_placing": "Right click to anchor to a position, use %s and %s to rotate. Press %s to confirm or %s to cancel. "
 }

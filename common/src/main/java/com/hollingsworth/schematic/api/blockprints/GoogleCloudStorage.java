@@ -58,7 +58,7 @@ public class GoogleCloudStorage {
         String sanitizedName = SceneExporter.sanitize(fileName);
         try (InputStream in = uri.toURL().openStream()) {
             var path = Paths.get(folder + "/"+ sanitizedName + extension);
-            Files.createDirectories(Paths.get(folder + "/" + sanitizedName));
+            Files.createDirectories(Paths.get(folder));
             Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
             return path;
         } catch (Exception e) {
