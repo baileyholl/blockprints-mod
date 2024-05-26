@@ -70,5 +70,6 @@
   "blockprints.visual_list": "Visual List",
   "blockprints.visualize_list_tooltip": "Manage, remove, and edit placed visualizations.",
   "blockprints.visualizations": "Visualizations",
-  "blockprints.start_placing": "Right click to anchor to a position, use %s and %s to rotate. Press %s to confirm or %s to cancel. "
+  "blockprints.start_placing": "Right click to anchor to a position, use %s and %s to rotate. Press %s to confirm or %s to cancel. ",
+  "blockprints.invalid_upload": "Invalid build. Cannot be empty or contain only air blocks."
 }

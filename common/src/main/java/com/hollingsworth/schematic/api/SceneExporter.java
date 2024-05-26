@@ -3,15 +3,10 @@ package com.hollingsworth.schematic.api;
 import com.hollingsworth.schematic.api.blockprints.ApiResponse;
 import com.hollingsworth.schematic.api.blockprints.GoogleCloudStorage;
 import com.hollingsworth.schematic.api.blockprints.upload.Upload;
-import com.hollingsworth.schematic.client.ClientData;
-import com.hollingsworth.schematic.client.renderer.StatePos;
-import com.hollingsworth.schematic.client.renderer.StructureRenderer;
 import com.hollingsworth.schematic.common.util.SchematicExport;
 import com.hollingsworth.schematic.export.PerspectivePreset;
 import com.hollingsworth.schematic.export.WrappedScene;
-import com.hollingsworth.schematic.mixin.StructureTemplateAccessor;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 import java.io.IOException;
@@ -27,7 +22,7 @@ public class SceneExporter {
     public static final String IMAGE_FOLDER = "./schematics/blockprints/images/";
     public static final String STRUCTURE_FOLDER = "./schematics/";
 
-    private static final int GAMESCENE_PLACEHOLDER_SCALE = 2;
+    public static final int GAMESCENE_PLACEHOLDER_SCALE = 2;
     public WrappedScene scene;
     public StructureTemplate structureTemplate;
 

@@ -66,6 +66,9 @@ public class WrappedScene {
 
         var prefSize = viewport.getPreferredSize();
         var scaledSize = getSizeForExport(scale);
+        if(scaledSize == null){
+            return null;
+        }
         return exportAsPng(scaledSize.width(), scaledSize.height(), prefSize);
     }
 
@@ -91,7 +94,7 @@ public class WrappedScene {
         }
     }
 
-    public LytSize getSizeForExport(float scale){
+    public @Nullable LytSize getSizeForExport(float scale){
         var prefSize = viewport.getPreferredSize();
         if (prefSize.width() <= 0 || prefSize.height() <= 0) {
             return null;

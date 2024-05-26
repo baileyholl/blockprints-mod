@@ -7,10 +7,12 @@ import com.hollingsworth.schematic.export.CameraSettings;
 import com.hollingsworth.schematic.export.Scene;
 import com.hollingsworth.schematic.export.WrappedScene;
 import com.hollingsworth.schematic.export.level.GuidebookLevel;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
@@ -56,6 +58,11 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
                 return;
             }
             SceneExporter sceneExporter = new SceneExporter(wrappedScene, structureTemplate);
+            if(sceneExporter.scene.getSizeForExport(SceneExporter.GAMESCENE_PLACEHOLDER_SCALE) == null){
+                Minecraft.getInstance().setScreen(null);
+                ClientUtil.sendMessage(Component.translatable("blockprints.invalid_upload").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
+                return;
+            }
             List<WrappedScene.ImageExport> images = sceneExporter.getImages();
 
 
