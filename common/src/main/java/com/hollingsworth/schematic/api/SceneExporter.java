@@ -7,6 +7,7 @@ import com.hollingsworth.schematic.common.util.SchematicExport;
 import com.hollingsworth.schematic.export.PerspectivePreset;
 import com.hollingsworth.schematic.export.WrappedScene;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 import java.io.IOException;
@@ -80,14 +81,14 @@ public class SceneExporter {
             }
             var uploadResponse = Upload.postUpload(name, description, makePublic);
             if (!uploadResponse.wasSuccessful() || uploadResponse.response == null) {
-                return ApiResponse.unexpectedFailure();
+                return uploadResponse.toBoolean();
             }
             var response = uploadResponse.response;
             String localStructureName = sanitize(finalExportName + '_' + response.id);
             SchematicExport.SchematicExportResult result = SchematicExport.saveSchematic(Paths.get(STRUCTURE_FOLDER), localStructureName, false, structureTemplate, start, end);
 
             if(result == null){
-                return ApiResponse.unexpectedFailure();
+                return ApiResponse.error(Component.literal("Could not save schematic locally"));
             }
 
             var preview = response.signedPreviewImage;
@@ -95,7 +96,7 @@ public class SceneExporter {
             var previewSuccess = GoogleCloudStorage.uploadFileToGCS(URI.create(preview).toURL(), previewPath, "image/png", response.imageFileSize);
             var structureSuccess = GoogleCloudStorage.uploadFileToGCS(URI.create(schematic).toURL(), result.file(), "application/octet-stream", response.schematicFileSize);
             if (!previewSuccess || !structureSuccess) {
-                return ApiResponse.unexpectedFailure();
+                return ApiResponse.error(Component.literal("Could not upload to GCS"));
             }
             for (int i = 0; i < response.signedImages.length; i++) {
                 // Guard against server changes
@@ -103,7 +104,7 @@ public class SceneExporter {
                     break;
                 }
                 if (!GoogleCloudStorage.uploadFileToGCS(URI.create(response.signedImages[i]).toURL(), imageFiles.get(i), "image/png", response.imageFileSize)) {
-                    return ApiResponse.unexpectedFailure();
+                    return ApiResponse.error(Component.literal("Could not upload to GCS"));
                 }
             }
             return Upload.postDoneUploading(response.id);

@@ -20,8 +20,17 @@ public class ApiResponse<T> {
         this.error = error;
     }
 
+    private ApiResponse(T response, String error) {
+        this.response = response;
+        this.error = error;
+    }
+
     public boolean wasSuccessful() {
         return error == null;
+    }
+
+    public ApiResponse<Boolean> toBoolean(){
+        return new ApiResponse<>(response != null, error);
     }
 
     public static <T> ApiResponse<T> error(Component component) {

@@ -48,7 +48,7 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
     @Override
     public void init() {
         super.init();
-        CompletableFuture.<ApiResponse<T>>supplyAsync(future, Util.backgroundExecutor()).<ApiResponse<T>>whenCompleteAsync((result, err) -> response = new Response<>(result, err), Minecraft.getInstance());
+        CompletableFuture.supplyAsync(future, Util.backgroundExecutor()).whenCompleteAsync((result, err) -> response = new Response<>(result, err), Minecraft.getInstance());
     }
 
     public void handleResponse() {
@@ -56,22 +56,30 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
             return;
         }
         responseHandled = true;
-        var result = response.response();
-        var err = response.throwable();
-        if (err != null) {
-            error = Component.translatable("blockprints.unexpected_error", err.toString()).getString();
-            err.printStackTrace();
+        var apiResponse = response.response();
+
+        // If the completable future failed or an unknown error was thrown
+        if(response.throwable != null){
+            response.throwable.printStackTrace();
+            error = Component.translatable("blockprints.unexpected_error", response.throwable.getMessage()).getString();
             addHomeButton();
-        } else if (result.error != null) {
-            error = result.error;
-            Constants.LOG.error("Error: " + result.error);
-            addHomeButton();
-        } else if (result.response != null) {
-            onSuccess.accept(result.response);
-        } else {
+            return;
+        }
+
+        // Invalid api response
+        if(apiResponse == null || (apiResponse.response == null && apiResponse.error == null)){
             Constants.LOG.error("Empty response with no error.");
             error = Component.translatable("blockprints.unexpected_error").getString();
             addHomeButton();
+            return;
+        }
+
+        if(apiResponse.error != null){
+            error = apiResponse.error;
+            Constants.LOG.error("Error: " + apiResponse.error);
+            addHomeButton();
+        }else {
+            onSuccess.accept(apiResponse.response);
         }
     }
 
