@@ -38,7 +38,8 @@ public class RenderFluidBlock {
     }
 
     public static void renderFluidBlock(BlockState renderState, Level level, BlockPos pos, PoseStack matrixStackIn, VertexConsumer builder, boolean renderAdjacent) {
-        throw new UnsupportedOperationException("Not implemented");
+        return;
+//        throw new UnsupportedOperationException("Not implemented");
 //        if (renderState.getFluidState().isEmpty()) return;
 //        FluidState fluidState = renderState.getFluidState();
 //        Fluid fluid = fluidState.getType();
@@ -68,34 +69,34 @@ public class RenderFluidBlock {
 //        BakedQuad quad;
 //        matrixStackIn.pushPose();
 //        //DOWN
-//        if (renderAdjacent || !(level.getBlockState(pos.relative(Direction.DOWN)).getBlock() instanceof RenderBlock)) {
+//        if (renderAdjacent) {
 //            quad = createQuad(ImmutableList.of(new Vec3(x, y, z2), new Vec3(x, y, z), new Vec3(x2, y, z), new Vec3(x2, y, z2)), cols, sprite, Direction.DOWN, minU, size, minV, size);
-//            builder.putBulkData(matrixStackIn.last(), quad, r, g, b, a, brightness, 0, false);
+//            builder.putBulkData(matrixStackIn.last(), quad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F },  r, g, b, new int[] { brightness, brightness, brightness, brightness }, 0, false);
 //        }
 //        //UP
-//        if (renderAdjacent || !(level.getBlockState(pos.relative(Direction.UP)).getBlock() instanceof RenderBlock)) {
+//        if (renderAdjacent) {
 //            quad = createQuad(ImmutableList.of(new Vec3(x, height, z), new Vec3(x, height, z2), new Vec3(x2, height, z2), new Vec3(x2, height, z)), cols, sprite, Direction.UP, minU, size, minV, size);
-//            builder.putBulkData(matrixStackIn.last(), quad, r, g, b, a, brightness, 0, false);
+//            builder.putBulkData(matrixStackIn.last(), quad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F },  r, g, b, new int[] { brightness, brightness, brightness, brightness }, 0, false);
 //        }
 //        //NORTH
-//        if (renderAdjacent || !(level.getBlockState(pos.relative(Direction.NORTH)).getBlock() instanceof RenderBlock)) {
+//        if (renderAdjacent) {
 //            quad = createQuad(ImmutableList.of(new Vec3(x2, height, z), new Vec3(x2, y, z), new Vec3(x, y, z), new Vec3(x, height, z)), cols, sprite, Direction.NORTH, minU, size, minV, size);
-//            builder.putBulkData(matrixStackIn.last(), quad, r, g, b, a, brightness, 0, false);
+//            builder.putBulkData(matrixStackIn.last(), quad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F },  r, g, b, new int[] { brightness, brightness, brightness, brightness }, 0, false);
 //        }
 //        //SOUTH
-//        if (renderAdjacent || !(level.getBlockState(pos.relative(Direction.SOUTH)).getBlock() instanceof RenderBlock)) {
+//        if (renderAdjacent) {
 //            quad = createQuad(ImmutableList.of(new Vec3(x, height, z2), new Vec3(x, y, z2), new Vec3(x2, y, z2), new Vec3(x2, height, z2)), cols, sprite, Direction.SOUTH, minU, size, minV, size);
-//            builder.putBulkData(matrixStackIn.last(), quad, r, g, b, a, brightness, 0, false);
+//            builder.putBulkData(matrixStackIn.last(), quad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F },  r, g, b, new int[] { brightness, brightness, brightness, brightness }, 0, false);
 //        }
 //        //WEST
-//        if (renderAdjacent || !(level.getBlockState(pos.relative(Direction.WEST)).getBlock() instanceof RenderBlock)) {
+//        if (renderAdjacent) {
 //            quad = createQuad(ImmutableList.of(new Vec3(x, height, z), new Vec3(x, y, z), new Vec3(x, y, z2), new Vec3(x, height, z2)), cols, sprite, Direction.WEST, minU, size, minV, size);
-//            builder.putBulkData(matrixStackIn.last(), quad, r, g, b, a, brightness, 0, false);
+//            builder.putBulkData(matrixStackIn.last(), quad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F },  r, g, b, new int[] { brightness, brightness, brightness, brightness }, 0, false);
 //        }
 //        //EAST
-//        if (renderAdjacent || !(level.getBlockState(pos.relative(Direction.EAST)).getBlock() instanceof RenderBlock)) {
+//        if (renderAdjacent) {
 //            quad = createQuad(ImmutableList.of(new Vec3(x2, height, z2), new Vec3(x2, y, z2), new Vec3(x2, y, z), new Vec3(x2, height, z)), cols, sprite, Direction.EAST, minU, size, minV, size);
-//            builder.putBulkData(matrixStackIn.last(), quad, r, g, b, a, brightness, 0, false);
+//            builder.putBulkData(matrixStackIn.last(), quad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F },  r, g, b, new int[] { brightness, brightness, brightness, brightness }, 0, false);
 //        }
 //
 //        matrixStackIn.popPose();

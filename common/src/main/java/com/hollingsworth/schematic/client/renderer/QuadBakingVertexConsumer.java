@@ -2,6 +2,7 @@ package com.hollingsworth.schematic.client.renderer;
 
 
 import com.google.common.base.Preconditions;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -17,7 +18,7 @@ import java.util.function.Consumer;
  */
 public class QuadBakingVertexConsumer implements VertexConsumer {
 
-    private static final int QUAD_DATA_SIZE = IQuadTransformer.STRIDE * 4;
+    private static final int QUAD_DATA_SIZE = DefaultVertexFormat.BLOCK.getIntegerSize() * 4;
 
     private final Consumer<BakedQuad> quadConsumer;
 

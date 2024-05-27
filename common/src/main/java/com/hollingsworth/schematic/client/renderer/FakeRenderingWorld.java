@@ -2,10 +2,7 @@ package com.hollingsworth.schematic.client.renderer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.*;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundEvent;
@@ -15,6 +12,7 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -30,15 +28,19 @@ import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.entity.EntityTypeTest;
+import net.minecraft.world.level.entity.LevelEntityGetter;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.level.storage.LevelData;
+import net.minecraft.world.level.storage.WritableLevelData;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.ticks.BlackholeTickAccess;
 import net.minecraft.world.ticks.LevelTickAccess;
 
@@ -48,13 +50,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class FakeRenderingWorld implements LevelAccessor {
+public class FakeRenderingWorld extends Level implements LevelAccessor {
     public final HashMap<BlockPos, BlockState> positions = new HashMap<>();
     private Level realWorld;
     private BlockPos lookingAt;
 
     public FakeRenderingWorld(Level rWorld, ArrayList<StatePos> coordinates, BlockPos lookingAt) {
-        this.realWorld = rWorld;
+        this(rWorld);
         this.lookingAt = lookingAt;
         for (StatePos statePos : coordinates) {
             this.setBlock(statePos.pos, statePos.state, 0);
@@ -64,9 +66,15 @@ public class FakeRenderingWorld implements LevelAccessor {
                 BlockState adjustedState = Block.updateFromNeighbourShapes(statePos.state, this, statePos.pos);
                 this.setBlock(statePos.pos, adjustedState, 0);
             } catch (Exception e) {
-                System.out.println(e);
+                e.printStackTrace();
             }
         }
+    }
+
+    public FakeRenderingWorld(Level world) {
+        super((WritableLevelData) world.getLevelData(), world.dimension(), world.registryAccess(), world.dimensionTypeRegistration(),
+                world::getProfiler, world.isClientSide, world.isDebug(), 0, 0);
+        this.realWorld = world;
     }
 
     @Nullable
@@ -145,6 +153,11 @@ public class FakeRenderingWorld implements LevelAccessor {
     @Override
     public BiomeManager getBiomeManager() {
         return realWorld.getBiomeManager();
+    }
+
+    @Override
+    protected LevelEntityGetter<Entity> getEntities() {
+        return null;
     }
 
     @Override
@@ -311,4 +324,136 @@ public class FakeRenderingWorld implements LevelAccessor {
     public boolean destroyBlock(BlockPos p_46957_, boolean p_46958_, @org.jetbrains.annotations.Nullable Entity p_46959_, int p_46960_) {
         return false;
     }
+
+    @Override
+    public int getMaxLocalRawBrightness(BlockPos pos) {
+        return 15;
+    }
+
+    @Override
+    public void sendBlockUpdated(BlockPos pos, BlockState oldState, BlockState newState, int flags) {
+        realWorld.sendBlockUpdated(pos, oldState, newState, flags);
+    }
+
+    @Override
+    public void playSeededSound(Player p_220363_, double p_220364_, double p_220365_, double p_220366_,
+                                SoundEvent p_220367_, SoundSource p_220368_, float p_220369_, float p_220370_, long p_220371_) {}
+
+    @Override
+    public void playSeededSound(Player pPlayer, double pX, double pY, double pZ, Holder<SoundEvent> pSound,
+                                SoundSource pSource, float pVolume, float pPitch, long pSeed) {}
+
+    @Override
+    public void playSeededSound(Player pPlayer, Entity pEntity, Holder<SoundEvent> pSound, SoundSource pCategory,
+                                float pVolume, float pPitch, long pSeed) {}
+
+    @Override
+    public void playSound(@Nullable Player player, double x, double y, double z, SoundEvent soundIn,
+                          SoundSource category, float volume, float pitch) {}
+
+    @Override
+    public void playSound(@Nullable Player p_217384_1_, Entity p_217384_2_, SoundEvent p_217384_3_,
+                          SoundSource p_217384_4_, float p_217384_5_, float p_217384_6_) {}
+
+    @Override
+    public Entity getEntity(int id) {
+        return null;
+    }
+
+    @Override
+    public MapItemSavedData getMapData(String mapName) {
+        return null;
+    }
+
+    @Override
+    public boolean addFreshEntity(Entity entityIn) {
+        return realWorld.addFreshEntity(entityIn);
+    }
+
+    @Override
+    public void setMapData(String pMapId, MapItemSavedData pData) {}
+
+    @Override
+    public int getFreeMapId() {
+        return realWorld.getFreeMapId();
+    }
+
+    @Override
+    public void destroyBlockProgress(int breakerId, BlockPos pos, int progress) {}
+
+    @Override
+    public Scoreboard getScoreboard() {
+        return realWorld.getScoreboard();
+    }
+
+    @Override
+    public RecipeManager getRecipeManager() {
+        return realWorld.getRecipeManager();
+    }
+
+    @Override
+    public void updateNeighbourForOutputSignal(BlockPos p_175666_1_, Block p_175666_2_) {}
+
+    @Override
+    public void gameEvent(Entity pEntity, GameEvent pEvent, BlockPos pPos) {}
+
+    @Override
+    public String gatherChunkSourceStats() {
+        return realWorld.gatherChunkSourceStats();
+    }
+
+
+    // Intentionally copied from LevelHeightAccessor. Workaround for issues caused
+    // when other mods (such as Lithium)
+    // override the vanilla implementations in ways which cause WrappedWorlds to
+    // return incorrect, default height info.
+    // WrappedWorld subclasses should implement their own getMinBuildHeight and
+    // getHeight overrides where they deviate
+    // from the defaults for their dimension.
+
+    @Override
+    public int getMaxBuildHeight() {
+        return this.getMinBuildHeight() + this.getHeight();
+    }
+
+    @Override
+    public int getSectionsCount() {
+        return this.getMaxSection() - this.getMinSection();
+    }
+
+    @Override
+    public int getMinSection() {
+        return SectionPos.blockToSectionCoord(this.getMinBuildHeight());
+    }
+
+    @Override
+    public int getMaxSection() {
+        return SectionPos.blockToSectionCoord(this.getMaxBuildHeight() - 1) + 1;
+    }
+
+    @Override
+    public boolean isOutsideBuildHeight(BlockPos pos) {
+        return this.isOutsideBuildHeight(pos.getY());
+    }
+
+    @Override
+    public boolean isOutsideBuildHeight(int y) {
+        return y < this.getMinBuildHeight() || y >= this.getMaxBuildHeight();
+    }
+
+    @Override
+    public int getSectionIndex(int y) {
+        return this.getSectionIndexFromSectionY(SectionPos.blockToSectionCoord(y));
+    }
+
+    @Override
+    public int getSectionIndexFromSectionY(int sectionY) {
+        return sectionY - this.getMinSection();
+    }
+
+    @Override
+    public int getSectionYFromSectionIndex(int sectionIndex) {
+        return sectionIndex + this.getMinSection();
+    }
+
 }
