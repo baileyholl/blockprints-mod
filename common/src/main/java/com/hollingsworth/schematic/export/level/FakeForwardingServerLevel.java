@@ -2,12 +2,14 @@ package com.hollingsworth.schematic.export.level;
 
 import net.minecraft.core.*;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.Entity;
@@ -15,6 +17,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
@@ -26,19 +29,24 @@ import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.entity.EntityTypeTest;
+import net.minecraft.world.level.entity.LevelEntityGetter;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.level.storage.LevelData;
+import net.minecraft.world.level.storage.WritableLevelData;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.ticks.LevelTickAccess;
 import net.minecraft.world.ticks.TickPriority;
 import org.jetbrains.annotations.Nullable;
@@ -62,11 +70,25 @@ import java.util.stream.Stream;
  * {@link net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate#placeInWorld} only makes use of
  * the server level in specific circumstances we don't use, this should continue to work.
  */
-public class FakeForwardingServerLevel implements ServerLevelAccessor {
-    private final LevelAccessor delegate;
+public class FakeForwardingServerLevel extends Level implements ServerLevelAccessor {
+    private LevelAccessor delegate;
 
     public FakeForwardingServerLevel(LevelAccessor delegate) {
+        this(delegate.registryAccess());
         this.delegate = delegate;
+    }
+
+    private FakeForwardingServerLevel(WritableLevelData pLevelData, ResourceKey<Level> pDimension,
+                       RegistryAccess pRegistryAccess, Holder<DimensionType> pDimensionTypeRegistration,
+                       Supplier<ProfilerFiller> pProfiler, boolean pIsClientSide, boolean pIsDebug, long pBiomeZoomSeed,
+                       int pMaxChainedNeighborUpdates) {
+        super(pLevelData, pDimension, pRegistryAccess, pDimensionTypeRegistration, pProfiler, pIsClientSide, pIsDebug,
+                pBiomeZoomSeed, pMaxChainedNeighborUpdates);
+    }
+
+    private FakeForwardingServerLevel(RegistryAccess access) {
+        this(null, null, access, access.registryOrThrow(Registries.DIMENSION_TYPE)
+                .getHolderOrThrow(BuiltinDimensionTypes.OVERWORLD), null, false, false, 0, 0);
     }
 
     @Override
@@ -436,11 +458,6 @@ public class FakeForwardingServerLevel implements ServerLevelAccessor {
     }
 
     @Override
-    public ChunkAccess getChunk(int chunkX, int chunkZ) {
-        return delegate.getChunk(chunkX, chunkZ);
-    }
-
-    @Override
     public ChunkAccess getChunk(int chunkX, int chunkZ, ChunkStatus requiredStatus) {
         return delegate.getChunk(chunkX, chunkZ, requiredStatus);
     }
@@ -763,4 +780,68 @@ public class FakeForwardingServerLevel implements ServerLevelAccessor {
     public int getMoonPhase() {
         return delegate.getMoonPhase();
     }
+
+    @Override
+    public void sendBlockUpdated(BlockPos pPos, BlockState pOldState, BlockState pNewState, int pFlags) {}
+
+    @Override
+    public void playSound(Player pPlayer, double pX, double pY, double pZ, SoundEvent pSound,
+                          SoundSource pCategory, float pVolume, float pPitch) {}
+
+    @Override
+    public void playSound(Player pPlayer, Entity pEntity, SoundEvent pEvent, SoundSource pCategory,
+                          float pVolume, float pPitch) {}
+
+    @Override
+    public void playSeededSound(Player p_220363_, double p_220364_, double p_220365_, double p_220366_,
+                                SoundEvent p_220367_, SoundSource p_220368_, float p_220369_, float p_220370_, long p_220371_) {}
+
+    @Override
+    public void playSeededSound(Player p_220372_, Entity p_220373_, Holder<SoundEvent> p_220374_, SoundSource p_220375_,
+                                float p_220376_, float p_220377_, long p_220378_) {}
+
+    @Override
+    public String gatherChunkSourceStats() {
+        return null;
+    }
+
+    @Override
+    public Entity getEntity(int pId) {
+        return null;
+    }
+
+    @Override
+    public MapItemSavedData getMapData(String pMapName) {
+        return null;
+    }
+
+    @Override
+    public void setMapData(String pMapId, MapItemSavedData pData) {}
+
+    @Override
+    public int getFreeMapId() {
+        return 0;
+    }
+
+    @Override
+    public void destroyBlockProgress(int pBreakerId, BlockPos pPos, int pProgress) {}
+
+    @Override
+    public Scoreboard getScoreboard() {
+        return null;
+    }
+
+    @Override
+    public RecipeManager getRecipeManager() {
+        return null;
+    }
+
+    @Override
+    protected LevelEntityGetter<Entity> getEntities() {
+        return null;
+    }
+
+    @Override
+    public void playSeededSound(Player pPlayer, double pX, double pY, double pZ, Holder<SoundEvent> pSound,
+                                SoundSource pSource, float pVolume, float pPitch, long pSeed) {}
 }
