@@ -72,6 +72,8 @@ import java.util.stream.Stream;
  */
 public class FakeForwardingServerLevel extends Level implements ServerLevelAccessor {
     private LevelAccessor delegate;
+//    protected Map<BlockPos, BlockEntity> blockEntities = new HashMap<>();
+//    protected Map<BlockPos, BlockState> blocks = new HashMap<>();
 
     public FakeForwardingServerLevel(LevelAccessor delegate) {
         this(delegate.registryAccess());

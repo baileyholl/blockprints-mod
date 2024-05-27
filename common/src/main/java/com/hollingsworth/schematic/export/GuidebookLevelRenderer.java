@@ -195,7 +195,11 @@ public class GuidebookLevelRenderer {
             stack.translate(pos.getX(), pos.getY(), pos.getZ());
 
             int packedLight = LevelRenderer.getLightColor(blockEntity.getLevel(), blockEntity.getBlockPos());
-            renderer.render(blockEntity, 0, stack, buffers, packedLight, OverlayTexture.NO_OVERLAY);
+            try {
+                renderer.render(blockEntity, 0, stack, buffers, packedLight, OverlayTexture.NO_OVERLAY);
+            }catch (Exception e){
+
+            }
             stack.popPose();
         }
     }
