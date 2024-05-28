@@ -124,6 +124,13 @@ dependencies {
     implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-1.20:${flywheel_version}")
     implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
     implementation fg.deobf("curse.maven:building-gadgets-298187:5144161")
+
+    implementation fg.deobf("curse.maven:ad-astra-635042:5116766")
+    implementation fg.deobf("curse.maven:resourceful-config-714059:5020441")
+    implementation fg.deobf("curse.maven:botarium-704113:5118353")
+    implementation fg.deobf("curse.maven:resourceful-lib-570073:5361260")
+
+    implementation fg.deobf("curse.maven:mekanism-268560:5125665")
 }
 
 tasks.withType(JavaCompile) {
