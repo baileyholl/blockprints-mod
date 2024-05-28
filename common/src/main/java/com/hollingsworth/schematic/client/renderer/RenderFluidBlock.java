@@ -1,17 +1,26 @@
 package com.hollingsworth.schematic.client.renderer;
 
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
+
+import static net.minecraft.client.renderer.LevelRenderer.getLightColor;
 
 public class RenderFluidBlock {
     private static BakedQuad createQuad(List<Vec3> vectors, float[] cols, TextureAtlasSprite sprite, Direction face, float u1, float u2, float v1, float v2) {
@@ -38,68 +47,71 @@ public class RenderFluidBlock {
     }
 
     public static void renderFluidBlock(BlockState renderState, Level level, BlockPos pos, PoseStack matrixStackIn, VertexConsumer builder, boolean renderAdjacent) {
-        return;
-//        throw new UnsupportedOperationException("Not implemented");
-//        if (renderState.getFluidState().isEmpty()) return;
-//        FluidState fluidState = renderState.getFluidState();
-//        Fluid fluid = fluidState.getType();
-//        // TODO: fix non-water rendering
-//        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(new ResourceLocation("water_still"));
-//        int color = 0xFFFFFFFF;//extensions.getTintColor(fluidStack);
-//        int brightness = getLightColor(level, pos);
-//        float a = (color >> 24 & 0xFF) / 255.0f;
-//        float r = (color >> 16 & 0xFF) / 255.0f;
-//        float g = (color >> 8 & 0xFF) / 255.0f;
-//        float b = (color & 0xFF) / 255.0f;
-//
-//        float minU = sprite.getU0();
-//        float minV = sprite.getV0();
-//
-//        float x = 0.0f;
-//        float y = 0.0f;
-//        float z = 0.0f;
-//
-//        float x2 = 1.0f;
-//        float z2 = 1.0f;
-//        float height = 0.875f; //14/16
-//        float size = 16.0f;
-//
-//        float[] cols = new float[]{r, g, b, a};
-//
-//        BakedQuad quad;
-//        matrixStackIn.pushPose();
-//        //DOWN
-//        if (renderAdjacent) {
-//            quad = createQuad(ImmutableList.of(new Vec3(x, y, z2), new Vec3(x, y, z), new Vec3(x2, y, z), new Vec3(x2, y, z2)), cols, sprite, Direction.DOWN, minU, size, minV, size);
-//            builder.putBulkData(matrixStackIn.last(), quad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F },  r, g, b, new int[] { brightness, brightness, brightness, brightness }, 0, false);
-//        }
-//        //UP
-//        if (renderAdjacent) {
-//            quad = createQuad(ImmutableList.of(new Vec3(x, height, z), new Vec3(x, height, z2), new Vec3(x2, height, z2), new Vec3(x2, height, z)), cols, sprite, Direction.UP, minU, size, minV, size);
-//            builder.putBulkData(matrixStackIn.last(), quad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F },  r, g, b, new int[] { brightness, brightness, brightness, brightness }, 0, false);
-//        }
-//        //NORTH
-//        if (renderAdjacent) {
-//            quad = createQuad(ImmutableList.of(new Vec3(x2, height, z), new Vec3(x2, y, z), new Vec3(x, y, z), new Vec3(x, height, z)), cols, sprite, Direction.NORTH, minU, size, minV, size);
-//            builder.putBulkData(matrixStackIn.last(), quad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F },  r, g, b, new int[] { brightness, brightness, brightness, brightness }, 0, false);
-//        }
-//        //SOUTH
-//        if (renderAdjacent) {
-//            quad = createQuad(ImmutableList.of(new Vec3(x, height, z2), new Vec3(x, y, z2), new Vec3(x2, y, z2), new Vec3(x2, height, z2)), cols, sprite, Direction.SOUTH, minU, size, minV, size);
-//            builder.putBulkData(matrixStackIn.last(), quad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F },  r, g, b, new int[] { brightness, brightness, brightness, brightness }, 0, false);
-//        }
-//        //WEST
-//        if (renderAdjacent) {
-//            quad = createQuad(ImmutableList.of(new Vec3(x, height, z), new Vec3(x, y, z), new Vec3(x, y, z2), new Vec3(x, height, z2)), cols, sprite, Direction.WEST, minU, size, minV, size);
-//            builder.putBulkData(matrixStackIn.last(), quad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F },  r, g, b, new int[] { brightness, brightness, brightness, brightness }, 0, false);
-//        }
-//        //EAST
-//        if (renderAdjacent) {
-//            quad = createQuad(ImmutableList.of(new Vec3(x2, height, z2), new Vec3(x2, y, z2), new Vec3(x2, y, z), new Vec3(x2, height, z)), cols, sprite, Direction.EAST, minU, size, minV, size);
-//            builder.putBulkData(matrixStackIn.last(), quad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F },  r, g, b, new int[] { brightness, brightness, brightness, brightness }, 0, false);
-//        }
-//
-//        matrixStackIn.popPose();
+        if (renderState.getFluidState().isEmpty()) return;
+        FluidState fluidState = renderState.getFluidState();
+        Fluid fluid = fluidState.getType();
+        // TODO: fix non-water rendering
+        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(new ResourceLocation("block/water_still"));
+        int color = 0xFFFFFFFF;
+        if(fluid == Fluids.WATER) {
+            color = -12618012;
+        }else if(fluid == Fluids.LAVA){
+            sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(new ResourceLocation("block/lava_still"));
+        }
+        int brightness = getLightColor(level, pos);
+        float a = (color >> 24 & 0xFF) / 255.0f;
+        float r = (color >> 16 & 0xFF) / 255.0f;
+        float g = (color >> 8 & 0xFF) / 255.0f;
+        float b = (color & 0xFF) / 255.0f;
+
+        float minU = sprite.getU0();
+        float minV = sprite.getV0();
+
+        float x = 0.0f;
+        float y = 0.0f;
+        float z = 0.0f;
+
+        float x2 = 1.0f;
+        float z2 = 1.0f;
+        float height = 0.875f; //14/16
+        float size = 16.0f;
+
+        float[] cols = new float[]{r, g, b, a};
+
+        BakedQuad quad;
+        matrixStackIn.pushPose();
+        //DOWN
+        if (renderAdjacent) {
+            quad = createQuad(ImmutableList.of(new Vec3(x, y, z2), new Vec3(x, y, z), new Vec3(x2, y, z), new Vec3(x2, y, z2)), cols, sprite, Direction.DOWN, minU, size, minV, size);
+            builder.putBulkData(matrixStackIn.last(), quad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F },  r, g, b, new int[] { brightness, brightness, brightness, brightness }, 0, false);
+        }
+        //UP
+        if (renderAdjacent) {
+            quad = createQuad(ImmutableList.of(new Vec3(x, height, z), new Vec3(x, height, z2), new Vec3(x2, height, z2), new Vec3(x2, height, z)), cols, sprite, Direction.UP, minU, size, minV, size);
+            builder.putBulkData(matrixStackIn.last(), quad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F },  r, g, b, new int[] { brightness, brightness, brightness, brightness }, 0, false);
+        }
+        //NORTH
+        if (renderAdjacent) {
+            quad = createQuad(ImmutableList.of(new Vec3(x2, height, z), new Vec3(x2, y, z), new Vec3(x, y, z), new Vec3(x, height, z)), cols, sprite, Direction.NORTH, minU, size, minV, size);
+            builder.putBulkData(matrixStackIn.last(), quad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F },  r, g, b, new int[] { brightness, brightness, brightness, brightness }, 0, false);
+        }
+        //SOUTH
+        if (renderAdjacent) {
+            quad = createQuad(ImmutableList.of(new Vec3(x, height, z2), new Vec3(x, y, z2), new Vec3(x2, y, z2), new Vec3(x2, height, z2)), cols, sprite, Direction.SOUTH, minU, size, minV, size);
+            builder.putBulkData(matrixStackIn.last(), quad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F },  r, g, b, new int[] { brightness, brightness, brightness, brightness }, 0, false);
+        }
+        //WEST
+        if (renderAdjacent) {
+            quad = createQuad(ImmutableList.of(new Vec3(x, height, z), new Vec3(x, y, z), new Vec3(x, y, z2), new Vec3(x, height, z2)), cols, sprite, Direction.WEST, minU, size, minV, size);
+            builder.putBulkData(matrixStackIn.last(), quad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F },  r, g, b, new int[] { brightness, brightness, brightness, brightness }, 0, false);
+        }
+        //EAST
+        if (renderAdjacent) {
+            quad = createQuad(ImmutableList.of(new Vec3(x2, height, z2), new Vec3(x2, y, z2), new Vec3(x2, y, z), new Vec3(x2, height, z)), cols, sprite, Direction.EAST, minU, size, minV, size);
+            builder.putBulkData(matrixStackIn.last(), quad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F },  r, g, b, new int[] { brightness, brightness, brightness, brightness }, 0, false);
+        }
+
+        matrixStackIn.popPose();
 
     }
 }

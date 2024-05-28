@@ -9,10 +9,9 @@
     "EditBoxAccessor",
     "ItemRendererAccessor",
     "NativeImageAccessor",
-    "StructureTemplateAccessor"
+    "StructureTemplateAccessor",
   ],
   "client": [
-    "fabric.ExampleMixin"
   ],
   "injectors": {
     "defaultRequire": 1

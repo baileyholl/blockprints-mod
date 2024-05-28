@@ -12,7 +12,8 @@
     "NativeImageAccessor",
     "ItemRendererAccessor",
     "BufferBuilderAccessor",
-    "StructureTemplateAccessor"
+    "StructureTemplateAccessor",
+    "VertexFormatAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

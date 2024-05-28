@@ -272,7 +272,7 @@ public class StructureRenderer {
                 drawRenderType.clearRenderState();
             }
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
         matrix.popPose();
 

@@ -1,9 +1,11 @@
 package com.hollingsworth.schematic.client.renderer;
 
+import com.hollingsworth.schematic.mixin.VertexFormatAccessor;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -44,17 +46,12 @@ public interface IQuadTransformer {
     }
 
     private static BakedQuad copy(BakedQuad quad) {
-        throw new UnsupportedOperationException("Not implemented");
-//        return quad;
-//        var vertices = quad.getVertices();
-//        return new BakedQuad(Arrays.copyOf(vertices, vertices.length), quad.getTintIndex(), quad.getDirection(), quad.getSprite(), quad.isShade(), quad.hasAmbientOcclusion());
+        var vertices = quad.getVertices();
+        return new BakedQuad(Arrays.copyOf(vertices, vertices.length), quad.getTintIndex(), quad.getDirection(), quad.getSprite(), quad.isShade());
     }
 
     private static int findOffset(VertexFormatElement element) {
-        throw new UnsupportedOperationException("Not implemented");
-//        return 0;
-//         Divide by 4 because we want the int offset
-//        var index = DefaultVertexFormat.BLOCK.getElements().indexOf(element);
-//        return index < 0 ? -1 : DefaultVertexFormat.BLOCK.getOffset(index) / 4;
+        var index = DefaultVertexFormat.BLOCK.getElements().indexOf(element);
+        return index < 0 ? -1 : ((VertexFormatAccessor)DefaultVertexFormat.BLOCK).getOffsets().getInt(index) / 4;
     }
 }
