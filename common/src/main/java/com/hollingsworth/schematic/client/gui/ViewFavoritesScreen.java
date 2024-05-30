@@ -1,8 +1,8 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
+import com.hollingsworth.schematic.api.blockprints.BlockprintsApi;
 import com.hollingsworth.schematic.api.blockprints.favorites.Favorite;
-import com.hollingsworth.schematic.api.blockprints.favorites.Favorites;
 import com.hollingsworth.schematic.api.blockprints.favorites.FavoritesResponse;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -25,19 +25,19 @@ public class ViewFavoritesScreen extends BaseSchematicScreen {
     }
 
     public static LoadingScreen<FavoritesResponse> getTransition() {
-        return new LoadingScreen<>(Favorites::getFavorites, (favorites) -> {
+        return new LoadingScreen<>(BlockprintsApi.getInstance().favorites()::getFavorites, (favorites) -> {
             Minecraft.getInstance().setScreen(new ViewFavoritesScreen(favorites));
         });
     }
 
     public static LoadingScreen<FavoritesResponse> getTransition(ViewFavoritesScreen previousScreen) {
-        return new LoadingScreen<>(Favorites::getFavorites, (favorites) -> {
+        return new LoadingScreen<>(BlockprintsApi.getInstance().favorites()::getFavorites, (favorites) -> {
             Minecraft.getInstance().setScreen(new ViewFavoritesScreen(favorites, previousScreen.showFavorites, previousScreen.showBuilds, previousScreen.showRecent));
         }, previousScreen);
     }
 
     public static LoadingScreen<FavoritesResponse> getTransition(boolean showFavorites, boolean showBuilds, boolean showRecent) {
-        return new LoadingScreen<>(() -> Favorites.getFavorites(showFavorites, showBuilds, showRecent), (favorites) -> {
+        return new LoadingScreen<>(() ->  BlockprintsApi.getInstance().favorites().getFavorites(showFavorites, showBuilds, showRecent), (favorites) -> {
             Minecraft.getInstance().setScreen(new ViewFavoritesScreen(favorites, showFavorites, showBuilds, showRecent));
         }, null, 30);
     }

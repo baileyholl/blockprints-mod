@@ -1,8 +1,8 @@
 package com.hollingsworth.schematic.api;
 
 import com.hollingsworth.schematic.api.blockprints.ApiResponse;
+import com.hollingsworth.schematic.api.blockprints.BlockprintsApi;
 import com.hollingsworth.schematic.api.blockprints.GoogleCloudStorage;
-import com.hollingsworth.schematic.api.blockprints.upload.Upload;
 import com.hollingsworth.schematic.common.util.SchematicExport;
 import com.hollingsworth.schematic.export.PerspectivePreset;
 import com.hollingsworth.schematic.export.WrappedScene;
@@ -79,7 +79,7 @@ public class SceneExporter {
                 imageFiles.add(path);
                 count++;
             }
-            var uploadResponse = Upload.postUpload(name, description, makePublic);
+            var uploadResponse = BlockprintsApi.getInstance().upload().postUpload(name, description, makePublic);
             if (!uploadResponse.wasSuccessful() || uploadResponse.response == null) {
                 return uploadResponse.toBoolean();
             }
@@ -107,7 +107,7 @@ public class SceneExporter {
                     return ApiResponse.error(Component.literal("Could not upload to GCS"));
                 }
             }
-            return Upload.postDoneUploading(response.id);
+            return BlockprintsApi.getInstance().upload().postDoneUploading(response.id);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             return ApiResponse.connectionError();
