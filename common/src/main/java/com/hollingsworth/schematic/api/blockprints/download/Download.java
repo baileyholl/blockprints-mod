@@ -5,23 +5,32 @@ import com.google.gson.JsonParser;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.api.SceneExporter;
 import com.hollingsworth.schematic.api.blockprints.ApiResponse;
+import com.hollingsworth.schematic.api.blockprints.BlockprintsApi;
 import com.hollingsworth.schematic.api.blockprints.GoogleCloudStorage;
 import com.hollingsworth.schematic.api.blockprints.RequestUtil;
 import net.minecraft.network.chat.Component;
 
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
 
 public class Download {
+    private BlockprintsApi api;
+    private final HttpClient CLIENT;
 
-    public static GetSchematicResponse getSchematic(String id) {
-        HttpRequest request = RequestUtil.getBuilder()
+    public Download(BlockprintsApi api) {
+        this.api = api;
+        this.CLIENT = this.api.CLIENT;
+    }
+
+    public GetSchematicResponse getSchematic(String id) {
+        HttpRequest request = api.getBuilder()
                 .uri(RequestUtil.getRoute("/api/v1/schematics/" + id))
                 .GET().build();
         try {
-            var res = RequestUtil.CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            var res = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
             if (res.statusCode() != 200) {
                 Constants.LOG.error(res.body());
                 return null;
@@ -34,12 +43,12 @@ public class Download {
         return null;
     }
 
-    public static GetDownloadResponse getSchematicDownloadUrl(String id) {
-        HttpRequest request = RequestUtil.getBuilder()
+    public GetDownloadResponse getSchematicDownloadUrl(String id) {
+        HttpRequest request = api.getBuilder()
                 .uri(RequestUtil.getRoute("/api/v1/schematics/" + id + "/download"))
                 .GET().build();
         try {
-            var res = RequestUtil.CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            var res = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
             if (res.statusCode() != 200) {
                 Constants.LOG.error(res.body());
                 return null;
@@ -53,7 +62,7 @@ public class Download {
     }
 
 
-    public static ApiResponse<PreviewDownloadResult> downloadPreview(String id) {
+    public ApiResponse<PreviewDownloadResult> downloadPreview(String id) {
         var result = getSchematic(id);
         if (result == null) {
             return ApiResponse.error(Component.translatable("blockprints.download_not_found"));
@@ -65,7 +74,7 @@ public class Download {
         return ApiResponse.success(new PreviewDownloadResult(result, downloaded.response));
     }
 
-    public static ApiResponse<Path> downloadSchematic(String schematicId, String name) {
+    public ApiResponse<Path> downloadSchematic(String schematicId, String name) {
         var result = getSchematicDownloadUrl(schematicId);
         if (result == null) {
             return ApiResponse.error(Component.translatable("blockprints.download_not_found"));

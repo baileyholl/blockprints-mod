@@ -1,7 +1,7 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
-import com.hollingsworth.schematic.api.blockprints.download.Download;
+import com.hollingsworth.schematic.api.blockprints.BlockprintsApi;
 import com.hollingsworth.schematic.api.blockprints.download.PreviewDownloadResult;
 import com.hollingsworth.schematic.client.ClientData;
 import com.hollingsworth.schematic.common.util.ClientUtil;
@@ -64,7 +64,7 @@ public class DownloadScreen extends BaseSchematicScreen {
     }
 
     public static LoadingScreen<PreviewDownloadResult> getTransition(String schematicId, Screen previousScreen) {
-        return new LoadingScreen<>(() -> Download.downloadPreview(schematicId),
+        return new LoadingScreen<>(() -> BlockprintsApi.getInstance().download().downloadPreview(schematicId),
                 (result) -> Minecraft.getInstance().setScreen(new DownloadScreen(previousScreen, result)), previousScreen);
     }
 
@@ -140,7 +140,7 @@ public class DownloadScreen extends BaseSchematicScreen {
     }
 
     public void startDownload(Consumer<Path> callback){
-        Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Download.downloadSchematic(preview.downloadResponse.id, preview.downloadResponse.structureName), callback));
+        Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> BlockprintsApi.getInstance().download().downloadSchematic(preview.downloadResponse.id, preview.downloadResponse.structureName), callback));
     }
 
     @Override

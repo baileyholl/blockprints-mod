@@ -1,8 +1,8 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
+import com.hollingsworth.schematic.api.blockprints.BlockprintsApi;
 import com.hollingsworth.schematic.api.blockprints.download.PreviewDownloadResult;
-import com.hollingsworth.schematic.api.blockprints.upload.Upload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -29,7 +29,7 @@ public class ConfirmDeleteScreen extends BaseSchematicScreen{
         }));
         addRenderableWidget(new GuiImageButton(bookLeft + 105, bookTop + 137, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6_red.png"), b -> {
             Minecraft.getInstance().setScreen(screenOnYes);
-            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Upload.postDelete(previewDownloadResult.downloadResponse.id), (success) -> {
+            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> BlockprintsApi.getInstance().upload().postDelete(previewDownloadResult.downloadResponse.id), (success) -> {
                 Minecraft.getInstance().setScreen(screenOnYes);
             }, this));
         }));

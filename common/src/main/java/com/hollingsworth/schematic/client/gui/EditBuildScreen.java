@@ -1,12 +1,10 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
-import com.hollingsworth.schematic.api.blockprints.download.Download;
+import com.hollingsworth.schematic.api.blockprints.BlockprintsApi;
 import com.hollingsworth.schematic.api.blockprints.download.PreviewDownloadResult;
-import com.hollingsworth.schematic.api.blockprints.upload.Upload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -33,7 +31,7 @@ public class EditBuildScreen extends BaseSchematicScreen {
     }
 
     public static LoadingScreen<PreviewDownloadResult> getTransition(String code, ViewFavoritesScreen previousScreen) {
-        return new LoadingScreen<>(() -> Download.downloadPreview(code), (build) -> {
+        return new LoadingScreen<>(() -> BlockprintsApi.getInstance().download().downloadPreview(code), (build) -> {
             Minecraft.getInstance().setScreen(new EditBuildScreen(previousScreen, build));
         }, previousScreen);
     }
@@ -61,7 +59,7 @@ public class EditBuildScreen extends BaseSchematicScreen {
             if (name.length() > UploadPreviewScreen.MAX_NAME_LENGTH || name.length() < UploadPreviewScreen.MIN_NAME_LENGTH || desc.length() > UploadPreviewScreen.MAX_DESC_LENGTH || desc.length() < UploadPreviewScreen.MIN_DESC_LENGTH) {
                 return;
             }
-            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> Upload.postEdit(preview.downloadResponse.id, name, desc, this.makePublic), (build) -> {
+            Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> BlockprintsApi.getInstance().upload().postEdit(preview.downloadResponse.id, name, desc, this.makePublic), (build) -> {
                 Minecraft.getInstance().setScreen(ViewFavoritesScreen.getTransition(previousScreen));
             }, this));
         });
