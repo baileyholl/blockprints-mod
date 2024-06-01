@@ -47,6 +47,7 @@ public class BlockprintsApi {
             }
             HttpRequest request = reqBuilder.header("Content-Type", "application/json")
                     .uri(uriBuilder.build())
+                    .timeout(Duration.ofSeconds(8))
                     .GET().build();
             var res = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
             var code = res.statusCode();

@@ -40,7 +40,7 @@ public class FabricPlatformHelper implements IPlatformHelper {
     // TODO: verify this works on fabric
     @Override
     public Iterable<RenderType> getRenderTypes(BakedModel bakedModel, BlockState blockstate, RandomSource rand) {
-        return List.of(ItemBlockRenderTypes.getRenderType(blockstate, true));
+        return List.of(ItemBlockRenderTypes.getChunkRenderType(blockstate));
     }
 
     @Override
