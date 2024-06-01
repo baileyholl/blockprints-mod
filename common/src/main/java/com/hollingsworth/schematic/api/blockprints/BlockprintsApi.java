@@ -13,6 +13,8 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.UUID;
 
 public class BlockprintsApi {
 
@@ -30,12 +32,14 @@ public class BlockprintsApi {
     // NumericDate of when the token expires (seconds)
     private int bpTokenExpires = 0;
 
-    public BlockprintsApi(){
-        this.CLIENT = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build();
+    private UUID requesterUUID = null;
+
+    public BlockprintsApi() throws ApiError{
+        this.CLIENT = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).connectTimeout(Duration.ofSeconds(30)).build();
         try {
             URIBuilder uriBuilder = new URIBuilder(RequestUtil.getDomain() + "/api/v1/auth");
             HttpRequest.Builder reqBuilder = null;
-            if (Minecraft.getInstance().getUser().getName().equals("Dev")) {
+            if (Minecraft.getInstance().getUser().getName().equals("Dev") || Minecraft.getInstance().getUser().getAccessToken().equals("FabricMC")) {
                 reqBuilder = HttpRequest.newBuilder();
             }else{
                 reqBuilder = HttpRequest.newBuilder()
@@ -47,29 +51,27 @@ public class BlockprintsApi {
             var res = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
             var code = res.statusCode();
             if (!RequestUtil.responseSuccessful(code)) {
-                throw new RuntimeException("Failed to authenticate with Blockprints API");
+                throw new Error("Failed to authenticate with Blockprints API");
             }
             JsonObject responseObj = JsonParser.parseString(res.body()).getAsJsonObject();
             this.bpToken = responseObj.get("token").getAsString();
             this.bpTokenExpires = responseObj.get("expiresAt").getAsInt();
-        } catch (URISyntaxException | IOException | InterruptedException e) {
+            this.requesterUUID = Minecraft.getInstance().player.getUUID();
+        } catch (URISyntaxException | IOException | InterruptedException | Error e) {
             e.printStackTrace();
-            throw new RuntimeException("Failed to authenticate with Blockprints API");
+            throw new ApiError("Failed to authenticate with Blockprints API. Are you logged in to Minecraft?");
         }
         this.downloadApi = new Download(this);
         this.favoritesApi = new Favorites(this);
         this.uploadApi = new Upload(this);
     }
 
-    public static BlockprintsApi getInstance() {
-        if (INSTANCE == null || INSTANCE.tokenExpired()) {
+    public static BlockprintsApi getInstance() throws ApiError {
+        var playerUuid = Minecraft.getInstance().player.getUUID();
+        if (INSTANCE == null || INSTANCE.tokenExpired() || INSTANCE.requesterUUID == null || !playerUuid.equals(INSTANCE.requesterUUID)) {
             INSTANCE = new BlockprintsApi();
         }
         return INSTANCE;
-    }
-
-    public static void clear(){
-        INSTANCE = null;
     }
 
     public HttpRequest.Builder getBuilder(boolean includeContentType){
@@ -86,7 +88,7 @@ public class BlockprintsApi {
     }
 
     public boolean tokenExpired(){
-        return this.bpTokenExpires < System.currentTimeMillis() / 1000;
+        return this.bpToken == null || this.bpTokenExpires < System.currentTimeMillis() / 1000;
     }
 
     public Download download() {

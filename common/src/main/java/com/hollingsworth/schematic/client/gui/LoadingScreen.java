@@ -1,6 +1,7 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
+import com.hollingsworth.schematic.api.blockprints.ApiError;
 import com.hollingsworth.schematic.api.blockprints.ApiResponse;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -11,6 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -26,6 +28,7 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
     Response<T> response;
     public Screen previousScreen = null;
 
+    CompletableFuture<ApiResponse<T>> completableFuture;
     public LoadingScreen(Supplier<ApiResponse<T>> future, Consumer<T> onSuccess, Screen previousScreen) {
         super();
         this.future = future;
@@ -48,8 +51,9 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
     @Override
     public void init() {
         super.init();
-        CompletableFuture.supplyAsync(future, Util.backgroundExecutor()).whenCompleteAsync((result, err) -> response = new Response<>(result, err), Minecraft.getInstance());
+        this.completableFuture = CompletableFuture.supplyAsync(future, Util.backgroundExecutor()).whenCompleteAsync((result, err) -> response = new Response<>(result, err), Minecraft.getInstance());
     }
+
 
     public void handleResponse() {
         if (response == null) {
@@ -60,10 +64,16 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
 
         // If the completable future failed or an unknown error was thrown
         if(response.throwable != null){
-            response.throwable.printStackTrace();
-            error = Component.translatable("blockprints.unexpected_error", response.throwable.getMessage()).getString();
-            addHomeButton();
-            return;
+            // If an api error is abruptly thrown, override the api response
+            if(response.throwable instanceof CompletionException completionException
+                    && completionException.getCause() instanceof ApiError apiError) {
+                apiResponse = apiError.toApiResponse();
+            }else {
+                response.throwable.printStackTrace();
+                error = Component.translatable("blockprints.unexpected_error", response.throwable.getMessage()).getString();
+                addHomeButton();
+                return;
+            }
         }
 
         // Invalid api response
@@ -105,6 +115,9 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
     @Override
     public void onClose() {
         super.onClose();
+        if(this.completableFuture != null && !this.completableFuture.isDone() && !this.completableFuture.isCancelled()) {
+            this.completableFuture.cancel(true);
+        }
     }
 
     @Override

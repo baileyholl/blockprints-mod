@@ -1,12 +1,10 @@
 package com.hollingsworth.schematic.client;
 
 import com.hollingsworth.schematic.Constants;
-import com.hollingsworth.schematic.api.blockprints.BlockprintsApi;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
@@ -24,19 +22,11 @@ public class ClientEvents {
     public static void keyEvent(final InputEvent.Key event) {
         if (Minecraft.getInstance().player == null || InputConstants.PRESS != event.getAction() || MINECRAFT.screen != null)
             return;
-        if (event.getKey() == ClientData.OPEN_MENU.getKey().getValue())
-            ClientData.openMenu();
-        if (event.getKey() == ClientData.CONFIRM.getKey().getValue()) {
-            ClientData.onConfirmHit();
-        }
-        if (event.getKey() == ClientData.CANCEL.getKey().getValue()) {
-            ClientData.onCancelHit();
-        }
-        if(event.getKey() == ClientData.ROTATE_LEFT.getKey().getValue()){
-            ClientData.onRotateHit(false);
-        }
-        if(event.getKey() == ClientData.ROTATE_RIGHT.getKey().getValue()){
-            ClientData.onRotateHit(true);
+
+        for(ClientData.KeyFunction keyMapping : ClientData.KEY_FUNCTIONS){
+            if(keyMapping.mapping().getKey().getValue() == event.getKey()){
+                keyMapping.function().run();
+            }
         }
     }
 
@@ -65,11 +55,5 @@ public class ClientEvents {
         if (event.getOverlay() != VanillaGuiOverlay.CROSSHAIR.type())
             return;
         ClientData.renderGUIOverlayEvent(event.getGuiGraphics(), event.getWindow());
-
-    }
-
-    @SubscribeEvent
-    public static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut logOut){
-        BlockprintsApi.clear();
     }
 }
