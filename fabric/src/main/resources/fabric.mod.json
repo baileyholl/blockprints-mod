@@ -2,11 +2,13 @@
     "schemaVersion": 1,
     "id": "blockprints",
     "version": "${version}",
-  
     "name": "Block Prints",
-    "description": "This is an example description! Tell everyone what your mod is about!",
+    "description": "A schematic creation, visualization, and cloud storage mod.",
     "authors": [
-      "Me!"
+      "BaileyH",
+      "Sarenor",
+      "Jarva",
+      "Shartte"
     ],
     "contact": {
       "homepage": "https://fabricmc.net/",
