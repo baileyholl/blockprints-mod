@@ -3,14 +3,8 @@
   "minVersion": "0.8",
   "package": "com.hollingsworth.schematic.mixin",
   "compatibilityLevel": "JAVA_17",
-  "refmap": "schematic.refmap.json",
-  "mixins": [
-    "BufferBuilderAccessor",
-    "EditBoxAccessor",
-    "ItemRendererAccessor",
-    "NativeImageAccessor",
-    "StructureTemplateAccessor",
-  ],
+  "refmap": "blockprints.refmap.json",
+  "mixins": [],
   "client": [
   ],
   "injectors": {

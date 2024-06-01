@@ -19,7 +19,15 @@ public class ClientData {
     public static final KeyMapping CANCEL = new KeyMapping("key." + Constants.MOD_ID + ".cancel_selection", GLFW.GLFW_KEY_BACKSPACE, CATEGORY);
     public static final KeyMapping ROTATE_LEFT = new KeyMapping("key." + Constants.MOD_ID + ".rotate_left", GLFW.GLFW_KEY_LEFT, CATEGORY);
     public static final KeyMapping ROTATE_RIGHT = new KeyMapping("key." + Constants.MOD_ID + ".rotate_right", GLFW.GLFW_KEY_RIGHT, CATEGORY);
-    public static final KeyMapping[] KEYS = new KeyMapping[]{OPEN_MENU, CONFIRM, CANCEL};
+
+    public static final KeyFunction[] KEY_FUNCTIONS = new KeyFunction[]{
+            new KeyFunction(OPEN_MENU, ClientData::openMenu),
+            new KeyFunction(CONFIRM, ClientData::onConfirmHit),
+            new KeyFunction(CANCEL, ClientData::onCancelHit),
+            new KeyFunction(ROTATE_LEFT, () -> ClientData.onRotateHit(false)),
+            new KeyFunction(ROTATE_RIGHT, () -> ClientData.onRotateHit(true))
+
+    };
 
     public static void openMenu() {
         Minecraft.getInstance().setScreen(new HomeScreen());
@@ -74,4 +82,6 @@ public class ClientData {
         AreaCaptureHandler.renderBoundaryUI(graphics, window);
         RenderStructureHandler.renderInstructions(graphics, window);
     }
+
+    public record KeyFunction(KeyMapping mapping, Runnable function){}
 }

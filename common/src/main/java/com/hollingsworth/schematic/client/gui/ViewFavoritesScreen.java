@@ -25,13 +25,13 @@ public class ViewFavoritesScreen extends BaseSchematicScreen {
     }
 
     public static LoadingScreen<FavoritesResponse> getTransition() {
-        return new LoadingScreen<>(BlockprintsApi.getInstance().favorites()::getFavorites, (favorites) -> {
+        return new LoadingScreen<>(() -> BlockprintsApi.getInstance().favorites().getFavorites(), (favorites) -> {
             Minecraft.getInstance().setScreen(new ViewFavoritesScreen(favorites));
         });
     }
 
     public static LoadingScreen<FavoritesResponse> getTransition(ViewFavoritesScreen previousScreen) {
-        return new LoadingScreen<>(BlockprintsApi.getInstance().favorites()::getFavorites, (favorites) -> {
+        return new LoadingScreen<>(() -> BlockprintsApi.getInstance().favorites().getFavorites(), (favorites) -> {
             Minecraft.getInstance().setScreen(new ViewFavoritesScreen(favorites, previousScreen.showFavorites, previousScreen.showBuilds, previousScreen.showRecent));
         }, previousScreen);
     }

@@ -7,7 +7,7 @@ import java.net.URI;
 public class RequestUtil {
 
     public static String getDomain() {
-        return Constants.isDev ? "http://localhost:3000" : "https://api.blockprints.io";
+        return Constants.isDev ? "http://127.0.0.1:3000" : "https://api.blockprints.io";
     }
 
     public static boolean responseSuccessful(int code) {

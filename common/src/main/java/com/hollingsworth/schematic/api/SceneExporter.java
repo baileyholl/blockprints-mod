@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.api;
 
+import com.hollingsworth.schematic.api.blockprints.ApiError;
 import com.hollingsworth.schematic.api.blockprints.ApiResponse;
 import com.hollingsworth.schematic.api.blockprints.BlockprintsApi;
 import com.hollingsworth.schematic.api.blockprints.GoogleCloudStorage;
@@ -108,7 +109,7 @@ public class SceneExporter {
                 }
             }
             return BlockprintsApi.getInstance().upload().postDoneUploading(response.id);
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException | InterruptedException | ApiError e) {
             e.printStackTrace();
             return ApiResponse.connectionError();
         }

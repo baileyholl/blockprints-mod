@@ -1,7 +1,6 @@
 package com.hollingsworth.schematic.client;
 
 import com.hollingsworth.schematic.Constants;
-import net.minecraft.client.KeyMapping;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -12,8 +11,8 @@ public class ModBusClientEvent {
 
     @SubscribeEvent
     public static void registerKeyBindings(RegisterKeyMappingsEvent event) {
-        for(KeyMapping keyMapping : ClientData.KEYS){
-            event.register(keyMapping);
+        for(ClientData.KeyFunction keyMapping : ClientData.KEY_FUNCTIONS){
+            event.register(keyMapping.mapping());
         }
     }
 }

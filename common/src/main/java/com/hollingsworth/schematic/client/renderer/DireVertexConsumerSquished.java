@@ -89,7 +89,6 @@ public class DireVertexConsumerSquished extends VertexConsumerWrapper {
 
     @Override
     public VertexConsumer uv(float u, float v) {
-        //Todo - Consider supporting other directions someday, its a bit more complicated though since UV is 2 dimension
         if (adjustUV) {
             //Growing up from ground!
             if (bottomUp) {
