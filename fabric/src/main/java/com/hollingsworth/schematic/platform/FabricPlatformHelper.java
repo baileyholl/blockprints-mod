@@ -1,5 +1,7 @@
 package com.hollingsworth.schematic.platform;
 
+import com.hollingsworth.schematic.Constants;
+import com.hollingsworth.schematic.compat.CreateCompat;
 import com.hollingsworth.schematic.platform.services.IPlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -33,11 +35,9 @@ public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override
     public boolean isDevelopmentEnvironment() {
-
         return FabricLoader.getInstance().isDevelopmentEnvironment();
     }
 
-    // TODO: verify this works on fabric
     @Override
     public Iterable<RenderType> getRenderTypes(BakedModel bakedModel, BlockState blockstate, RandomSource rand) {
         return List.of(ItemBlockRenderTypes.getChunkRenderType(blockstate));
@@ -45,6 +45,8 @@ public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override
     public void appendCreateGlue(Level level, AABB aabb, CompoundTag tag) {
-        //todo implement
+        if(Constants.isCreateLoaded){
+            CreateCompat.appendGlue(level, aabb, tag);
+        }
     }
 }
