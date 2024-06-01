@@ -35,6 +35,7 @@
     },
     "suggests": {
       "another-mod": "*"
-    }
-  }
+    },
+    "accessWidener": "blockprints.accesswidener"
+}
   
