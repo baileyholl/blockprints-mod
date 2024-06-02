@@ -1,7 +1,6 @@
 package com.hollingsworth.schematic.client.renderer;
 
 import com.hollingsworth.schematic.client.RaycastHelper;
-import com.hollingsworth.schematic.client.RenderStructureHandler;
 import com.hollingsworth.schematic.common.util.Color;
 import com.hollingsworth.schematic.common.util.DimPos;
 import com.hollingsworth.schematic.platform.Services;
@@ -123,10 +122,6 @@ public class StructureRenderer {
      * This method creates a Map<RenderType, VertexBuffer> when given an ArrayList<StatePos> statePosCache - its used both here to draw in-game AND in the TemplateManagerGUI.java class
      */
     public static void generateRender(StructureRenderData data, Level level, BlockPos renderPos, float transparency, ArrayList<StatePos> statePosCache, Map<RenderType, VertexBuffer> vertexBuffers) {
-        if(!RenderStructureHandler.showRender){
-            return;
-        }
-        boolean isExchanging = false;
         if (statePosCache == null || statePosCache.isEmpty()) return;
         data.fakeRenderingWorld = new FakeRenderingWorld(level, statePosCache, renderPos);
         PoseStack matrix = new PoseStack(); //Create a new matrix stack for use in the buffer building process
@@ -189,9 +184,6 @@ public class StructureRenderer {
     }
 
     public static void drawBoundBox(StructureRenderData data, PoseStack matrix, BlockPos blockPos) {
-        if(!RenderStructureHandler.showRender){
-            return;
-        }
         Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         matrix.pushPose();
         matrix.translate(-projectedView.x(), -projectedView.y(), -projectedView.z());
@@ -223,7 +215,7 @@ public class StructureRenderer {
 
     //Draw what we've cached
     public static void drawRender(StructureRenderData data, PoseStack poseStack, Matrix4f projectionMatrix, Player player) {
-        if (vertexBuffers == null || !RenderStructureHandler.showRender) {
+        if (vertexBuffers == null) {
             return;
         }
         BlockPos anchorPos = data.anchorPos;

@@ -16,37 +16,36 @@ import static com.hollingsworth.schematic.client.ClientData.CANCEL;
 import static com.hollingsworth.schematic.client.ClientData.CONFIRM;
 
 public class RenderStructureHandler {
-    public static boolean showRender = false;
     public static BlockPos anchorPos;
-
     public static StructureRenderData placingData;
 
     public static void startRender(StructureTemplate structureTemplate, String name, String bpId){
         if(placingData != null){
             cancelRender();
         }
-        showRender = true;
         anchorPos = null;
         placingData = new StructureRenderData(structureTemplate, name, bpId);
         StructureRenderer.structures.add(placingData);
     }
 
     public static void cancelRender(){
-        showRender = false;
+        if(placingData == null){
+            return;
+        }
         anchorPos = null;
         StructureRenderer.structures.remove(placingData);
         placingData = null;
     }
 
     public static void onConfirmHit() {
-        if (!RenderStructureHandler.showRender) {
+        if (placingData == null) {
             return;
         }
         placingData = null;
     }
 
     public static void onCancelHit() {
-        if (!RenderStructureHandler.showRender) {
+        if (placingData == null) {
             return;
         }
         cancelRender();
