@@ -29,10 +29,9 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
     public Screen previousScreen = null;
 
     CompletableFuture<ApiResponse<T>> completableFuture;
+
     public LoadingScreen(Supplier<ApiResponse<T>> future, Consumer<T> onSuccess, Screen previousScreen) {
-        super();
-        this.future = future;
-        this.onSuccess = onSuccess;
+        this(future, onSuccess);
         this.previousScreen = previousScreen;
     }
 
@@ -46,14 +45,13 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
         super();
         this.future = future;
         this.onSuccess = onSuccess;
+        this.completableFuture = CompletableFuture.supplyAsync(future, Util.backgroundExecutor()).whenCompleteAsync((result, err) -> response = new Response<>(result, err), Minecraft.getInstance());
     }
 
     @Override
     public void init() {
         super.init();
-        this.completableFuture = CompletableFuture.supplyAsync(future, Util.backgroundExecutor()).whenCompleteAsync((result, err) -> response = new Response<>(result, err), Minecraft.getInstance());
     }
-
 
     public void handleResponse() {
         if (response == null) {
