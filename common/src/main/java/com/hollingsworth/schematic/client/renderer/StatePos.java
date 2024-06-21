@@ -15,10 +15,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class StatePos {
@@ -137,7 +138,6 @@ public class StatePos {
         return blockStateMap;
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static Map<Template.ItemStackKey, Integer> getItemList(ArrayList<StatePos> list) {
         Map<Template.ItemStackKey, Integer> itemList = new Object2IntOpenHashMap<>();
         if (list == null || list.isEmpty())
