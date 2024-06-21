@@ -11,6 +11,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -68,7 +69,8 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
 
             Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> sceneExporter.writeAndUpload(images, this.nameField.getValue(), this.descriptionField.getValue(), this.makePublic, start, end), (res) -> {
                 Minecraft.getInstance().setScreen(null);
-                ClientUtil.sendMessage(Component.translatable("blockprints.upload_complete"));
+                var url = "https://blockprints.io/schematic/" + res;
+                ClientUtil.sendMessage(Component.translatable("blockprints.upload_complete", Component.literal(url).withStyle(Style.EMPTY.withColor(ChatFormatting.BLUE).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url)))));
             }));
         });
         addRenderableWidget(uploadButton);

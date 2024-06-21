@@ -1,18 +1,24 @@
 package com.hollingsworth.schematic.client.renderer;
 
 
+import com.hollingsworth.schematic.export.Template;
+import com.hollingsworth.schematic.mixin.StructureTemplateAccessor;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class StatePos {
@@ -54,6 +60,20 @@ public class StatePos {
         compoundTag.putShort("blockstateshort", (short) blockStates.indexOf(state));
         compoundTag.putLong("blockpos", pos.asLong());
         return compoundTag;
+    }
+
+    public static ArrayList<StatePos> listFrom(StructureTemplate template){
+        var accessor = (StructureTemplateAccessor)template;
+        var list = new ArrayList<StatePos>();
+        var palettes = accessor.getPalettes();
+        if(palettes.isEmpty()){
+            return list;
+        }
+        var palette = palettes.get(0);
+        for(StructureTemplate.StructureBlockInfo blockInfo : palette.blocks()){
+            list.add(new StatePos(blockInfo.state(), blockInfo.pos()));
+        }
+        return list;
     }
 
     public static ArrayList<BlockState> getBlockStateMap(ArrayList<StatePos> list) {
@@ -115,6 +135,24 @@ public class StatePos {
             blockStateMap.add(blockState);
         }
         return blockStateMap;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static Map<Template.ItemStackKey, Integer> getItemList(ArrayList<StatePos> list) {
+        Map<Template.ItemStackKey, Integer> itemList = new Object2IntOpenHashMap<>();
+        if (list == null || list.isEmpty())
+            return itemList;
+        for (StatePos statePos : list) {
+            BlockPos blockPos = BlockPos.ZERO;
+            Level level = Minecraft.getInstance().level;
+            ItemStack cloneStack = statePos.state.getBlock().getCloneItemStack(level, blockPos, statePos.state);
+            Template.ItemStackKey itemStackKey = new Template.ItemStackKey(cloneStack, true);
+            if (!itemList.containsKey(itemStackKey)) //Todo Slabs, etc
+                itemList.put(itemStackKey, 1);
+            else
+                itemList.put(itemStackKey, itemList.get(itemStackKey) + 1);
+        }
+        return itemList;
     }
 
     @Override

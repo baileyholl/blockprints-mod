@@ -6,6 +6,7 @@ import com.hollingsworth.schematic.api.blockprints.BlockprintsApi;
 import com.hollingsworth.schematic.api.blockprints.GoogleCloudStorage;
 import com.hollingsworth.schematic.common.util.SchematicExport;
 import com.hollingsworth.schematic.export.PerspectivePreset;
+import com.hollingsworth.schematic.export.Template;
 import com.hollingsworth.schematic.export.WrappedScene;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -36,7 +37,7 @@ public class SceneExporter {
     public List<WrappedScene.ImageExport> getImages() {
         List<WrappedScene.ImageExport> images = new ArrayList<>();
         images.add(scene.exportPreviewPng());
-        images.add(scene.exportAsPng(GAMESCENE_PLACEHOLDER_SCALE));
+        images.add(scene.exportPreviewPng());
         PerspectivePreset[] perspectivePresets = PerspectivePreset.values();
         // check which preset the scene is closest to
         float currentYaw = scene.scene.getCameraSettings().getRotationY();
@@ -57,13 +58,17 @@ public class SceneExporter {
         for (PerspectivePreset preset : perspectivePresets) {
             if (preset != closest) {
                 scene.scene.getCameraSettings().setPerspectivePreset(preset);
-                images.add(scene.exportAsPng(GAMESCENE_PLACEHOLDER_SCALE));
+                scene.scene.getCameraSettings().setRotationCenter(scene.scene.getWorldCenter());
+                scene.scene.getCameraSettings().setZoom(1.0f);
+                scene.scene.centerScene();
+
+                images.add(scene.exportPreviewPng());
             }
         }
         return images;
     }
 
-    public ApiResponse<Boolean> writeAndUpload(List<WrappedScene.ImageExport> images, String name, String description, boolean makePublic, BlockPos start, BlockPos end) {
+    public ApiResponse<String> writeAndUpload(List<WrappedScene.ImageExport> images, String name, String description, boolean makePublic, BlockPos start, BlockPos end) {
         String finalExportName = sanitize(name);
         try {
             Files.createDirectories(Path.of(IMAGE_FOLDER));
@@ -80,9 +85,10 @@ public class SceneExporter {
                 imageFiles.add(path);
                 count++;
             }
-            var uploadResponse = BlockprintsApi.getInstance().upload().postUpload(name, description, makePublic);
+            var template = new Template(name, start, end);
+            var uploadResponse = BlockprintsApi.getInstance().upload().postUpload(name, description, template.toJson(), makePublic);
             if (!uploadResponse.wasSuccessful() || uploadResponse.response == null) {
-                return uploadResponse.toBoolean();
+                return ApiResponse.error(uploadResponse);
             }
             var response = uploadResponse.response;
             String localStructureName = sanitize(finalExportName + '_' + response.id);
@@ -108,7 +114,8 @@ public class SceneExporter {
                     return ApiResponse.error(Component.literal("Could not upload to GCS"));
                 }
             }
-            return BlockprintsApi.getInstance().upload().postDoneUploading(response.id);
+            BlockprintsApi.getInstance().upload().postDoneUploading(response.id);
+            return ApiResponse.success(response.id);
         } catch (IOException | InterruptedException | ApiError e) {
             e.printStackTrace();
             return ApiResponse.connectionError();

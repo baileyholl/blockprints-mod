@@ -21,11 +21,12 @@ public class Upload {
         this.CLIENT = this.api.CLIENT;
     }
 
-    public ApiResponse<UploadResponse> postUpload(String name, String description, boolean makePublic) {
+    public ApiResponse<UploadResponse> postUpload(String name, String description, String json, boolean makePublic) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("name", name);
         jsonObject.addProperty("description", description);
         jsonObject.addProperty("makePublic", makePublic);
+        jsonObject.addProperty("json", json);
         HttpRequest request = api.getBuilder()
                 .uri(RequestUtil.getRoute("/api/v1/upload"))
                 .POST(HttpRequest.BodyPublishers.ofString(jsonObject.toString())).build();

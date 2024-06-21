@@ -37,6 +37,14 @@ public class ApiResponse<T> {
         return new ApiResponse<>(component.getString());
     }
 
+    public static <T> ApiResponse<T> error(String error){
+        return new ApiResponse<>(error);
+    }
+
+    public static <T> ApiResponse<T> error(ApiResponse<?> response){
+        return new ApiResponse<>(response.error);
+    }
+
     public static ApiResponse<Boolean> success() {
         return new ApiResponse<>(true);
     }
