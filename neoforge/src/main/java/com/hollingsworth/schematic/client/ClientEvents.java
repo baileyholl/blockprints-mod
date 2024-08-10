@@ -3,17 +3,16 @@ package com.hollingsworth.schematic.client;
 import com.hollingsworth.schematic.Constants;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.InputEvent;
+import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = Constants.MOD_ID)
-@OnlyIn(Dist.CLIENT)
+@EventBusSubscriber(value = Dist.CLIENT, modid = Constants.MOD_ID)
 public class ClientEvents {
 
     private static final Minecraft MINECRAFT = Minecraft.getInstance();
@@ -51,9 +50,9 @@ public class ClientEvents {
 
     @SubscribeEvent
     @OnlyIn(Dist.CLIENT)
-    public static void afterRenderOverlayLayer(RenderGuiOverlayEvent.Post event) {
-        if (event.getOverlay() != VanillaGuiOverlay.CROSSHAIR.type())
+    public static void afterRenderOverlayLayer(RenderGuiLayerEvent.Post event) {
+        if (event.getName().equals(VanillaGuiLayers.CROSSHAIR))
             return;
-        ClientData.renderGUIOverlayEvent(event.getGuiGraphics(), event.getWindow());
+        ClientData.renderGUIOverlayEvent(event.getGuiGraphics(), Minecraft.getInstance().getWindow());
     }
 }
