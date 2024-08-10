@@ -867,4 +867,22 @@ public class FakeForwardingServerLevel extends Level implements ServerLevelAcces
     @Override
     public void playSeededSound(Player pPlayer, double pX, double pY, double pZ, Holder<SoundEvent> pSound,
                                 SoundSource pSource, float pVolume, float pPitch, long pSeed) {}
+
+
+    // Invisible overrides for neoforge compatibility
+    public void setDayTimeFraction(float dayTimePerTick) {
+
+    }
+
+    public void setDayTimePerTick(float dayTimePerTick) {
+
+    }
+
+    public float getDayTimePerTick(){
+        return 0;
+    }
+
+    public float getDayTimeFraction(){
+        return 0;
+    }
 }

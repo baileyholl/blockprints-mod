@@ -476,4 +476,20 @@ public class FakeRenderingWorld extends Level implements LevelAccessor {
         return sectionIndex + this.getMinSection();
     }
 
+    // Invisible overrides for neoforge compatibility
+    public void setDayTimeFraction(float dayTimePerTick) {
+
+    }
+    public void setDayTimePerTick(float dayTimePerTick) {
+
+    }
+
+    public float getDayTimePerTick(){
+        return 0;
+    }
+
+    public float getDayTimeFraction(){
+        return 0;
+    }
+
 }

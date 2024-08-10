@@ -348,4 +348,21 @@ public class GuidebookLevel extends Level {
         public void onSectionChange(Entity object) {
         }
     }
+
+    // Invisible overrides for neoforge compatibility
+    public void setDayTimePerTick(float dayTimePerTick) {
+
+    }
+
+    public void setDayTimeFraction(float dayTimePerTick) {
+
+    }
+
+    public float getDayTimePerTick(){
+        return 0;
+    }
+
+    public float getDayTimeFraction(){
+        return 0;
+    }
 }

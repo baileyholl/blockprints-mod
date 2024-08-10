@@ -72,9 +72,9 @@ jar {
         attributes([
                 'Specification-Title'   : mod_name,
                 'Specification-Vendor'  : mod_author,
-                'Specification-Version' : project.jar.archiveVersion,
+                "Specification-Version": mod_version,
                 'Implementation-Title'  : project.name,
-                'Implementation-Version': project.jar.archiveVersion,
+                "Implementation-Version": mod_version,
                 'Implementation-Vendor' : mod_author,
                 'Built-On-Minecraft'    : minecraft_version
         ])
@@ -99,7 +99,8 @@ processResources {
             "forge_version": forge_version,
             "forge_loader_version_range": forge_loader_version_range,
             'credits'                      : credits,
-            'java_version'                 : java_version
+            'java_version'                 : java_version,
+            "Implementation-Version": mod_version,
     ]
 
     filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {
