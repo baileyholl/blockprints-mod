@@ -25,7 +25,7 @@ public class GuiImageButton extends ANButton implements ITooltipProvider {
     }
 
     public GuiImageButton(int x, int y, int u, int v, int w, int h, int image_width, int image_height, String resource_image, OnPress onPress) {
-        this(x, y, u, v, w, h, image_width, image_height, new ResourceLocation(Constants.MOD_ID, resource_image), onPress);
+        this(x, y, u, v, w, h, image_width, image_height, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, resource_image), onPress);
     }
 
     public GuiImageButton(int x, int y, int u, int v, int w, int h, int image_width, int image_height, ResourceLocation image, OnPress onPress) {
@@ -52,9 +52,9 @@ public class GuiImageButton extends ANButton implements ITooltipProvider {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int parX, int parY, float partialTicks) {
+    protected void renderWidget(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         if (visible) {
-            graphics.blit(image, x, y, u, v, width, height, image_width, image_height);
+            pGuiGraphics.blit(image, x, y, u, v, width, height, image_width, image_height);
         }
     }
 

@@ -93,7 +93,7 @@ public class NoShadowTextField extends EditBox {
                 }
 
                 String s = accessor.getFont().plainSubstrByWidth(accessor.getValue().substring(accessor.getDisplayPos()), this.getInnerWidth());
-                this.moveCursorTo(accessor.getFont().plainSubstrByWidth(s, i).length() + accessor.getDisplayPos());
+                this.moveCursorTo(accessor.getFont().plainSubstrByWidth(s, i).length() + accessor.getDisplayPos(), true);
                 return true;
             } else if (this.isFocused() && mouseButton == 1) {
                 if (accessor.getValue().isEmpty())

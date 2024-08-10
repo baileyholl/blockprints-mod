@@ -15,15 +15,15 @@ public class HomeScreen extends BaseSchematicScreen {
     @Override
     public void init() {
         super.init();
-        addRenderableWidget(new GuiImageButton(bookLeft + 41, bookTop + 41, 223, 47, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_navigation.png"), b -> {
+        addRenderableWidget(new GuiImageButton(bookLeft + 41, bookTop + 41, 223, 47, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_navigation.png"), b -> {
             ClientData.startBoundaryCapture();
             Minecraft.getInstance().setScreen(null);
             Minecraft.getInstance().player.sendSystemMessage(Component.translatable(Constants.MOD_ID + ".start_selecting"));
         }));
-        addRenderableWidget(new GuiImageButton(bookLeft + 41, bookTop + 89, 223, 47, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_navigation.png"), b -> {
+        addRenderableWidget(new GuiImageButton(bookLeft + 41, bookTop + 89, 223, 47, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_navigation.png"), b -> {
             Minecraft.getInstance().setScreen(new EnterCodeScreen());
         }));
-        addRenderableWidget(new GuiImageButton(bookLeft + 41, bookTop + 137, 223, 47, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_navigation.png"), b -> {
+        addRenderableWidget(new GuiImageButton(bookLeft + 41, bookTop + 137, 223, 47, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_navigation.png"), b -> {
             Minecraft.getInstance().setScreen(ViewFavoritesScreen.getTransition());
         }));
     }
@@ -31,14 +31,14 @@ public class HomeScreen extends BaseSchematicScreen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.render(graphics, mouseX, mouseY, partialTicks);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/logo_container.png"), bookLeft + 5, bookTop + 7, 0, 0, 295, 24, 295, 24);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/logo_blockprints.png"), bookLeft + 105, bookTop + 9, 0, 0, 96, 16, 96, 16);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/logo_container.png"), bookLeft + 5, bookTop + 7, 0, 0, 295, 24, 295, 24);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/logo_blockprints.png"), bookLeft + 105, bookTop + 9, 0, 0, 96, 16, 96, 16);
 
 
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_upload_large.png"), bookLeft + 51, bookTop + 48, 0, 0, 27, 33, 27, 33);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_upload_large.png"), bookLeft + 51, bookTop + 48, 0, 0, 27, 33, 27, 33);
 
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_download_large.png"), bookLeft + 51, bookTop + 96, 0, 0, 27, 33, 27, 33);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_build_list_large.png"), bookLeft + 49, bookTop + 144, 0, 0, 33, 33, 33, 33);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_download_large.png"), bookLeft + 51, bookTop + 96, 0, 0, 27, 33, 27, 33);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_build_list_large.png"), bookLeft + 49, bookTop + 144, 0, 0, 33, 33, 33, 33);
         GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.upload").getVisualOrderText(), bookLeft + 91, bookTop + 45);
         GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.download").getVisualOrderText(), bookLeft + 91, bookTop + 93);
         GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.build_list").getVisualOrderText(), bookLeft + 91, bookTop + 141);

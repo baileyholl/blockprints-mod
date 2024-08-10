@@ -103,7 +103,7 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
             handleResponse();
         }
         if ((ticksRunning == 20 * 5 || error != null) && !backAdded) {
-            addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
+            addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
                 Minecraft.getInstance().setScreen(this.previousScreen != null ? previousScreen : new HomeScreen());
             }));
             backAdded = true;
@@ -128,7 +128,7 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
     }
 
     public void addHomeButton() {
-        addRenderableWidget(new GuiImageButton(bookLeft + 105, bookTop + 137, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
+        addRenderableWidget(new GuiImageButton(bookLeft + 105, bookTop + 137, 95, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
             Minecraft.getInstance().setScreen(new HomeScreen());
         }));
         addHomeButton = true;
@@ -139,7 +139,7 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
         super.render(graphics, mouseX, mouseY, partialTicks);
 
         if (addHomeButton) {
-            graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_home.png"), bookLeft + 108, bookTop + 140, 0, 0, 9, 8, 9, 8);
+            graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_home.png"), bookLeft + 108, bookTop + 140, 0, 0, 9, 8, 9, 8);
             GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.home").getVisualOrderText(), bookLeft + 128, bookTop + 141);
         }
     }
@@ -147,12 +147,12 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
     @Override
     public void drawBackgroundElements(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.drawBackgroundElements(graphics, mouseX, mouseY, partialTicks);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/container_loading_status.png"), 0, 0, 0, 0, 305, 209, 305, 209);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container_loading_status.png"), 0, 0, 0, 0, 305, 209, 305, 209);
         if (error != null) {
             graphics.drawWordWrap(font, Component.literal(error), 92, 77, 125, Constants.WHITE);
             return;
         }
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/animation_logo_loading.png"), 144, 91, 0, 26 * (anim / 2), 14, 26, 14, 650);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/animation_logo_loading.png"), 144, 91, 0, 26 * (anim / 2), 14, 26, 14, 650);
         String dots = "";
         if (anim < 13) {
             dots = "";

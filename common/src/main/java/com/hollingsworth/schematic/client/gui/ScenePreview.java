@@ -93,7 +93,7 @@ public class ScenePreview extends AbstractWidget {
 
             innerBlit(graphics.pose(), renderer, x, x + newDim.width(), y, y + newDim.height(), 0);
         }
-        ModScreen.blitRect(graphics.pose(), x + 121, y + 3, 0, 0, 17, 17, 17, 17, new ResourceLocation(Constants.MOD_ID, "textures/gui/gimbal/gimbal_cardinal.png"), 150);
+        ModScreen.blitRect(graphics.pose(), x + 121, y + 3, 0, 0, 17, 17, 17, 17, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/gimbal/gimbal_cardinal.png"), 150);
     }
 
     void innerBlit(PoseStack pose, OffScreenRenderer osr, int x1, int x2, int y1, int y2, int blitOffset) {
@@ -101,13 +101,12 @@ public class ScenePreview extends AbstractWidget {
         // Rest is same as GuiGraphics#
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         Matrix4f matrix4f = pose.last().pose();
-        BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
-        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferBuilder.vertex(matrix4f, x1, y1, blitOffset).uv(0, 1).endVertex();
-        bufferBuilder.vertex(matrix4f, x1, y2, blitOffset).uv(0, 0).endVertex();
-        bufferBuilder.vertex(matrix4f, x2, y2, blitOffset).uv(1, 0).endVertex();
-        bufferBuilder.vertex(matrix4f, x2, y1, blitOffset).uv(1, 1).endVertex();
-        BufferUploader.drawWithShader(bufferBuilder.end());
+        BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        bufferBuilder.addVertex(matrix4f, x1, y1, blitOffset).setUv(0, 1);
+        bufferBuilder.addVertex(matrix4f, x1, y2, blitOffset).setUv(0, 0);
+        bufferBuilder.addVertex(matrix4f, x2, y2, blitOffset).setUv(1, 0);
+        bufferBuilder.addVertex(matrix4f, x2, y1, blitOffset).setUv(1, 1);
+        BufferUploader.drawWithShader(bufferBuilder.build());
     }
 
     public static LytSize getScaledDimension(LytSize imgSize, LytSize boundary) {

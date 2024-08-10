@@ -13,13 +13,13 @@ import java.util.List;
  *
  */
 public interface IQuadTransformer {
-    int STRIDE = DefaultVertexFormat.BLOCK.getIntegerSize();
-    int POSITION = findOffset(DefaultVertexFormat.ELEMENT_POSITION);
-    int COLOR = findOffset(DefaultVertexFormat.ELEMENT_COLOR);
-    int UV0 = findOffset(DefaultVertexFormat.ELEMENT_UV0);
-    int UV1 = findOffset(DefaultVertexFormat.ELEMENT_UV1);
-    int UV2 = findOffset(DefaultVertexFormat.ELEMENT_UV2);
-    int NORMAL = findOffset(DefaultVertexFormat.ELEMENT_NORMAL);
+    int STRIDE = DefaultVertexFormat.BLOCK.getVertexSize();
+    int POSITION = findOffset(VertexFormatElement.POSITION);
+    int COLOR = findOffset(VertexFormatElement.COLOR);
+    int UV0 = findOffset(VertexFormatElement.UV0);
+    int UV1 = findOffset(VertexFormatElement.UV1);
+    int UV2 = findOffset(VertexFormatElement.UV2);
+    int NORMAL = findOffset(VertexFormatElement.NORMAL);
 
     void processInPlace(BakedQuad quad);
 

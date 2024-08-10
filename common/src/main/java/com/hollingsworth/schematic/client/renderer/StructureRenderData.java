@@ -1,7 +1,7 @@
 package com.hollingsworth.schematic.client.renderer;
 
 import com.hollingsworth.schematic.mixin.StructureTemplateAccessor;
-import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.MeshData;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Mirror;
@@ -19,7 +19,7 @@ public class StructureRenderData {
     public int sortCounter;
     public BoundingBox boundingBox;
     public BlockPos anchorPos;
-    public Map<RenderType, BufferBuilder.SortState> sortStates = new HashMap<>();
+    public Map<RenderType, MeshData.SortState> sortStates = new HashMap<>();
     public String name;
     public String blockprintsId;
     public FakeRenderingWorld fakeRenderingWorld;

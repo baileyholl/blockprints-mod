@@ -18,7 +18,6 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 import java.util.Map;
@@ -97,7 +96,6 @@ public class DireRenderMethods {
     public static void renderCopy(PoseStack matrix, BlockPos startPos, BlockPos endPos, Color color) {
         if (startPos == null || endPos == null)
             return;
-
         //We want to draw from the starting position to the (ending position)+1
         int x = Math.min(startPos.getX(), endPos.getX()), y = Math.min(startPos.getY(), endPos.getY()), z = Math.min(startPos.getZ(), endPos.getZ());
 
@@ -110,33 +108,33 @@ public class DireRenderMethods {
 
         matrix.pushPose();
         Matrix4f matrix4f = matrix.last().pose();
-        Matrix3f matrix3f = matrix.last().normal();
+        PoseStack.Pose matrix3f = matrix.last();
         int colorRGB = color.getRGB();
 
-        builder.vertex(matrix4f, x, y, z).color(colorRGB).normal(matrix3f, 1.0F, 0.0F, 0.0F).endVertex();
-        builder.vertex(matrix4f, dx, y, z).color(colorRGB).normal(matrix3f, 1.0F, 0.0F, 0.0F).endVertex();
-        builder.vertex(matrix4f, x, y, z).color(colorRGB).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
-        builder.vertex(matrix4f, x, dy, z).color(colorRGB).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
-        builder.vertex(matrix4f, x, y, z).color(colorRGB).normal(matrix3f, 0.0F, 0.0F, 1.0F).endVertex();
-        builder.vertex(matrix4f, x, y, dz).color(colorRGB).normal(matrix3f, 0.0F, 0.0F, 1.0F).endVertex();
-        builder.vertex(matrix4f, dx, y, z).color(colorRGB).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
-        builder.vertex(matrix4f, dx, dy, z).color(colorRGB).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
-        builder.vertex(matrix4f, dx, dy, z).color(colorRGB).normal(matrix3f, -1.0F, 0.0F, 0.0F).endVertex();
-        builder.vertex(matrix4f, x, dy, z).color(colorRGB).normal(matrix3f, -1.0F, 0.0F, 0.0F).endVertex();
-        builder.vertex(matrix4f, x, dy, z).color(colorRGB).normal(matrix3f, 0.0F, 0.0F, 1.0F).endVertex();
-        builder.vertex(matrix4f, x, dy, dz).color(colorRGB).normal(matrix3f, 0.0F, 0.0F, 1.0F).endVertex();
-        builder.vertex(matrix4f, x, dy, dz).color(colorRGB).normal(matrix3f, 0.0F, -1.0F, 0.0F).endVertex();
-        builder.vertex(matrix4f, x, y, dz).color(colorRGB).normal(matrix3f, 0.0F, -1.0F, 0.0F).endVertex();
-        builder.vertex(matrix4f, x, y, dz).color(colorRGB).normal(matrix3f, 1.0F, 0.0F, 0.0F).endVertex();
-        builder.vertex(matrix4f, dx, y, dz).color(colorRGB).normal(matrix3f, 1.0F, 0.0F, 0.0F).endVertex();
-        builder.vertex(matrix4f, dx, y, dz).color(colorRGB).normal(matrix3f, 0.0F, 0.0F, -1.0F).endVertex();
-        builder.vertex(matrix4f, dx, y, z).color(colorRGB).normal(matrix3f, 0.0F, 0.0F, -1.0F).endVertex();
-        builder.vertex(matrix4f, x, dy, dz).color(colorRGB).normal(matrix3f, 1.0F, 0.0F, 0.0F).endVertex();
-        builder.vertex(matrix4f, dx, dy, dz).color(colorRGB).normal(matrix3f, 1.0F, 0.0F, 0.0F).endVertex();
-        builder.vertex(matrix4f, dx, y, dz).color(colorRGB).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
-        builder.vertex(matrix4f, dx, dy, dz).color(colorRGB).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
-        builder.vertex(matrix4f, dx, dy, z).color(colorRGB).normal(matrix3f, 0.0F, 0.0F, 1.0F).endVertex();
-        builder.vertex(matrix4f, dx, dy, dz).color(colorRGB).normal(matrix3f, 0.0F, 0.0F, 1.0F).endVertex();
+        builder.addVertex(matrix4f, x, y, z).setColor(colorRGB).setNormal(matrix3f, 1.0F, 0.0F, 0.0F);
+        builder.addVertex(matrix4f, dx, y, z).setColor(colorRGB).setNormal(matrix3f, 1.0F, 0.0F, 0.0F);
+        builder.addVertex(matrix4f, x, y, z).setColor(colorRGB).setNormal(matrix3f, 0.0F, 1.0F, 0.0F);
+        builder.addVertex(matrix4f, x, dy, z).setColor(colorRGB).setNormal(matrix3f, 0.0F, 1.0F, 0.0F);
+        builder.addVertex(matrix4f, x, y, z).setColor(colorRGB).setNormal(matrix3f, 0.0F, 0.0F, 1.0F);
+        builder.addVertex(matrix4f, x, y, dz).setColor(colorRGB).setNormal(matrix3f, 0.0F, 0.0F, 1.0F);
+        builder.addVertex(matrix4f, dx, y, z).setColor(colorRGB).setNormal(matrix3f, 0.0F, 1.0F, 0.0F);
+        builder.addVertex(matrix4f, dx, dy, z).setColor(colorRGB).setNormal(matrix3f, 0.0F, 1.0F, 0.0F);
+        builder.addVertex(matrix4f, dx, dy, z).setColor(colorRGB).setNormal(matrix3f, -1.0F, 0.0F, 0.0F);
+        builder.addVertex(matrix4f, x, dy, z).setColor(colorRGB).setNormal(matrix3f, -1.0F, 0.0F, 0.0F);
+        builder.addVertex(matrix4f, x, dy, z).setColor(colorRGB).setNormal(matrix3f, 0.0F, 0.0F, 1.0F);
+        builder.addVertex(matrix4f, x, dy, dz).setColor(colorRGB).setNormal(matrix3f, 0.0F, 0.0F, 1.0F);
+        builder.addVertex(matrix4f, x, dy, dz).setColor(colorRGB).setNormal(matrix3f, 0.0F, -1.0F, 0.0F);
+        builder.addVertex(matrix4f, x, y, dz).setColor(colorRGB).setNormal(matrix3f, 0.0F, -1.0F, 0.0F);
+        builder.addVertex(matrix4f, x, y, dz).setColor(colorRGB).setNormal(matrix3f, 1.0F, 0.0F, 0.0F);
+        builder.addVertex(matrix4f, dx, y, dz).setColor(colorRGB).setNormal(matrix3f, 1.0F, 0.0F, 0.0F);
+        builder.addVertex(matrix4f, dx, y, dz).setColor(colorRGB).setNormal(matrix3f, 0.0F, 0.0F, -1.0F);
+        builder.addVertex(matrix4f, dx, y, z).setColor(colorRGB).setNormal(matrix3f, 0.0F, 0.0F, -1.0F);
+        builder.addVertex(matrix4f, x, dy, dz).setColor(colorRGB).setNormal(matrix3f, 1.0F, 0.0F, 0.0F);
+        builder.addVertex(matrix4f, dx, dy, dz).setColor(colorRGB).setNormal(matrix3f, 1.0F, 0.0F, 0.0F);
+        builder.addVertex(matrix4f, dx, y, dz).setColor(colorRGB).setNormal(matrix3f, 0.0F, 1.0F, 0.0F);
+        builder.addVertex(matrix4f, dx, dy, dz).setColor(colorRGB).setNormal(matrix3f, 0.0F, 1.0F, 0.0F);
+        builder.addVertex(matrix4f, dx, dy, z).setColor(colorRGB).setNormal(matrix3f, 0.0F, 0.0F, 1.0F);
+        builder.addVertex(matrix4f, dx, dy, dz).setColor(colorRGB).setNormal(matrix3f, 0.0F, 0.0F, 1.0F);
 
         buffer.endBatch(DireRenderTypes.lines()); // @mcp: draw = finish
         matrix.popPose();
@@ -164,39 +162,39 @@ public class DireRenderMethods {
         float endZ = (float) zEnd;
 
         //down
-        builder.vertex(matrix, startX, startY, startZ).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, endX, startY, startZ).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, endX, startY, endZ).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, startX, startY, endZ).color(red, green, blue, alpha).endVertex();
+        builder.addVertex(matrix, startX, startY, startZ).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, endX, startY, startZ).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, endX, startY, endZ).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, startX, startY, endZ).setColor(red, green, blue, alpha);
 
         //up
-        builder.vertex(matrix, startX, endY, startZ).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, startX, endY, endZ).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, endX, endY, endZ).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, endX, endY, startZ).color(red, green, blue, alpha).endVertex();
+        builder.addVertex(matrix, startX, endY, startZ).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, startX, endY, endZ).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, endX, endY, endZ).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, endX, endY, startZ).setColor(red, green, blue, alpha);
 
         //east
-        builder.vertex(matrix, startX, startY, startZ).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, startX, endY, startZ).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, endX, endY, startZ).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, endX, startY, startZ).color(red, green, blue, alpha).endVertex();
+        builder.addVertex(matrix, startX, startY, startZ).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, startX, endY, startZ).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, endX, endY, startZ).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, endX, startY, startZ).setColor(red, green, blue, alpha);
 
         //west
-        builder.vertex(matrix, startX, startY, endZ).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, endX, startY, endZ).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, endX, endY, endZ).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, startX, endY, endZ).color(red, green, blue, alpha).endVertex();
+        builder.addVertex(matrix, startX, startY, endZ).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, endX, startY, endZ).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, endX, endY, endZ).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, startX, endY, endZ).setColor(red, green, blue, alpha);
 
         //south
-        builder.vertex(matrix, endX, startY, startZ).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, endX, endY, startZ).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, endX, endY, endZ).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, endX, startY, endZ).color(red, green, blue, alpha).endVertex();
+        builder.addVertex(matrix, endX, startY, startZ).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, endX, endY, startZ).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, endX, endY, endZ).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, endX, startY, endZ).setColor(red, green, blue, alpha);
 
         //north
-        builder.vertex(matrix, startX, startY, startZ).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, startX, startY, endZ).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, startX, endY, endZ).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, startX, endY, startZ).color(red, green, blue, alpha).endVertex();
+        builder.addVertex(matrix, startX, startY, startZ).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, startX, startY, endZ).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, startX, endY, endZ).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, startX, endY, startZ).setColor(red, green, blue, alpha);
     }
 }

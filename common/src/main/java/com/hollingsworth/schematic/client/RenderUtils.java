@@ -31,16 +31,16 @@ public class RenderUtils {
 
     }
 
-    private static MultiBufferSource transparentBuffer(MultiBufferSource buffer) {
-        return renderType -> new TintedVertexConsumer(buffer.getBuffer(TRANSLUCENT), 1.0f, 1.0f, 1.0f, 0.25f);
-    }
+//    private static MultiBufferSource transparentBuffer(MultiBufferSource buffer) {
+//        return renderType -> new TintedVertexConsumer(buffer.getBuffer(TRANSLUCENT), 1.0f, 1.0f, 1.0f, 0.25f);
+//    }
 
     private static final Matrix4f SCALE_INVERT_Y = new Matrix4f().scaling(1F, -1F, 1F);
 
     public static void renderItemModel(PoseStack poseStack, ItemStack stack, float x, float y, float scale, int alpha, BakedModel model, ItemRenderer renderer, int zIndex) {
         poseStack.pushPose();
         poseStack.translate(x + 8F, y + 8F, zIndex);
-        poseStack.mulPoseMatrix(SCALE_INVERT_Y);
+        poseStack.mulPose(SCALE_INVERT_Y);
         poseStack.scale(scale, scale, scale);
 
         boolean flatLight = !model.usesBlockLight();

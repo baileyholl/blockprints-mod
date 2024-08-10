@@ -97,10 +97,10 @@ public class AreaCaptureHandler {
             if (firstPos == null) {
                 currentSelectionBox = selectedPos == null ? null : new AABB(selectedPos);
             } else {
-                currentSelectionBox = selectedPos == null ? new AABB(firstPos) : new AABB(firstPos, selectedPos).expandTowards(1, 1, 1);
+                currentSelectionBox = selectedPos == null ? new AABB(firstPos) : AABB.encapsulatingFullBlocks(firstPos, selectedPos).expandTowards(1, 1, 1);
             }
         } else {
-            currentSelectionBox = new AABB(firstPos, secondPos).expandTowards(1, 1, 1);
+            currentSelectionBox = AABB.encapsulatingFullBlocks(firstPos, secondPos).expandTowards(1, 1, 1);
         }
 
         renderBbox(currentSelectionBox, poseStack);

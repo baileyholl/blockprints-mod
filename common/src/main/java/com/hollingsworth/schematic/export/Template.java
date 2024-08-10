@@ -7,6 +7,8 @@ import com.hollingsworth.schematic.client.renderer.StatePos;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceLocation;
@@ -45,7 +47,7 @@ public class Template {
         for (Map.Entry<ItemStackKey, Integer> entry : requiredItemsTemp.entrySet()) {
             if (entry.getKey().getStack().isEmpty()) continue;
             var item = entry.getKey().item;
-            ResourceLocation registryName = BuiltInRegistries.ITEM.getKey(item);
+            ResourceLocation registryName = BuiltInRegistries.ITEM.getKey(item.value());
             requiredItems.put(registryName.toString(), entry.getValue());
         }
     }
@@ -64,7 +66,7 @@ public class Template {
 
     public static ArrayList<StatePos> listForDire(BlockPos startRaw, BlockPos endRaw, Level level){
         ArrayList<StatePos> list = new ArrayList<>();
-        AABB area = new AABB(startRaw, endRaw);
+        AABB area = AABB.encapsulatingFullBlocks(startRaw, endRaw);
         BlockPos.betweenClosedStream(area).map(BlockPos::immutable).forEach(pos -> {
             if (validStateForDire(level.getBlockState(pos), level, pos))
                 list.add(new StatePos(cleanBlockState(level.getBlockState(pos)), pos.subtract(startRaw)));
@@ -83,7 +85,7 @@ public class Template {
 
         BlockPos start = list.get(0).pos;
         BlockPos end = list.get(list.size() - 1).pos;
-        AABB aabb = new AABB(start, end);
+        AABB aabb = AABB.encapsulatingFullBlocks(start, end);
 
         Map<BlockPos, BlockState> blockStateByPos = list.stream()
                 .collect(Collectors.toMap(e -> e.pos, e -> e.state));
@@ -160,31 +162,23 @@ public class Template {
     }
 
     public static class ItemStackKey {
-        public final Item item;
-        public final CompoundTag nbt;
-        public final int hash;
+        public final Holder<Item> item;
+        public final DataComponentPatch dataComponents;
+        private final int hash;
 
 
         public ItemStackKey(ItemStack stack, boolean compareNBT) {
-            this.item = stack.getItem();
-            this.nbt = compareNBT ? stack.getTag() : new CompoundTag();
-            this.hash = Objects.hash(item, nbt);
+            this.item = stack.getItemHolder();
+            this.dataComponents = compareNBT ? stack.getComponentsPatch() : DataComponentPatch.EMPTY;
+            this.hash = Objects.hash(item, dataComponents);
         }
 
         public ItemStack getStack() {
-            var stack = new ItemStack(item, 1);
-            if(nbt != null && !nbt.isEmpty()){
-                stack.setTag(nbt);
-            }
-            return stack;
+            return new ItemStack(item, 1, dataComponents);
         }
 
         public ItemStack getStack(int amt) {
-            var stack = new ItemStack(item, amt);
-            if(nbt != null && !nbt.isEmpty()){
-                stack.setTag(nbt);
-            }
-            return stack;
+            return new ItemStack(item, amt, dataComponents);
         }
 
         @Override
@@ -195,7 +189,7 @@ public class Template {
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof ItemStackKey) {
-                return (((ItemStackKey) obj).item == this.item) && Objects.equals(((ItemStackKey) obj).nbt, this.nbt);
+                return (((ItemStackKey) obj).item == this.item) && Objects.equals(((ItemStackKey) obj).dataComponents, this.dataComponents);
             }
             return false;
         }

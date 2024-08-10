@@ -26,12 +26,12 @@ public class EnterCodeScreen extends BaseSchematicScreen {
         codeField.setMaxLength(100);
 //        codeField.setValue("10638b87-b336-40a0-903f-42485e3fbf19");
         addRenderableWidget(codeField);
-        submitButton = new GuiImageButton(bookLeft + 57, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
+        submitButton = new GuiImageButton(bookLeft + 57, bookTop + 153, 95, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
             Minecraft.getInstance().setScreen(DownloadScreen.getTransition(codeField.getValue().trim(), this));
         });
-        addRenderableWidget(new GuiImageButton(bookLeft + 153, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
+        addRenderableWidget(new GuiImageButton(bookLeft + 153, bookTop + 153, 95, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
         }));
-        addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
+        addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
             Minecraft.getInstance().setScreen(new HomeScreen());
         }));
         addRenderableWidget(submitButton);
@@ -40,8 +40,8 @@ public class EnterCodeScreen extends BaseSchematicScreen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.render(graphics, mouseX, mouseY, partialTicks);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_preview.png"), bookLeft + 59, bookTop + 156, 0, 0, 11, 9, 11, 9);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_website.png"), bookLeft + 155, bookTop + 155, 0, 0, 11, 11, 11, 11);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_preview.png"), bookLeft + 59, bookTop + 156, 0, 0, 11, 9, 11, 9);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_website.png"), bookLeft + 155, bookTop + 155, 0, 0, 11, 11, 11, 11);
         GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.preview").getVisualOrderText(), bookLeft + 92, bookTop + 157);
         GuiUtils.drawOutlinedText(font, graphics, Component.literal("BlockPrints.io").getVisualOrderText(), bookLeft + 176, bookTop + 157);
 
@@ -52,6 +52,6 @@ public class EnterCodeScreen extends BaseSchematicScreen {
     @Override
     public void drawBackgroundElements(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.drawBackgroundElements(graphics, mouseX, mouseY, partialTicks);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/dialog_code_static.png"), 41, 57, 0, 0, 223, 62, 223, 62);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/dialog_code_static.png"), 41, 57, 0, 0, 223, 62, 223, 62);
     }
 }

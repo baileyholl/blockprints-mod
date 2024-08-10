@@ -13,9 +13,11 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.profiling.InactiveProfiler;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -33,6 +35,7 @@ import net.minecraft.world.level.entity.LevelEntityGetter;
 import net.minecraft.world.level.entity.TransientEntitySectionManager;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.Scoreboard;
@@ -47,7 +50,7 @@ import java.util.stream.Stream;
 public class GuidebookLevel extends Level {
 
     private static final ResourceKey<Level> LEVEL_ID = ResourceKey.create(Registries.DIMENSION,
-            new ResourceLocation(Constants.MOD_ID, "schematic_world"));
+            ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "schematic_world"));
 
     private final TransientEntitySectionManager<Entity> entityStorage = new TransientEntitySectionManager<>(
             Entity.class, new EntityCallbacks());
@@ -195,6 +198,11 @@ public class GuidebookLevel extends Level {
     }
 
     @Override
+    public TickRateManager tickRateManager() {
+        return null;
+    }
+
+    @Override
     public void sendBlockUpdated(BlockPos pos, BlockState oldState, BlockState newState, int flags) {
     }
 
@@ -215,17 +223,18 @@ public class GuidebookLevel extends Level {
 
     @Nullable
     @Override
-    public MapItemSavedData getMapData(String mapName) {
+    public MapItemSavedData getMapData(MapId mapId) {
         return null;
     }
 
     @Override
-    public void setMapData(String mapId, MapItemSavedData data) {
+    public MapId getFreeMapId() {
+        return null;
     }
 
     @Override
-    public int getFreeMapId() {
-        return 0;
+    public void setMapData(MapId mapId, MapItemSavedData mapItemSavedData) {
+
     }
 
     @Override
@@ -262,7 +271,13 @@ public class GuidebookLevel extends Level {
     }
 
     @Override
-    public void gameEvent(GameEvent gameEvent, Vec3 vec3, GameEvent.Context context) {
+    public void gameEvent(Holder<GameEvent> holder, Vec3 vec3, GameEvent.Context context) {
+
+    }
+
+    @Override
+    public void gameEvent(ResourceKey<GameEvent> pGameEvent, BlockPos pPos, GameEvent.Context pContext) {
+
     }
 
     @Override
@@ -292,6 +307,11 @@ public class GuidebookLevel extends Level {
     @Override
     public RegistryAccess registryAccess() {
         return registryAccess;
+    }
+
+    @Override
+    public PotionBrewing potionBrewing() {
+        return null;
     }
 
     @Override

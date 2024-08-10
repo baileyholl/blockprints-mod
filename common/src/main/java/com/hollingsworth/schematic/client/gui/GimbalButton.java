@@ -14,11 +14,11 @@ public class GimbalButton extends ANButton{
     }
 
     @Override
-    public void render(GuiGraphics graphics, int parX, int parY, float partialTicks) {
+    public void renderWidget(GuiGraphics graphics, int parX, int parY, float partialTicks) {
         if(!this.visible){
             return;
         }
         int alpha = isMouseOver(parX, parY) ? 255 : 100;
-        ModScreen.blitRect(graphics.pose(), x, y, 0, 0, width, height, width, height, new ResourceLocation(Constants.MOD_ID, "textures/gui/gimbal/gimbal_" + direction + "_highlighted.png"), alpha);
+        ModScreen.blitRect(graphics.pose(), x, y, 0, 0, width, height, width, height, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/gimbal/gimbal_" + direction + "_highlighted.png"), alpha);
     }
 }

@@ -2,7 +2,6 @@ package com.hollingsworth.schematic.client.renderer;
 
 
 import com.hollingsworth.schematic.export.Template;
-import com.hollingsworth.schematic.mixin.StructureTemplateAccessor;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -14,7 +13,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,51 +29,51 @@ public class StatePos {
         this.pos = pos;
     }
 
-    public StatePos(CompoundTag compoundTag) {
-        if (!compoundTag.contains("blockstate") || !compoundTag.contains("blockpos")) {
-            this.state = null;
-            this.pos = null;
-        }
-        this.state = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), compoundTag.getCompound("blockstate"));
-        this.pos = NbtUtils.readBlockPos(compoundTag.getCompound("blockpos"));
-    }
-
-    public StatePos(CompoundTag compoundTag, ArrayList<BlockState> blockStates) {
-        if (!compoundTag.contains("blockstateshort") || !compoundTag.contains("blockpos")) {
-            this.state = null;
-            this.pos = null;
-        }
-        this.state = blockStates.get(compoundTag.getShort("blockstateshort"));
-        this.pos = BlockPos.of(compoundTag.getLong("blockpos"));
-    }
-
-    public CompoundTag getTag() {
-        CompoundTag compoundTag = new CompoundTag();
-        compoundTag.put("blockstate", NbtUtils.writeBlockState(state));
-        compoundTag.put("blockpos", NbtUtils.writeBlockPos(pos));
-        return compoundTag;
-    }
-
-    public CompoundTag getTag(ArrayList<BlockState> blockStates) {
-        CompoundTag compoundTag = new CompoundTag();
-        compoundTag.putShort("blockstateshort", (short) blockStates.indexOf(state));
-        compoundTag.putLong("blockpos", pos.asLong());
-        return compoundTag;
-    }
-
-    public static ArrayList<StatePos> listFrom(StructureTemplate template){
-        var accessor = (StructureTemplateAccessor)template;
-        var list = new ArrayList<StatePos>();
-        var palettes = accessor.getPalettes();
-        if(palettes.isEmpty()){
-            return list;
-        }
-        var palette = palettes.get(0);
-        for(StructureTemplate.StructureBlockInfo blockInfo : palette.blocks()){
-            list.add(new StatePos(blockInfo.state(), blockInfo.pos()));
-        }
-        return list;
-    }
+//    public StatePos(CompoundTag compoundTag) {
+//        if (!compoundTag.contains("blockstate") || !compoundTag.contains("blockpos")) {
+//            this.state = null;
+//            this.pos = null;
+//        }
+//        this.state = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), compoundTag.getCompound("blockstate"));
+//        this.pos = NbtUtils.readBlockPos(compoundTag.getCompound("blockpos"));
+//    }
+//
+//    public StatePos(CompoundTag compoundTag, ArrayList<BlockState> blockStates) {
+//        if (!compoundTag.contains("blockstateshort") || !compoundTag.contains("blockpos")) {
+//            this.state = null;
+//            this.pos = null;
+//        }
+//        this.state = blockStates.get(compoundTag.getShort("blockstateshort"));
+//        this.pos = BlockPos.of(compoundTag.getLong("blockpos"));
+//    }
+//
+//    public CompoundTag getTag() {
+//        CompoundTag compoundTag = new CompoundTag();
+//        compoundTag.put("blockstate", NbtUtils.writeBlockState(state));
+//        compoundTag.put("blockpos", NbtUtils.writeBlockPos(pos));
+//        return compoundTag;
+//    }
+//
+//    public CompoundTag getTag(ArrayList<BlockState> blockStates) {
+//        CompoundTag compoundTag = new CompoundTag();
+//        compoundTag.putShort("blockstateshort", (short) blockStates.indexOf(state));
+//        compoundTag.putLong("blockpos", pos.asLong());
+//        return compoundTag;
+//    }
+//
+//    public static ArrayList<StatePos> listFrom(StructureTemplate template){
+//        var accessor = (StructureTemplateAccessor)template;
+//        var list = new ArrayList<StatePos>();
+//        var palettes = accessor.getPalettes();
+//        if(palettes.isEmpty()){
+//            return list;
+//        }
+//        var palette = palettes.get(0);
+//        for(StructureTemplate.StructureBlockInfo blockInfo : palette.blocks()){
+//            list.add(new StatePos(blockInfo.state(), blockInfo.pos()));
+//        }
+//        return list;
+//    }
 
     public static ArrayList<BlockState> getBlockStateMap(ArrayList<StatePos> list) {
         ArrayList<BlockState> blockStateMap = new ArrayList<>();

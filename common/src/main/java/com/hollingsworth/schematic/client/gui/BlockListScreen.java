@@ -34,7 +34,7 @@ public class BlockListScreen extends BaseSchematicScreen {
     @Override
     public void init() {
         super.init();
-        addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
+        addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
             Minecraft.getInstance().setScreen(previousScreen);
         }));
         updateList();
@@ -68,7 +68,7 @@ public class BlockListScreen extends BaseSchematicScreen {
     @Override
     public void drawBackgroundElements(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.drawBackgroundElements(graphics, mouseX, mouseY, partialTicks);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/container_list_blocks.png"), 25, 25, 0, 0, 239, 159, 239, 159);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container_list_blocks.png"), 25, 25, 0, 0, 239, 159, 239, 159);
         graphics.drawString(font, Component.translatable("blockprints.block"), 30, 29, 0, false);
         graphics.drawString(font, Component.translatable("blockprints.qty"), 235, 29, 0, false);
     }

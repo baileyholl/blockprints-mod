@@ -29,7 +29,7 @@ public class ManageVisualScreen extends BaseSchematicScreen{
             this.scroll = count;
             updateList();
         }));
-        addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
+        addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
             Minecraft.getInstance().setScreen(new HomeScreen());
         }));
     }
@@ -51,7 +51,7 @@ public class ManageVisualScreen extends BaseSchematicScreen{
     @Override
     public void drawBackgroundElements(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.drawBackgroundElements(graphics, mouseX, mouseY, partialTicks);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/container_list_visualizer.png"), 25, 25, 0, 0, 239, 159, 239, 159);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container_list_visualizer.png"), 25, 25, 0, 0, 239, 159, 239, 159);
         GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.visualizations").getVisualOrderText(), 30, 29);
     }
 }

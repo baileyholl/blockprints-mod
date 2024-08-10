@@ -2,19 +2,13 @@ package com.hollingsworth.schematic.export;
 
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexSorting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL30;
@@ -163,59 +157,59 @@ public class OffScreenRenderer implements AutoCloseable {
         fb.unbindRead();
     }
 
-    public void setupOrtographicRendering() {
-        float angle = 36;
-        float renderHeight = 0;
-        float renderScale = 100;
-        float rotation = 45;
-
-        // Set up GL state for GUI rendering where the 16x16 item will fill the entire framebuffer
-        RenderSystem.setProjectionMatrix(
-                new Matrix4f().ortho(-1, 1, 1, -1, 1000, 3000),
-                VertexSorting.ORTHOGRAPHIC_Z);
-
-        var poseStack = RenderSystem.getModelViewStack();
-        poseStack.setIdentity();
-        poseStack.translate(0.0F, 0.0F, -2000.0F);
-
-        FogRenderer.setupNoFog();
-
-        poseStack.scale(1, -1, -1);
-        poseStack.mulPose(new Quaternionf().rotationY(Mth.DEG_TO_RAD * -180));
-
-        Quaternionf flip = new Quaternionf().rotationZ(Mth.DEG_TO_RAD * 180);
-        flip.mul(new Quaternionf().rotationX(Mth.DEG_TO_RAD * angle));
-
-        poseStack.translate(0, (renderHeight / -300d), 0);
-        poseStack.scale(renderScale * 0.004f, renderScale * 0.004f, 1f);
-
-        Quaternionf rotate = new Quaternionf().rotationY(Mth.DEG_TO_RAD * rotation);
-        poseStack.mulPose(flip);
-        poseStack.mulPose(rotate);
-
-        RenderSystem.applyModelViewMatrix();
-        Lighting.setupLevel(poseStack.last().pose());
-    }
-
-    public void setupPerspectiveRendering(float zoom, float fov, Vector3f eyePos, Vector3f lookAt) {
-        float aspectRatio = (float) width / height;
-
-        PoseStack projMat = new PoseStack();
-        if (zoom != 1.0F) {
-            projMat.scale(zoom, zoom, 1.0F);
-        }
-
-        projMat.mulPoseMatrix(new Matrix4f().perspective(fov, aspectRatio, 0.05F, 16));
-        RenderSystem.setProjectionMatrix(projMat.last().pose(), VertexSorting.DISTANCE_TO_ORIGIN);
-
-        var poseStack = RenderSystem.getModelViewStack();
-        poseStack.setIdentity();
-        var vm = createViewMatrix(eyePos, lookAt);
-        poseStack.mulPoseMatrix(vm);
-
-        RenderSystem.applyModelViewMatrix();
-        Lighting.setupLevel(poseStack.last().pose());
-    }
+//    public void setupOrtographicRendering() {
+//        float angle = 36;
+//        float renderHeight = 0;
+//        float renderScale = 100;
+//        float rotation = 45;
+//
+//        // Set up GL state for GUI rendering where the 16x16 item will fill the entire framebuffer
+//        RenderSystem.setProjectionMatrix(
+//                new Matrix4f().ortho(-1, 1, 1, -1, 1000, 3000),
+//                VertexSorting.ORTHOGRAPHIC_Z);
+//
+//        var poseStack = RenderSystem.getModelViewStack();
+//        poseStack.setIdentity();
+//        poseStack.translate(0.0F, 0.0F, -2000.0F);
+//
+//        FogRenderer.setupNoFog();
+//
+//        poseStack.scale(1, -1, -1);
+//        poseStack.mulPose(new Quaternionf().rotationY(Mth.DEG_TO_RAD * -180));
+//
+//        Quaternionf flip = new Quaternionf().rotationZ(Mth.DEG_TO_RAD * 180);
+//        flip.mul(new Quaternionf().rotationX(Mth.DEG_TO_RAD * angle));
+//
+//        poseStack.translate(0, (renderHeight / -300d), 0);
+//        poseStack.scale(renderScale * 0.004f, renderScale * 0.004f, 1f);
+//
+//        Quaternionf rotate = new Quaternionf().rotationY(Mth.DEG_TO_RAD * rotation);
+//        poseStack.mulPose(flip);
+//        poseStack.mulPose(rotate);
+//
+//        RenderSystem.applyModelViewMatrix();
+//        Lighting.setupLevel(poseStack.last().pose());
+//    }
+//
+//    public void setupPerspectiveRendering(float zoom, float fov, Vector3f eyePos, Vector3f lookAt) {
+//        float aspectRatio = (float) width / height;
+//
+//        PoseStack projMat = new PoseStack();
+//        if (zoom != 1.0F) {
+//            projMat.scale(zoom, zoom, 1.0F);
+//        }
+//
+//        projMat.mulPoseMatrix(new Matrix4f().perspective(fov, aspectRatio, 0.05F, 16));
+//        RenderSystem.setProjectionMatrix(projMat.last().pose(), VertexSorting.DISTANCE_TO_ORIGIN);
+//
+//        var poseStack = RenderSystem.getModelViewStack();
+//        poseStack.setIdentity();
+//        var vm = createViewMatrix(eyePos, lookAt);
+//        poseStack.mulPoseMatrix(vm);
+//
+//        RenderSystem.applyModelViewMatrix();
+//        Lighting.setupLevel(poseStack.last().pose());
+//    }
 
     /**
      * This is in essence the same code as in gluLookAt, but it returns the resulting transformation matrix instead of

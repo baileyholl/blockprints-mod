@@ -1,54 +1,30 @@
 package com.hollingsworth.schematic.client.gui;
 
 
-import com.hollingsworth.schematic.client.ForgeGraphics;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import org.lwjgl.glfw.GLFW;
 
 import java.text.DecimalFormat;
 
 /**
  * Slider widget implementation which allows inputting values in a certain range with optional step size.
- * Copy of ForgeSlider
+ * Copy of ExtendedSlider
  */
 public class BaseSlider extends AbstractSliderButton {
-    private static final ResourceLocation SLIDER_LOCATION = new ResourceLocation("textures/gui/slider.png");
     protected Component prefix;
     protected Component suffix;
-
     protected double minValue;
     protected double maxValue;
-
-    /**
-     * Allows input of discontinuous values with a certain step
-     */
     protected double stepSize;
-
     protected boolean drawString;
-
     private final DecimalFormat format;
 
-    /**
-     * @param x            x position of upper left corner
-     * @param y            y position of upper left corner
-     * @param width        Width of the widget
-     * @param height       Height of the widget
-     * @param prefix       {@link Component} displayed before the value string
-     * @param suffix       {@link Component} displayed after the value string
-     * @param minValue     Minimum (left) value of slider
-     * @param maxValue     Maximum (right) value of slider
-     * @param currentValue Starting value when widget is first displayed
-     * @param stepSize     Size of step used. Precision will automatically be calculated based on this value if this value is not 0.
-     * @param precision    Only used when {@code stepSize} is 0. Limited to a maximum of 4 (inclusive).
-     * @param drawString   Should text be displayed on the widget
-     */
     public BaseSlider(int x, int y, int width, int height, Component prefix, Component suffix, double minValue, double maxValue, double currentValue, double stepSize, int precision, boolean drawString) {
-        super(x, y, width, height, Component.empty(), 0D);
+        super(x, y, width, height, Component.empty(), 0.0);
         this.prefix = prefix;
         this.suffix = suffix;
         this.minValue = minValue;
@@ -56,17 +32,16 @@ public class BaseSlider extends AbstractSliderButton {
         this.stepSize = Math.abs(stepSize);
         this.value = this.snapToNearest((currentValue - minValue) / (maxValue - minValue));
         this.drawString = drawString;
-
-        if (stepSize == 0D) {
+        if (stepSize == 0.0) {
             precision = Math.min(precision, 4);
-
             StringBuilder builder = new StringBuilder("0");
-
-            if (precision > 0)
+            if (precision > 0) {
                 builder.append('.');
+            }
 
-            while (precision-- > 0)
+            while(precision-- > 0) {
                 builder.append('0');
+            }
 
             this.format = new DecimalFormat(builder.toString());
         } else if (Mth.equal(this.stepSize, Math.floor(this.stepSize))) {
@@ -78,37 +53,22 @@ public class BaseSlider extends AbstractSliderButton {
         this.updateMessage();
     }
 
-    /**
-     * Overload with {@code stepSize} set to 1, useful for sliders with whole number values.
-     */
     public BaseSlider(int x, int y, int width, int height, Component prefix, Component suffix, double minValue, double maxValue, double currentValue, boolean drawString) {
-        this(x, y, width, height, prefix, suffix, minValue, maxValue, currentValue, 1D, 0, drawString);
+        this(x, y, width, height, prefix, suffix, minValue, maxValue, currentValue, 1.0, 0, drawString);
     }
 
-    /**
-     * @return Current slider value as a double
-     */
     public double getValue() {
-        return this.value * (maxValue - minValue) + minValue;
+        return this.value * (this.maxValue - this.minValue) + this.minValue;
     }
 
-    /**
-     * @return Current slider value as an long
-     */
     public long getValueLong() {
         return Math.round(this.getValue());
     }
 
-    /**
-     * @return Current slider value as an int
-     */
     public int getValueInt() {
-        return (int) this.getValueLong();
+        return (int)this.getValueLong();
     }
 
-    /**
-     * @param value The new slider value
-     */
     public void setValue(double value) {
         this.value = this.snapToNearest((value - this.minValue) / (this.maxValue - this.minValue));
         this.updateMessage();
@@ -118,92 +78,90 @@ public class BaseSlider extends AbstractSliderButton {
         return this.format.format(this.getValue());
     }
 
-    @Override
     public void onClick(double mouseX, double mouseY) {
-        this.setValueFromMouse(mouseX, mouseY);
+        this.setValueFromMouse(mouseX);
     }
 
-    @Override
     protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
         super.onDrag(mouseX, mouseY, dragX, dragY);
-        this.setValueFromMouse(mouseX, mouseY);
+        this.setValueFromMouse(mouseX);
     }
 
-    @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        boolean flag = keyCode == GLFW.GLFW_KEY_LEFT;
-        if (flag || keyCode == GLFW.GLFW_KEY_RIGHT) {
-            if (this.minValue > this.maxValue)
+        boolean flag = keyCode == 263;
+        if (flag || keyCode == 262) {
+            if (this.minValue > this.maxValue) {
                 flag = !flag;
-            float f = flag ? -1F : 1F;
-            if (stepSize <= 0D)
-                this.setSliderValue(this.value + (f / (this.width - 8)));
-            else
-                this.setValue(this.getValue() + f * this.stepSize);
+            }
+
+            float f = flag ? -1.0F : 1.0F;
+            if (this.stepSize <= 0.0) {
+                this.setSliderValue(this.value + (double)(f / (float)(this.width - 8)));
+            } else {
+                this.setValue(this.getValue() + (double)f * this.stepSize);
+            }
         }
 
         return false;
     }
 
-    public void setValueFromMouse(double mouseX, double mouseY) {
-        this.setSliderValue((mouseX - (this.getX() + 4)) / (this.width - 8));
+    public void setValueFromMouse(double mouseX) {
+        this.setSliderValue((mouseX - (double)(this.getX() + 4)) / (double)(this.width - 8));
     }
 
-    /**
-     * @param value Percentage of slider range
-     */
+    public void setValueFromMouse(double mouseX, double mouseY){
+        this.setSliderValue((mouseY - (double)(this.getY() + 4)) / (double)(this.height - 8));
+    }
+
     public void setSliderValue(double value) {
         double oldValue = this.value;
         this.value = this.snapToNearest(value);
-        if (!Mth.equal(oldValue, this.value))
+        if (!Mth.equal(oldValue, this.value)) {
             this.applyValue();
+        }
 
         this.updateMessage();
     }
 
-    /**
-     * Snaps the value, so that the displayed value is the nearest multiple of {@code stepSize}.
-     * If {@code stepSize} is 0, no snapping occurs.
-     */
     private double snapToNearest(double value) {
-        if (stepSize <= 0D)
-            return Mth.clamp(value, 0D, 1D);
-
-        value = Mth.lerp(Mth.clamp(value, 0D, 1D), this.minValue, this.maxValue);
-
-        value = (stepSize * Math.round(value / stepSize));
-
-        if (this.minValue > this.maxValue) {
-            value = Mth.clamp(value, this.maxValue, this.minValue);
+        if (this.stepSize <= 0.0) {
+            return Mth.clamp(value, 0.0, 1.0);
         } else {
-            value = Mth.clamp(value, this.minValue, this.maxValue);
-        }
+            value = Mth.lerp(Mth.clamp(value, 0.0, 1.0), this.minValue, this.maxValue);
+            value = this.stepSize * (double)Math.round(value / this.stepSize);
+            if (this.minValue > this.maxValue) {
+                value = Mth.clamp(value, this.maxValue, this.minValue);
+            } else {
+                value = Mth.clamp(value, this.minValue, this.maxValue);
+            }
 
-        return Mth.map(value, this.minValue, this.maxValue, 0D, 1D);
+            return Mth.map(value, this.minValue, this.maxValue, 0.0, 1.0);
+        }
     }
 
-    @Override
     protected void updateMessage() {
         if (this.drawString) {
-            this.setMessage(Component.literal("").append(prefix).append(this.getValueString()).append(suffix));
+            this.setMessage(Component.literal("").append(this.prefix).append(this.getValueString()).append(this.suffix));
         } else {
             this.setMessage(Component.empty());
         }
+
     }
 
-    @Override
     protected void applyValue() {
     }
 
-    @Override
+
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        final Minecraft mc = Minecraft.getInstance();
-        ForgeGraphics forgeGraphics = new ForgeGraphics(guiGraphics);
-        forgeGraphics.blitWithBorder(SLIDER_LOCATION, this.getX(), this.getY(), 0, getTextureY(), this.width, this.height, 200, 20, 2, 3, 2, 2);
-
-        forgeGraphics.blitWithBorder(SLIDER_LOCATION, this.getX() + (int) (this.value * (double) (this.width - 8)), this.getY(), 0, getHandleTextureY(), 8, this.height, 200, 20, 2, 3, 2, 2);
-
-        renderScrollingString(guiGraphics, mc.font, 2, this.active ? 16777215 : 10526880 | Mth.ceil(this.alpha * 255.0F) << 24);
+        Minecraft minecraft = Minecraft.getInstance();
+        guiGraphics.setColor(1.0F, 1.0F, 1.0F, this.alpha);
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.enableDepthTest();
+        guiGraphics.blitSprite(this.getSprite(), this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        guiGraphics.blitSprite(this.getHandleSprite(), this.getX() + (int)(this.value * (double)(this.width - 8)), this.getY(), 8, this.getHeight());
+        guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        int i = this.active ? 16777215 : 10526880;
+        this.renderScrollingString(guiGraphics, minecraft.font, 2, i | Mth.ceil(this.alpha * 255.0F) << 24);
     }
-
 }

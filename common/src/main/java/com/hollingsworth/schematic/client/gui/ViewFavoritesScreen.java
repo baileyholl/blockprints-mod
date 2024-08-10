@@ -79,8 +79,8 @@ public class ViewFavoritesScreen extends BaseSchematicScreen {
             updateList();
         }));
 
-        ResourceLocation unchecked = new ResourceLocation(Constants.MOD_ID, "textures/gui/container_filter_unchecked.png");
-        ResourceLocation checked = new ResourceLocation(Constants.MOD_ID, "textures/gui/container_filter_checked.png");
+        ResourceLocation unchecked = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container_filter_unchecked.png");
+        ResourceLocation checked = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container_filter_checked.png");
         addRenderableWidget(new ToggleImageButton(bookLeft + 206, bookTop + 29, 7, 7, unchecked, checked, b -> {
             this.showBuilds = !this.showBuilds;
             queryFavorites();
@@ -97,10 +97,10 @@ public class ViewFavoritesScreen extends BaseSchematicScreen {
         }, () -> this.showRecent).withTooltip(Component.translatable("blockprints.filter_recent_builds")));
 
 
-        addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
+        addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
             Minecraft.getInstance().setScreen(new HomeScreen());
         }));
-        addRenderableWidget(new GuiImageButton(bookLeft + 25, bookTop + 9, 79, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_5.png"), b -> {
+        addRenderableWidget(new GuiImageButton(bookLeft + 25, bookTop + 9, 79, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_5.png"), b -> {
             Minecraft.getInstance().setScreen(new ManageVisualScreen());
         })).withTooltip(Component.translatable("blockprints.visualize_list_tooltip"));
 
@@ -128,19 +128,19 @@ public class ViewFavoritesScreen extends BaseSchematicScreen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.render(graphics, mouseX, mouseY, partialTicks);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_visualize.png"), bookLeft + 28, bookTop + 13, 0, 0, 9, 7, 9, 7);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_visualize.png"), bookLeft + 28, bookTop + 13, 0, 0, 9, 7, 9, 7);
         GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.visual_list").getVisualOrderText(), bookLeft + 70, bookTop + 13);
     }
 
     @Override
     public void drawBackgroundElements(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.drawBackgroundElements(graphics, mouseX, mouseY, partialTicks);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/container_list_builds.png"), 25, 25, 0, 0, 239, 159, 239, 159);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_my_builds.png"), 214, 29, 0, 0, 5, 7, 5, 7);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container_list_builds.png"), 25, 25, 0, 0, 239, 159, 239, 159);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_my_builds.png"), 214, 29, 0, 0, 5, 7, 5, 7);
 
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_favorite_builds.png"), 232, 29, 0, 0, 7, 7, 7, 7);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_favorite_builds.png"), 232, 29, 0, 0, 7, 7, 7, 7);
 
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_recent_builds.png"), 252, 29, 0, 0, 7, 7, 7, 7);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_recent_builds.png"), 252, 29, 0, 0, 7, 7, 7, 7);
         GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.builds").getVisualOrderText(), 30, 29);
     }
 }
