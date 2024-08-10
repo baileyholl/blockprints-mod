@@ -164,3 +164,5 @@ accessible method net/minecraft/client/gui/components/AbstractSliderButton getTe
 accessible method net/minecraft/client/gui/components/AbstractSliderButton getHandleTextureY ()I
 accessible class net/minecraft/client/gui/components/MultilineTextField$StringView
 extendable method com/mojang/blaze3d/vertex/BufferBuilder putSortedQuadIndices (Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;)V
+accessible method net/minecraft/client/gui/components/AbstractSliderButton getSprite ()Lnet/minecraft/resources/ResourceLocation;
+accessible method net/minecraft/client/gui/components/AbstractSliderButton getHandleSprite ()Lnet/minecraft/resources/ResourceLocation;
