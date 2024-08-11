@@ -3,4 +3,33 @@ plugins {
     id 'fabric-loom' version '1.7-SNAPSHOT' apply false
     // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
     id 'net.neoforged.moddev' version '0.1.110' apply false
+
+    id "io.github.pacifistmc.forgix" version "1.2.9"
+}
+
+tasks.register("build") {
+    group = "build"
+    subprojects.each {
+        dependsOn("${it.name}:build")
+    }
+    finalizedBy mergeJars
+}
+
+forgix {
+    group = rootProject.properties.group
+    mergedJarName = "blockprints-merged-${minecraft_version}-${mod_version}.jar"
+    outputDir = "build/libs" // This is the output directory of the merged jar from the root project. If this property is not defined then by default it's set to "Merged".
+
+    neoforge {
+        projectName = "neoforge" // This is the name of the forge project. If this property is not defined then by default it'll set to "forge" since that's the name the Architectury Template uses.
+        jarLocation = "build/libs/blockprints-neoforge-${minecraft_version}-${mod_version}.jar" // This is the location of the forge jar from the forge project. If this property is not defined then by default it fetches the jar with the shortest name.
+
+        mixin "blockprints.mixins.json"
+        mixin "blockprints.neoforge.mixins.json"
+    }
+
+    fabric {
+        projectName = "fabric" // This is the name of the fabric project. If this property is not defined then by default it'll set to "fabric" since that's the name the Architectury Template uses.
+        jarLocation = "build/libs/blockprints-fabric-${minecraft_version}-${mod_version}.jar" // This is the location of the fabric jar from the fabric project. If this property is not defined then by default it fetches the jar with the shortest name.
+    }
 }
