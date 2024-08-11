@@ -85,7 +85,7 @@ public class Template {
 
         BlockPos start = list.get(0).pos;
         BlockPos end = list.get(list.size() - 1).pos;
-        AABB aabb = AABB.encapsulatingFullBlocks(start, end);
+        AABB aabb = new AABB(new Vec3(start.getX(), start.getY(), start.getZ()), new Vec3(end.getX(), end.getY(), end.getZ()));
 
         Map<BlockPos, BlockState> blockStateByPos = list.stream()
                 .collect(Collectors.toMap(e -> e.pos, e -> e.state));

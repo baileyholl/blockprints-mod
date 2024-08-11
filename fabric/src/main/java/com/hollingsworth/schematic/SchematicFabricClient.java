@@ -26,9 +26,9 @@ public class SchematicFabricClient implements ClientModInitializer {
             }
         });
 
-        WorldRenderEvents.AFTER_TRANSLUCENT.register((context) -> {
-            ClientData.renderAfterTransparentBlocks(context.matrixStack(), context.projectionMatrix());
-            ClientData.renderAfterSky(context.matrixStack());
+        WorldRenderEvents.LAST.register((context) -> {
+            ClientData.renderAfterTransparentBlocks(context.matrixStack(), context.projectionMatrix(), context.positionMatrix());
+            ClientData.renderAfterSky(context.matrixStack(), context.positionMatrix());
         });
 
         HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> {

@@ -1,8 +1,8 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.hollingsworth.schematic.mixin.forge",
-  "compatibilityLevel": "JAVA_17",
+  "package": "com.hollingsworth.schematic.mixin.neoforge",
+  "compatibilityLevel": "JAVA_21",
   "refmap": "blockprints.refmap.json",
   "mixins": [
   ],

@@ -44,4 +44,6 @@ Upload and share builds with friends or between worlds by storing them on Blockp
     side="BOTH"
 
 [[mixins]]
-    config="blockprints.forge.mixins.json"
+    config="blockprints.neoforge.mixins.json"
+[[mixins]]
+    config="blockprints.mixins.json"

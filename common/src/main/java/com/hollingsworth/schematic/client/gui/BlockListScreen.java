@@ -60,12 +60,6 @@ public class BlockListScreen extends BaseSchematicScreen {
     }
 
     @Override
-    public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-
-    }
-
-    @Override
     public void drawBackgroundElements(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.drawBackgroundElements(graphics, mouseX, mouseY, partialTicks);
         graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container_list_blocks.png"), 25, 25, 0, 0, 239, 159, 239, 159);

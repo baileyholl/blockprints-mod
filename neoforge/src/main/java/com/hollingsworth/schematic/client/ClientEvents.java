@@ -39,13 +39,13 @@ public class ClientEvents {
     @SubscribeEvent
     public static void renderLast(final RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
-            ClientData.renderAfterTransparentBlocks(event.getPoseStack(), event.getProjectionMatrix());
+            ClientData.renderAfterTransparentBlocks(event.getPoseStack(), event.getProjectionMatrix(), event.getModelViewMatrix());
             return;
         }
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY) {
             return;
         }
-        ClientData.renderAfterSky(event.getPoseStack());
+        ClientData.renderAfterSky(event.getPoseStack(), event.getModelViewMatrix());
     }
 
     @SubscribeEvent

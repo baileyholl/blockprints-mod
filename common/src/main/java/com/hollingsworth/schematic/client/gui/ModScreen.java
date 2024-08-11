@@ -45,7 +45,6 @@ public abstract class ModScreen extends Screen {
 
     @Override
     public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
         PoseStack poseStack = matrixStack.pose();
         poseStack.pushPose();
         if (scaleFactor != 1) {
@@ -104,7 +103,9 @@ public abstract class ModScreen extends Screen {
         drawBackgroundElements(graphics, mouseX, mouseY, partialTicks);
         drawForegroundElements(graphics, mouseX, mouseY, partialTicks);
         poseStack.popPose();
-        super.render(graphics, mouseX, mouseY, partialTicks);
+        for (Renderable renderable : this.renderables) {
+            renderable.render(graphics, mouseX, mouseY, partialTicks);
+        }
         drawTooltip(graphics, mouseX, mouseY);
     }
 

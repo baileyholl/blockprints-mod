@@ -26,6 +26,6 @@ public class ToggleImageButton extends GuiImageButton {
     @Override
     public void renderWidget(GuiGraphics graphics, int parX, int parY, float partialTicks) {
         this.image = this.selected.get() ? this.selectedImage : this.unselectedImage;
-        super.render(graphics, parX, parY, partialTicks);
+        super.renderWidget(graphics, parX, parY, partialTicks);
     }
 }

@@ -20,6 +20,7 @@ public class StructureRenderData {
     public BoundingBox boundingBox;
     public BlockPos anchorPos;
     public Map<RenderType, MeshData.SortState> sortStates = new HashMap<>();
+    public Map<RenderType, MeshData> meshDatas = new HashMap<>();
     public String name;
     public String blockprintsId;
     public FakeRenderingWorld fakeRenderingWorld;

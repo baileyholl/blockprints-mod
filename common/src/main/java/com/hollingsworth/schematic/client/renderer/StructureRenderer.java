@@ -41,7 +41,6 @@ public class StructureRenderer {
     //A map of RenderType -> Vertex Buffer to buffer the different render types.
     private static final Map<RenderType, VertexBuffer> vertexBuffers = RenderType.chunkBufferLayers().stream().collect(Collectors.toMap((renderType) -> renderType, (type) -> new VertexBuffer(VertexBuffer.Usage.STATIC)));
     private static final Map<RenderType, BufferBuilder> bufferBuilders = new HashMap<>();
-    private static final Map<RenderType, MeshData> meshDatas = new HashMap<>();
     //Start rendering - this is the most expensive part, so we render it, then cache it, and draw it over and over (much cheaper)
     public static void buildRender(StructureRenderData data, PoseStack poseStack, Player player) {
         BlockHitResult lookingAt = RaycastHelper.getLookingAt(player, true);
@@ -107,7 +106,14 @@ public class StructureRenderer {
 ////        }
         return true;
     }
-
+    public static void clearByteBuffers(StructureRenderData data) { //Prevents leaks - Unused?
+        for (Map.Entry<RenderType, ByteBufferBuilder> entry : builders.entrySet()) {
+            entry.getValue().clear();
+        }
+        bufferBuilders.clear();
+        data.sortStates.clear();
+        data.meshDatas.clear();
+    }
     /**
      * This method creates a Map<RenderType, VertexBuffer> when given an ArrayList<StatePos> statePosCache - its used both here to draw in-game AND in the TemplateManagerGUI.java class
      */
@@ -118,6 +124,7 @@ public class StructureRenderer {
         BlockRenderDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
         ModelBlockRenderer modelBlockRenderer = dispatcher.getModelRenderer();
         final RandomSource random = RandomSource.create();
+        clearByteBuffers(data);
         //Iterate through the state pos cache and start drawing to the VertexBuffers - skip modelRenders(like chests) - include fluids (even though they don't work yet)
         for (StatePos pos : statePosCache.stream().filter(pos -> isModelRender(pos.state) || !pos.state.getFluidState().isEmpty()).toList()) {
             BlockState renderState = data.fakeRenderingWorld.getBlockStateWithoutReal(pos.pos);
@@ -156,6 +163,7 @@ public class StructureRenderer {
             RenderType renderType = entry.getKey();
             ByteBufferBuilder byteBufferBuilder = getByteBuffer(renderType);
             BufferBuilder builder = entry.getValue();
+            var meshDatas = data.meshDatas;
             if (meshDatas.containsKey(renderType) && meshDatas.get(renderType) != null)
                 meshDatas.get(renderType).close();
             meshDatas.put(renderType, builder.build());
@@ -173,16 +181,6 @@ public class StructureRenderer {
     //Get the buffer from the map, and ensure its building
     public static ByteBufferBuilder getByteBuffer(RenderType renderType) {
         return builders.get(renderType);
-    }
-
-    public static void drawCopyBox(PoseStack matrix, BlockPos start, BlockPos end) {
-        Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-        matrix.pushPose();
-        matrix.translate(-projectedView.x(), -projectedView.y(), -projectedView.z());
-        Color color = Color.GREEN;// mode.equals("copy") ? Color.GREEN : Color.RED;
-        DireRenderMethods.renderCopy(matrix, start, end, color);
-
-        matrix.popPose();
     }
 
     public static void drawBoundBox(StructureRenderData data, PoseStack matrix, BlockPos blockPos) {
@@ -216,7 +214,7 @@ public class StructureRenderer {
     }
 
     //Draw what we've cached
-    public static void drawRender(StructureRenderData data, PoseStack poseStack, Matrix4f projectionMatrix, Player player) {
+    public static void drawRender(StructureRenderData data, PoseStack poseStack, Matrix4f projectionMatrix, Matrix4f modelViewMatrix, Player player) {
         if (vertexBuffers == null) {
             return;
         }
@@ -240,6 +238,7 @@ public class StructureRenderer {
 
         PoseStack matrix = poseStack;
         matrix.pushPose();
+        matrix.mulPose(modelViewMatrix);
         matrix.translate(-projectedView.x(), -projectedView.y(), -projectedView.z());
         matrix.translate(renderPos.getX(), renderPos.getY(), renderPos.getZ());
         //Draw the renders in the specified order
