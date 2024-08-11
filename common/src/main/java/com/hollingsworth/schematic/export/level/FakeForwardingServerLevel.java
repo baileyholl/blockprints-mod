@@ -66,7 +66,6 @@ import java.util.stream.Stream;
 /**
  * Makes it possible to use a {@link LevelAccessor} where code requires a {@link ServerLevelAccessor}, when that code
  * doesn't actually use the {@link ServerLevelAccessor#getLevel()} method.
- * <p/>
  * When porting this class, just use IntelliJ's "Code -> Delegate To" code generation to generate new methods in
  * LevelAccessor and make them delegate to {@link #delegate}. If {@link ServerLevelAccessor} requires new methods, make
  * them throw {@link UnsupportedOperationException}. As long as
