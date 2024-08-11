@@ -28,6 +28,9 @@ public class SchematicFabricClient implements ClientModInitializer {
 
         WorldRenderEvents.LAST.register((context) -> {
             ClientData.renderAfterTransparentBlocks(context.matrixStack(), context.projectionMatrix(), context.positionMatrix());
+        });
+
+        WorldRenderEvents.END.register((context) -> {
             ClientData.renderAfterSky(context.matrixStack(), context.positionMatrix());
         });
 
