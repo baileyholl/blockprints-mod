@@ -2,7 +2,10 @@ package com.hollingsworth.schematic.platform.services;
 
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -44,4 +47,8 @@ public interface IPlatformHelper {
     public Iterable<RenderType> getRenderTypes(BakedModel bakedModel, BlockState blockstate, RandomSource rand);
 
     public void appendCreateGlue(Level level, AABB aabb, CompoundTag tag);
+
+    public boolean canPlaceBlock(ServerPlayer player, BlockState blockState, BlockPos pos);
+
+    public void sendClientToServerPacket(CustomPacketPayload packet);
 }

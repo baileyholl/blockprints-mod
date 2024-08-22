@@ -4,6 +4,8 @@ import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.client.gui.GuiUtils;
 import com.hollingsworth.schematic.client.renderer.StructureRenderData;
 import com.hollingsworth.schematic.client.renderer.StructureRenderer;
+import com.hollingsworth.schematic.network.PlaceStructurePacket;
+import com.hollingsworth.schematic.platform.Services;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -41,6 +43,7 @@ public class RenderStructureHandler {
         if (placingData == null) {
             return;
         }
+        Services.PLATFORM.sendClientToServerPacket(new PlaceStructurePacket(placingData.statePosCache));
         placingData = null;
     }
 

@@ -4,7 +4,6 @@ import com.hollingsworth.schematic.Constants;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.InputEvent;
@@ -49,7 +48,6 @@ public class ClientEvents {
     }
 
     @SubscribeEvent
-    @OnlyIn(Dist.CLIENT)
     public static void afterRenderOverlayLayer(RenderGuiLayerEvent.Post event) {
         if (event.getName().equals(VanillaGuiLayers.CROSSHAIR))
             return;

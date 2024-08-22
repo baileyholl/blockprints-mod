@@ -7,7 +7,10 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -48,5 +51,15 @@ public class FabricPlatformHelper implements IPlatformHelper {
         if(Constants.isCreateLoaded){
             CreateCompat.appendGlue(level, aabb, tag);
         }
+    }
+
+    @Override
+    public boolean canPlaceBlock(ServerPlayer player, BlockState blockState, BlockPos pos) {
+        return false;
+    }
+
+    @Override
+    public void sendClientToServerPacket(CustomPacketPayload packet) {
+
     }
 }
