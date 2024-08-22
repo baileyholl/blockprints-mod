@@ -86,25 +86,29 @@ public class RenderFluidBlock {
 
         //DOWN
         quad = createQuad(ImmutableList.of(new Vec3(x, y, z2), new Vec3(x, y, z), new Vec3(x2, y, z), new Vec3(x2, y, z2)), cols, sprite, Direction.DOWN, minU, maxU, minV, maxV);
-        builder.putBulkData(matrixStackIn.last(), quad, r, g, b, a, brightness, 0);
+        putBulkData(builder, matrixStackIn.last(), quad, r, g, b, a, brightness, 0, false);
         //UP
         quad = createQuad(ImmutableList.of(new Vec3(x, height, z), new Vec3(x, height, z2), new Vec3(x2, height, z2), new Vec3(x2, height, z)), cols, sprite, Direction.UP, minU, maxU, minV, maxV);
-        builder.putBulkData(matrixStackIn.last(), quad, r, g, b, a, brightness, 0);
+        putBulkData(builder,matrixStackIn.last(), quad, r, g, b, a, brightness, 0,false);
         //NORTH
         quad = createQuad(ImmutableList.of(new Vec3(x2, height, z), new Vec3(x2, y, z), new Vec3(x, y, z), new Vec3(x, height, z)), cols, sprite, Direction.NORTH, minU, maxU, minV, maxV);
-        builder.putBulkData(matrixStackIn.last(), quad, r, g, b, a, brightness, 0);
+        putBulkData(builder, matrixStackIn.last(), quad, r, g, b, a, brightness, 0,false);
         //SOUTH
         quad = createQuad(ImmutableList.of(new Vec3(x, height, z2), new Vec3(x, y, z2), new Vec3(x2, y, z2), new Vec3(x2, height, z2)), cols, sprite, Direction.SOUTH, minU, maxU, minV, maxV);
-        builder.putBulkData(matrixStackIn.last(), quad, r, g, b, a, brightness, 0);
+        putBulkData(builder,matrixStackIn.last(), quad, r, g, b, a, brightness, 0, false);
         //WEST
         quad = createQuad(ImmutableList.of(new Vec3(x, height, z), new Vec3(x, y, z), new Vec3(x, y, z2), new Vec3(x, height, z2)), cols, sprite, Direction.WEST, minU, maxU, minV, maxV);
-        builder.putBulkData(matrixStackIn.last(), quad, r, g, b, a, brightness, 0);
+        putBulkData(builder,matrixStackIn.last(), quad, r, g, b, a, brightness, 0, false);
         //EAST
         quad = createQuad(ImmutableList.of(new Vec3(x2, height, z2), new Vec3(x2, y, z2), new Vec3(x2, y, z), new Vec3(x2, height, z)), cols, sprite, Direction.EAST, minU, maxU, minV, maxV);
-        builder.putBulkData(matrixStackIn.last(), quad, r, g, b, a, brightness, 0);
+        putBulkData(builder,matrixStackIn.last(), quad, r, g, b, a, brightness, 0, false);
 
         matrixStackIn.popPose();
 
+    }
+
+    static void putBulkData(VertexConsumer consumer, PoseStack.Pose pose, BakedQuad bakedQuad, float red, float green, float blue, float alpha, int packedLight, int packedOverlay, boolean readExistingColor) {
+        consumer.putBulkData(pose, bakedQuad, new float[]{1.0F, 1.0F, 1.0F, 1.0F}, red, green, blue, alpha, new int[]{packedLight, packedLight, packedLight, packedLight}, packedOverlay, readExistingColor);
     }
 
 }

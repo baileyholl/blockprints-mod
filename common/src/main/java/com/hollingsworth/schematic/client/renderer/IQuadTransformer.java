@@ -12,7 +12,7 @@ import java.util.List;
  *
  */
 public interface IQuadTransformer {
-    int STRIDE = DefaultVertexFormat.BLOCK.getVertexSize();
+    int STRIDE = DefaultVertexFormat.BLOCK.getVertexSize() / 4;
     int POSITION = findOffset(VertexFormatElement.POSITION);
     int COLOR = findOffset(VertexFormatElement.COLOR);
     int UV0 = findOffset(VertexFormatElement.UV0);

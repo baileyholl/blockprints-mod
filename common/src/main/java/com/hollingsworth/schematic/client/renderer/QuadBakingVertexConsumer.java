@@ -95,6 +95,7 @@ public class QuadBakingVertexConsumer implements VertexConsumer {
         return this;
     }
 
+
     public void setTintIndex(int tintIndex) {
         this.tintIndex = tintIndex;
     }

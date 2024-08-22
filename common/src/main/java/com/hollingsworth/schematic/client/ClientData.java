@@ -68,6 +68,8 @@ public class ClientData {
     public static void renderAfterTransparentBlocks(PoseStack poseStack, Matrix4f projectionMatrix, Matrix4f modelViewMatrix){
         for(var data : StructureRenderer.structures){
             StructureRenderer.buildRender(data, poseStack, Minecraft.getInstance().player);
+        }
+        for(var data : StructureRenderer.structures){
             StructureRenderer.drawRender(data, poseStack, projectionMatrix, modelViewMatrix, Minecraft.getInstance().player);
         }
    }

@@ -15,10 +15,7 @@ import org.lwjgl.opengl.GL30;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class OffScreenRenderer implements AutoCloseable {
     private final NativeImage nativeImage;
@@ -82,67 +79,67 @@ public class OffScreenRenderer implements AutoCloseable {
         }
     }
 
-    public void captureAsPng(Runnable r, Path path) throws IOException {
-        renderToBuffer(r);
-
-        nativeImage.writeToFile(path);
-    }
+//    public void captureAsPng(Runnable r, Path path) throws IOException {
+//        renderToBuffer(r);
+//
+//        nativeImage.writeToFile(path);
+//    }
 
     public boolean isAnimated(Collection<TextureAtlasSprite> sprites) {
         return sprites.stream().anyMatch(s -> s.contents().animatedTexture != null);
     }
 
-    public byte[] captureAsWebp(Runnable r, Collection<TextureAtlasSprite> sprites, WebPExporter.Format format) {
-        var animatedSprites = sprites.stream()
-                .filter(sprite -> sprite.contents().animatedTexture != null)
-                .toList();
-
-        // Not animated
-        if (animatedSprites.isEmpty()) {
-            return captureAsPng(r);
-        }
-
-        // This is an oversimplification. Not all animated textures may have the same loop frequency
-        // But the greatest common divisor could be so inconvenient that we're essentially looping forever.
-        var maxTime = animatedSprites.stream()
-                .mapToInt(s -> s.contents().animatedTexture.frames.stream().mapToInt(value -> value.time).sum())
-                .max()
-                .orElse(0);
-
-        var textureManager = Minecraft.getInstance().getTextureManager();
-
-        var tickers = animatedSprites.stream()
-                .collect(Collectors.groupingBy(TextureAtlasSprite::atlasLocation))
-                .entrySet().stream().collect(
-                        Collectors.toMap(
-                                Map.Entry::getKey,
-                                e -> e.getValue().stream().map(TextureAtlasSprite::createTicker).toList()));
-        for (var sprite : animatedSprites) {
-            textureManager.getTexture(sprite.atlasLocation()).bind();
-            sprite.uploadFirstFrame();
-        }
-
-        int width = nativeImage.getWidth();
-        int height = nativeImage.getHeight();
-
-        try (var webpWriter = new WebPExporter(width, height, format)) {
-            for (var i = 0; i < maxTime; i++) {
-                // Bind all animated textures to their corresponding frames
-                for (var entry : tickers.entrySet()) {
-                    textureManager.getTexture(entry.getKey()).bind();
-                    for (var ticker : entry.getValue()) {
-                        ticker.tickAndUpload();
-                    }
-                }
-
-                renderToBuffer(r);
-
-                webpWriter.writeFrame(i, nativeImage);
-            }
-
-            return webpWriter.finish();
-        }
-    }
+//    public byte[] captureAsWebp(Runnable r, Collection<TextureAtlasSprite> sprites, WebPExporter.Format format) {
+//        var animatedSprites = sprites.stream()
+//                .filter(sprite -> sprite.contents().animatedTexture != null)
+//                .toList();
+//
+//        // Not animated
+//        if (animatedSprites.isEmpty()) {
+//            return captureAsPng(r);
+//        }
+//
+//        // This is an oversimplification. Not all animated textures may have the same loop frequency
+//        // But the greatest common divisor could be so inconvenient that we're essentially looping forever.
+//        var maxTime = animatedSprites.stream()
+//                .mapToInt(s -> s.contents().animatedTexture.frames.stream().mapToInt(value -> value.time).sum())
+//                .max()
+//                .orElse(0);
+//
+//        var textureManager = Minecraft.getInstance().getTextureManager();
+//
+//        var tickers = animatedSprites.stream()
+//                .collect(Collectors.groupingBy(TextureAtlasSprite::atlasLocation))
+//                .entrySet().stream().collect(
+//                        Collectors.toMap(
+//                                Map.Entry::getKey,
+//                                e -> e.getValue().stream().map(TextureAtlasSprite::createTicker).toList()));
+//        for (var sprite : animatedSprites) {
+//            textureManager.getTexture(sprite.atlasLocation()).bind();
+//            sprite.uploadFirstFrame();
+//        }
+//
+//        int width = nativeImage.getWidth();
+//        int height = nativeImage.getHeight();
+//
+//        try (var webpWriter = new WebPExporter(width, height, format)) {
+//            for (var i = 0; i < maxTime; i++) {
+//                // Bind all animated textures to their corresponding frames
+//                for (var entry : tickers.entrySet()) {
+//                    textureManager.getTexture(entry.getKey()).bind();
+//                    for (var ticker : entry.getValue()) {
+//                        ticker.tickAndUpload();
+//                    }
+//                }
+//
+//                renderToBuffer(r);
+//
+//                webpWriter.writeFrame(i, nativeImage);
+//            }
+//
+//            return webpWriter.finish();
+//        }
+//    }
 
     private void renderToBuffer(Runnable r) {
         fb.bindWrite(true);

@@ -71,7 +71,7 @@ public class WrappedScene {
 
     public ImageExport exportAsPng(int width, int height, LytSize viewportSize){
         try (var osr = new OffScreenRenderer(width, height)) {
-            byte[] image =  osr.captureAsPng(() -> {
+            byte[] image = osr.captureAsPng(() -> {
                 var renderer = GuidebookLevelRenderer.getInstance();
                 scene.getCameraSettings().setViewportSize(viewportSize);
                 renderer.render(scene.getLevel(), scene.getCameraSettings());
