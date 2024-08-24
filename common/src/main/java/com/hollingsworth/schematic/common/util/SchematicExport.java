@@ -48,7 +48,7 @@ public class SchematicExport {
 			}
 		});
 		if(Constants.isCreateLoaded){
-			Services.PLATFORM.appendCreateGlue(Minecraft.getInstance().level, new AABB(origin, origin.offset(bounds)), data);
+			Services.PLATFORM.appendCreateGlue(Minecraft.getInstance().level, AABB.encapsulatingFullBlocks(origin, origin.offset(bounds)), data);
 		}
 		if (fileName.isEmpty())
 			fileName = "failed_fallback";

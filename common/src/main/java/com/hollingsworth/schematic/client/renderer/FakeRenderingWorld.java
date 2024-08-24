@@ -9,9 +9,11 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -25,7 +27,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkSource;
-import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.level.entity.LevelEntityGetter;
@@ -35,6 +37,7 @@ import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.level.storage.WritableLevelData;
@@ -130,13 +133,18 @@ public class FakeRenderingWorld extends Level implements LevelAccessor {
     }
 
     @Override
+    public PotionBrewing potionBrewing() {
+        return null;
+    }
+
+    @Override
     public FeatureFlagSet enabledFeatures() {
         return null;
     }
 
     @org.jetbrains.annotations.Nullable
     @Override
-    public ChunkAccess getChunk(int p_46823_, int p_46824_, ChunkStatus p_46825_, boolean p_46826_) {
+    public ChunkAccess getChunk(int pX, int pZ, ChunkStatus pChunkStatus, boolean pRequireChunk) {
         return null;
     }
 
@@ -216,6 +224,11 @@ public class FakeRenderingWorld extends Level implements LevelAccessor {
     }
 
     @Override
+    public TickRateManager tickRateManager() {
+        return null;
+    }
+
+    @Override
     public DifficultyInstance getCurrentDifficultyAt(BlockPos p_46800_) {
         return null;
     }
@@ -252,7 +265,7 @@ public class FakeRenderingWorld extends Level implements LevelAccessor {
     }
 
     @Override
-    public void gameEvent(GameEvent p_220404_, Vec3 p_220405_, GameEvent.Context p_220406_) {
+    public void gameEvent(Holder<GameEvent> holder, Vec3 vec3, GameEvent.Context context) {
 
     }
 
@@ -360,8 +373,9 @@ public class FakeRenderingWorld extends Level implements LevelAccessor {
         return null;
     }
 
+    @org.jetbrains.annotations.Nullable
     @Override
-    public MapItemSavedData getMapData(String mapName) {
+    public MapItemSavedData getMapData(MapId mapId) {
         return null;
     }
 
@@ -371,12 +385,16 @@ public class FakeRenderingWorld extends Level implements LevelAccessor {
     }
 
     @Override
-    public void setMapData(String pMapId, MapItemSavedData pData) {}
+    public void setMapData(MapId mapId, MapItemSavedData mapItemSavedData) {
+
+    }
 
     @Override
-    public int getFreeMapId() {
+    public MapId getFreeMapId() {
         return realWorld.getFreeMapId();
     }
+
+
 
     @Override
     public void destroyBlockProgress(int breakerId, BlockPos pos, int progress) {}
@@ -395,7 +413,9 @@ public class FakeRenderingWorld extends Level implements LevelAccessor {
     public void updateNeighbourForOutputSignal(BlockPos p_175666_1_, Block p_175666_2_) {}
 
     @Override
-    public void gameEvent(Entity pEntity, GameEvent pEvent, BlockPos pPos) {}
+    public void gameEvent(@org.jetbrains.annotations.Nullable Entity pEntity, Holder<GameEvent> pGameEvent, Vec3 pPos) {
+
+    }
 
     @Override
     public String gatherChunkSourceStats() {
@@ -454,6 +474,22 @@ public class FakeRenderingWorld extends Level implements LevelAccessor {
     @Override
     public int getSectionYFromSectionIndex(int sectionIndex) {
         return sectionIndex + this.getMinSection();
+    }
+
+    // Invisible overrides for neoforge compatibility
+    public void setDayTimeFraction(float dayTimePerTick) {
+
+    }
+    public void setDayTimePerTick(float dayTimePerTick) {
+
+    }
+
+    public float getDayTimePerTick(){
+        return 0;
+    }
+
+    public float getDayTimeFraction(){
+        return 0;
     }
 
 }

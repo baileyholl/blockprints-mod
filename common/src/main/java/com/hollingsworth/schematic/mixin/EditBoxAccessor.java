@@ -18,7 +18,7 @@ public interface EditBoxAccessor {
     String getValue();
 
     @Accessor
-    int getFrame();
+    long getFocusedTime();
 
     @Accessor
     boolean isBordered();

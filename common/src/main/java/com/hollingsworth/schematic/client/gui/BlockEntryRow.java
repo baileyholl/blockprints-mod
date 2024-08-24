@@ -29,7 +29,7 @@ public class BlockEntryRow extends AbstractWidget implements ITooltipProvider {
             PoseStack stack = guiGraphics.pose();
             RenderUtils.drawItemAsIcon(entry.renderStack, stack, x + 1, y - 0.3f, 10.0f);
         } else {
-            guiGraphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_notice.png"), x + 6, y + 3, 0, 0, 6, 9, 6, 9);
+            guiGraphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_notice.png"), x + 6, y + 3, 0, 0, 6, 9, 6, 9);
         }
         guiGraphics.drawString(Minecraft.getInstance().font, entry.name, x + 17, y + 4, 0, false);
         MutableComponent component = Component.literal("" + entry.count);

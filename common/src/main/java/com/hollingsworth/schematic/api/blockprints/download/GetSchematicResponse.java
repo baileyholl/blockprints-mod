@@ -33,7 +33,7 @@ public class GetSchematicResponse {
         }
 
         for (var entry : jsonObject.get("blockCount").getAsJsonObject().entrySet()) {
-            blockCounts.add(new Tuple<>(new ResourceLocation(entry.getKey()), entry.getValue().getAsInt()));
+            blockCounts.add(new Tuple<>(ResourceLocation.tryParse(entry.getKey()), entry.getValue().getAsInt()));
         }
     }
 }

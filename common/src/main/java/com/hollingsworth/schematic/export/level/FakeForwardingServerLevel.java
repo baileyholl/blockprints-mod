@@ -12,11 +12,13 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.biome.Biome;
@@ -28,7 +30,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkSource;
-import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.entity.EntityTypeTest;
@@ -38,6 +40,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.level.storage.WritableLevelData;
@@ -63,7 +66,6 @@ import java.util.stream.Stream;
 /**
  * Makes it possible to use a {@link LevelAccessor} where code requires a {@link ServerLevelAccessor}, when that code
  * doesn't actually use the {@link ServerLevelAccessor#getLevel()} method.
- * <p/>
  * When porting this class, just use IntelliJ's "Code -> Delegate To" code generation to generate new methods in
  * LevelAccessor and make them delegate to {@link #delegate}. If {@link ServerLevelAccessor} requires new methods, make
  * them throw {@link UnsupportedOperationException}. As long as
@@ -144,6 +146,11 @@ public class FakeForwardingServerLevel extends Level implements ServerLevelAcces
     }
 
     @Override
+    public TickRateManager tickRateManager() {
+        return delegate instanceof Level level ? level.tickRateManager() : null;
+    }
+
+    @Override
     public DifficultyInstance getCurrentDifficultyAt(BlockPos pos) {
         return delegate.getCurrentDifficultyAt(pos);
     }
@@ -213,23 +220,28 @@ public class FakeForwardingServerLevel extends Level implements ServerLevelAcces
     }
 
     @Override
-    public void gameEvent(GameEvent event, Vec3 position, GameEvent.Context context) {
-        delegate.gameEvent(event, position, context);
+    public void gameEvent(Holder<GameEvent> holder, Vec3 vec3, GameEvent.Context context) {
+        delegate.gameEvent(holder, vec3, context);
     }
 
     @Override
-    public void gameEvent(@Nullable Entity entity, GameEvent event, Vec3 position) {
-        delegate.gameEvent(entity, event, position);
+    public void gameEvent(@Nullable Entity pEntity, Holder<GameEvent> pGameEvent, Vec3 pPos) {
+        delegate.gameEvent(pEntity, pGameEvent, pPos);
     }
 
     @Override
-    public void gameEvent(@Nullable Entity entity, GameEvent event, BlockPos pos) {
-        delegate.gameEvent(entity, event, pos);
+    public void gameEvent(@Nullable Entity pEntity, Holder<GameEvent> pGameEvent, BlockPos pPos) {
+        delegate.gameEvent(pEntity, pGameEvent, pPos);
     }
 
     @Override
-    public void gameEvent(GameEvent event, BlockPos pos, GameEvent.Context context) {
-        delegate.gameEvent(event, pos, context);
+    public void gameEvent(Holder<GameEvent> pGameEvent, BlockPos pPos, GameEvent.Context pContext) {
+        delegate.gameEvent(pGameEvent, pPos, pContext);
+    }
+
+    @Override
+    public void gameEvent(ResourceKey<GameEvent> pGameEvent, BlockPos pPos, GameEvent.Context pContext) {
+        delegate.gameEvent(pGameEvent, pPos, pContext);
     }
 
     @Override
@@ -356,10 +368,10 @@ public class FakeForwardingServerLevel extends Level implements ServerLevelAcces
         return delegate.getPlayerByUUID(uniqueId);
     }
 
-    @Override
     @Nullable
-    public ChunkAccess getChunk(int x, int z, ChunkStatus requiredStatus, boolean nonnull) {
-        return delegate.getChunk(x, z, requiredStatus, nonnull);
+    @Override
+    public ChunkAccess getChunk(int pX, int pZ, ChunkStatus pChunkStatus, boolean pRequireChunk) {
+        return delegate.getChunk(pX, pZ, pChunkStatus, pRequireChunk);
     }
 
     @Override
@@ -523,6 +535,11 @@ public class FakeForwardingServerLevel extends Level implements ServerLevelAcces
     @Override
     public RegistryAccess registryAccess() {
         return delegate.registryAccess();
+    }
+
+    @Override
+    public PotionBrewing potionBrewing() {
+        return null;
     }
 
     @Override
@@ -812,17 +829,20 @@ public class FakeForwardingServerLevel extends Level implements ServerLevelAcces
         return null;
     }
 
+    @Nullable
     @Override
-    public MapItemSavedData getMapData(String pMapName) {
+    public MapItemSavedData getMapData(MapId mapId) {
         return null;
     }
 
     @Override
-    public void setMapData(String pMapId, MapItemSavedData pData) {}
+    public void setMapData(MapId mapId, MapItemSavedData mapItemSavedData) {
+
+    }
 
     @Override
-    public int getFreeMapId() {
-        return 0;
+    public MapId getFreeMapId() {
+        return null;
     }
 
     @Override
@@ -846,4 +866,22 @@ public class FakeForwardingServerLevel extends Level implements ServerLevelAcces
     @Override
     public void playSeededSound(Player pPlayer, double pX, double pY, double pZ, Holder<SoundEvent> pSound,
                                 SoundSource pSource, float pVolume, float pPitch, long pSeed) {}
+
+
+    // Invisible overrides for neoforge compatibility
+    public void setDayTimeFraction(float dayTimePerTick) {
+
+    }
+
+    public void setDayTimePerTick(float dayTimePerTick) {
+
+    }
+
+    public float getDayTimePerTick(){
+        return 0;
+    }
+
+    public float getDayTimeFraction(){
+        return 0;
+    }
 }

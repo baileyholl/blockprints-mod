@@ -3,21 +3,10 @@ package com.hollingsworth.schematic.export;
 import com.hollingsworth.schematic.export.level.FakeForwardingServerLevel;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtAccounter;
-import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.level.levelgen.SingleThreadedRandomSource;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.zip.GZIPInputStream;
 
 public class WrappedScene {
     @Nullable
@@ -36,18 +25,18 @@ public class WrappedScene {
 
     private SavedCameraSettings initialCameraSettings = new SavedCameraSettings();
 
-    public void placeStructure(Path filePath){
-        try (DataInputStream stream = new DataInputStream(new BufferedInputStream(
-                new GZIPInputStream(Files.newInputStream(filePath, StandardOpenOption.READ))))) {
-            CompoundTag compoundTag = NbtIo.read(stream, new NbtAccounter(0x20000000L));
-            var template = new StructureTemplate();
-            var blocks = scene.getLevel().registryAccess().registryOrThrow(Registries.BLOCK).asLookup();
-            template.load(blocks, compoundTag);
-            placeStructure(template);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
+//    public void placeStructure(Path filePath){
+//        try (DataInputStream stream = new DataInputStream(new BufferedInputStream(
+//                new GZIPInputStream(Files.newInputStream(filePath, StandardOpenOption.READ))))) {
+//            CompoundTag compoundTag = NbtIo.read(stream, new NbtAccounter(0x20000000L));
+//            var template = new StructureTemplate();
+//            var blocks = scene.getLevel().registryAccess().registryOrThrow(Registries.BLOCK).asLookup();
+//            template.load(blocks, compoundTag);
+//            placeStructure(template);
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+//    }
 
     public void placeStructure(StructureTemplate structureTemplate){
         var random = new SingleThreadedRandomSource(0L);
@@ -82,7 +71,7 @@ public class WrappedScene {
 
     public ImageExport exportAsPng(int width, int height, LytSize viewportSize){
         try (var osr = new OffScreenRenderer(width, height)) {
-            byte[] image =  osr.captureAsPng(() -> {
+            byte[] image = osr.captureAsPng(() -> {
                 var renderer = GuidebookLevelRenderer.getInstance();
                 scene.getCameraSettings().setViewportSize(viewportSize);
                 renderer.render(scene.getLevel(), scene.getCameraSettings());

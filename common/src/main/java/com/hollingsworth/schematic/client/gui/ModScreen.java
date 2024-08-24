@@ -45,7 +45,6 @@ public abstract class ModScreen extends Screen {
 
     @Override
     public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
         PoseStack poseStack = matrixStack.pose();
         poseStack.pushPose();
         if (scaleFactor != 1) {
@@ -96,7 +95,7 @@ public abstract class ModScreen extends Screen {
     }
 
     public void drawScreenAfterScale(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        renderBackground(graphics);
+        renderBackground(graphics, mouseX, mouseY, partialTicks);
         PoseStack poseStack = graphics.pose();
         poseStack.pushPose();
         poseStack.translate(bookLeft, bookTop, 0);
@@ -104,7 +103,9 @@ public abstract class ModScreen extends Screen {
         drawBackgroundElements(graphics, mouseX, mouseY, partialTicks);
         drawForegroundElements(graphics, mouseX, mouseY, partialTicks);
         poseStack.popPose();
-        super.render(graphics, mouseX, mouseY, partialTicks);
+        for (Renderable renderable : this.renderables) {
+            renderable.render(graphics, mouseX, mouseY, partialTicks);
+        }
         drawTooltip(graphics, mouseX, mouseY);
     }
 
@@ -137,14 +138,16 @@ public abstract class ModScreen extends Screen {
         float y1 = y0 + height;
 
         Tesselator tess = Tesselator.getInstance();
-        BufferBuilder builder = tess.getBuilder();
-        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        BufferBuilder builder = tess.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         Matrix4f matrix = matrixStack.last().pose();
-        builder.vertex(matrix, x0, y1, 0.0f).uv(tx0, ty1).endVertex();
-        builder.vertex(matrix, x1, y1, 0.0f).uv(tx1, ty1).endVertex();
-        builder.vertex(matrix, x1, y0, 0.0f).uv(tx1, ty0).endVertex();
-        builder.vertex(matrix, x0, y0, 0.0f).uv(tx0, ty0).endVertex();
-        tess.end();
+        builder.addVertex(matrix, x0, y1, 0.0f).setUv(tx0, ty1);
+        builder.addVertex(matrix, x1, y1, 0.0f).setUv(tx1, ty1);
+        builder.addVertex(matrix, x1, y0, 0.0f).setUv(tx1, ty0);
+        builder.addVertex(matrix, x0, y0, 0.0f).setUv(tx0, ty0);
+        MeshData meshdata = builder.build();
+        if (meshdata != null) {
+            BufferUploader.drawWithShader(meshdata);
+        }
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1f);
     }
 }

@@ -2,6 +2,7 @@ package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.mixin.EditBoxAccessor;
+import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -35,7 +36,7 @@ public class NoShadowTextField extends EditBox {
         int k = accessor.getHighlightPos() - accessor.getDisplayPos();
         String s = accessor.getFont().plainSubstrByWidth(accessor.getValue().substring(accessor.getDisplayPos()), this.getInnerWidth());
         boolean flag = j >= 0 && j <= s.length();
-        boolean flag1 = this.isFocused() && accessor.getFrame() / 6 % 2 == 0 && flag;
+        boolean flag1 = this.isFocused() && (Util.getMillis() - accessor.getFocusedTime()) / 300L % 2L == 0L && flag;
         int l = accessor.isBordered() ? this.x + 4 : this.x;
         int i1 = accessor.isBordered() ? this.y + (this.height - 8) / 2 : this.y;
         int j1 = l;
@@ -93,7 +94,7 @@ public class NoShadowTextField extends EditBox {
                 }
 
                 String s = accessor.getFont().plainSubstrByWidth(accessor.getValue().substring(accessor.getDisplayPos()), this.getInnerWidth());
-                this.moveCursorTo(accessor.getFont().plainSubstrByWidth(s, i).length() + accessor.getDisplayPos());
+                this.moveCursorTo(accessor.getFont().plainSubstrByWidth(s, i).length() + accessor.getDisplayPos(), true);
                 return true;
             } else if (this.isFocused() && mouseButton == 1) {
                 if (accessor.getValue().isEmpty())

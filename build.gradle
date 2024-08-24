@@ -1,97 +1,35 @@
 plugins {
-    id "io.github.pacifistmc.forgix" version "1.2.6"
+    // see https://fabricmc.net/develop/ for new versions
+    id 'fabric-loom' version '1.7-SNAPSHOT' apply false
+    // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
+    id 'net.neoforged.moddev' version '0.1.110' apply false
+
+    id "io.github.pacifistmc.forgix" version "1.2.9"
 }
 
-subprojects {
-    
-    apply plugin: 'java'
-    
-    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-    java.withSourcesJar()
-        
-    jar {
-        from(rootProject.file("LICENSE")) {
-            rename { "${it}_${mod_name}" }
-        }
-        manifest {
-            attributes([
-                'Specification-Title'     : mod_name,
-                'Specification-Vendor'    : mod_author,
-                'Specification-Version'   : project.jar.archiveVersion,
-                'Implementation-Title'    : project.name,
-                'Implementation-Version'  : project.jar.archiveVersion,
-                'Implementation-Vendor'   : mod_author,
-                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                'Timestamp'              : System.currentTimeMillis(),
-                'Built-On-Java'           : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})",
-                'Built-On-Minecraft'      : minecraft_version
-            ])
-        }
+tasks.register("build") {
+    group = "build"
+    subprojects.each {
+        dependsOn("${it.name}:build")
     }
-
-    sourcesJar {
-        from(rootProject.file("LICENSE")) {
-            rename { "${it}_${mod_name}" }
-        }
-    }
-
-    repositories {
-        mavenCentral()
-
-        maven {
-            name = 'Sponge / Mixin'
-            url = 'https://repo.spongepowered.org/repository/maven-public/'
-        }
-
-        maven {
-            name = 'BlameJared Maven (CrT / Bookshelf)'
-            url = 'https://maven.blamejared.com'
-        }
-
-        maven {
-            name = 'JitPack (Mixin Extras)'
-            url = 'https://jitpack.io'
-        }
-
-        maven {
-            name = 'Curse Maven (OAuth)'
-            url = 'https://cursemaven.com'
-        }
-    }
-
-    tasks.withType(JavaCompile).configureEach {
-    
-        it.options.encoding = 'UTF-8'
-        it.options.release = 17
-    }
-
-    // Disables Gradle's custom module metadata from being published to maven. The
-    // metadata includes mapped dependencies which are not reasonably consumable by
-    // other mod developers.
-    tasks.withType(GenerateModuleMetadata) {
-
-        enabled = false
-    }
-
-    build.finalizedBy(mergeJars)
-    assemble.finalizedBy(mergeJars)
+    finalizedBy mergeJars
 }
 
 forgix {
     group = rootProject.properties.group
-    mergedJarName = "Blockprints-merged-${minecraft_version}-${version}.jar"
+    mergedJarName = "blockprints-merged-${minecraft_version}-${mod_version}.jar"
     outputDir = "build/libs" // This is the output directory of the merged jar from the root project. If this property is not defined then by default it's set to "Merged".
 
-    forge {
-        projectName = "forge" // This is the name of the forge project. If this property is not defined then by default it'll set to "forge" since that's the name the Architectury Template uses.
-        jarLocation = "build/libs/Blockprints-forge-${minecraft_version}-${version}.jar" // This is the location of the forge jar from the forge project. If this property is not defined then by default it fetches the jar with the shortest name.
+    neoforge {
+        projectName = "neoforge" // This is the name of the forge project. If this property is not defined then by default it'll set to "forge" since that's the name the Architectury Template uses.
+        jarLocation = "build/libs/blockprints-neoforge-${minecraft_version}-${mod_version}.jar" // This is the location of the forge jar from the forge project. If this property is not defined then by default it fetches the jar with the shortest name.
 
         mixin "blockprints.mixins.json"
-        mixin "blockprints.forge.mixins.json"
+        mixin "blockprints.neoforge.mixins.json"
     }
 
     fabric {
         projectName = "fabric" // This is the name of the fabric project. If this property is not defined then by default it'll set to "fabric" since that's the name the Architectury Template uses.
-        jarLocation = "build/libs/Blockprints-fabric-${minecraft_version}-${version}.jar" // This is the location of the fabric jar from the fabric project. If this property is not defined then by default it fetches the jar with the shortest name.
+        jarLocation = "build/libs/blockprints-fabric-${minecraft_version}-${mod_version}.jar" // This is the location of the fabric jar from the fabric project. If this property is not defined then by default it fetches the jar with the shortest name.
     }
 }

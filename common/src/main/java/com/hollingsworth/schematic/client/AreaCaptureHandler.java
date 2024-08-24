@@ -23,6 +23,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
 
 import static com.hollingsworth.schematic.client.ClientData.*;
 import static com.hollingsworth.schematic.client.RaycastHelper.rayTraceRange;
@@ -65,7 +66,7 @@ public class AreaCaptureHandler {
 
     public static BlockPos selectedPos = null;
 
-    public static void renderBoundary(PoseStack poseStack) {
+    public static void renderBoundary(PoseStack poseStack, Matrix4f modelViewMatrix) {
         if (!AreaCaptureHandler.showBoundary)
             return;
         BlockPos firstPos = AreaCaptureHandler.firstTarget;
@@ -85,7 +86,7 @@ public class AreaCaptureHandler {
             selectedPos = null;
         }
         if (firstPos == null && selectedPos != null) {
-            renderBbox(new AABB(selectedPos), poseStack);
+            renderBbox(new AABB(selectedPos), poseStack, modelViewMatrix);
             return;
         }
         BlockPos secondPos = AreaCaptureHandler.secondTarget;
@@ -97,16 +98,16 @@ public class AreaCaptureHandler {
             if (firstPos == null) {
                 currentSelectionBox = selectedPos == null ? null : new AABB(selectedPos);
             } else {
-                currentSelectionBox = selectedPos == null ? new AABB(firstPos) : new AABB(firstPos, selectedPos).expandTowards(1, 1, 1);
+                currentSelectionBox = selectedPos == null ? new AABB(firstPos) : AABB.encapsulatingFullBlocks(firstPos, selectedPos).expandTowards(1, 1, 1);
             }
         } else {
-            currentSelectionBox = new AABB(firstPos, secondPos).expandTowards(1, 1, 1);
+            currentSelectionBox = AABB.encapsulatingFullBlocks(firstPos, secondPos).expandTowards(1, 1, 1);
         }
 
-        renderBbox(currentSelectionBox, poseStack);
+        renderBbox(currentSelectionBox, poseStack, modelViewMatrix);
     }
 
-    public static void renderBbox(AABB currentSelectionBox, PoseStack poseStack) {
+    public static void renderBbox(AABB currentSelectionBox, PoseStack poseStack, Matrix4f modelViewMatrix) {
         if (currentSelectionBox == null) {
             return;
         }
@@ -117,6 +118,7 @@ public class AreaCaptureHandler {
         currentSelectionBox = currentSelectionBox.move(-camera.x, -camera.y, -camera.z);
 
         poseStack.pushPose();
+        poseStack.mulPose(modelViewMatrix);
         VertexConsumer vertexconsumer = ClientConstants.bufferSource.getBuffer(RenderType.lines());
         LevelRenderer.renderLineBox(poseStack, vertexconsumer, currentSelectionBox, 0.9F, 0.9F, 0.9F, 1.0f);
         ClientConstants.bufferSource.endBatch();

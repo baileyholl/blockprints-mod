@@ -5,10 +5,7 @@ import com.hollingsworth.schematic.common.util.Color;
 import com.hollingsworth.schematic.common.util.DimPos;
 import com.hollingsworth.schematic.platform.Services;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexBuffer;
-import com.mojang.blaze3d.vertex.VertexSorting;
+import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -32,25 +29,9 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class StructureRenderer {
     public static ArrayList<StructureRenderData> structures = new ArrayList<>();
-    private static int sortCounter = 0;
-
-    //A map of RenderType -> DireBufferBuilder, so we can draw the different render types in proper order later
-    private static final Map<RenderType, DireBufferBuilder> builders = RenderType.chunkBufferLayers().stream().collect(Collectors.toMap((renderType) -> renderType, (type) -> new DireBufferBuilder(type.bufferSize())));
-    //A map of RenderType -> Vertex Buffer to buffer the different render types.
-    private static final Map<RenderType, VertexBuffer> vertexBuffers = RenderType.chunkBufferLayers().stream().collect(Collectors.toMap((renderType) -> renderType, (type) -> new VertexBuffer(VertexBuffer.Usage.STATIC)));
-
-    //Get the buffer from the map, and ensure its building
-    public static DireBufferBuilder getBuffer(RenderType renderType) {
-        final DireBufferBuilder buffer = builders.get(renderType);
-        if (!buffer.building()) {
-            buffer.begin(renderType.mode(), renderType.format());
-        }
-        return buffer;
-    }
 
     //Start rendering - this is the most expensive part, so we render it, then cache it, and draw it over and over (much cheaper)
     public static void buildRender(StructureRenderData data, PoseStack poseStack, Player player) {
@@ -68,56 +49,27 @@ public class StructureRenderer {
 
         renderPos = renderPos.above();
         //Start drawing the Render and cache it, used for both Building and Copy/Paste
-        if (shouldUpdateRender(player)) {
-            generateRender(data, player.level(), renderPos, 0.5f, data.statePosCache, vertexBuffers);
-            data.updateRender = false;
+        if (shouldUpdateRender(data, renderPos)) {
+            generateRender(data, player.level(), renderPos, 0.5f, data.statePosCache, data.vertexBuffers);
+            data.lastRenderPos = renderPos;
         }
     }
 
-    public static boolean shouldUpdateRender(Player player) {
-//        ArrayList<StatePos> buildList;
-//        BaseMode mode = GadgetNBT.getMode(gadget);
-//        BlockHitResult lookingAt = RaycastHelper.getLookingAt(player, true);
-//        BlockPos anchorPos = GadgetNBT.getAnchorPos(gadget);
-//        BlockPos renderPos = anchorPos.equals(GadgetNBT.nullPos) ? lookingAt.getBlockPos() : anchorPos;
-//        UUID gadgetUUID = GadgetNBT.getUUID(gadget);
-//
-////        if (gadget.getItem() instanceof GadgetBuilding || gadget.getItem() instanceof GadgetExchanger) {
-////            if (player.level().getBlockState(renderPos).isAir())
-////                return false;
-////            BlockState renderBlockState = GadgetNBT.getGadgetBlockState(gadget);
-////            if (renderBlockState.isAir()) return false;
-////            buildList = mode.collect(lookingAt.getDirection(), player, renderPos, renderBlockState); //Get the build list for what we're looking at
-////
-////            FakeRenderingWorld tempWorld = new FakeRenderingWorld(player.level(), buildList, renderPos); //Toss it into the fake render world
-////            if (fakeRenderingWorld != null && fakeRenderingWorld.positions.equals(tempWorld.positions)) //If they are identical, no need to update render
-////                return false;
-////
-////            //If not, we should update the cache, the UUID, and return true, meaning we need to update the render
-////            statePosCache = buildList;
-////            copyPasteUUIDCache = UUID.randomUUID(); //In case theres an existing copy/Paste render saved, nullify it
-////            return true;
-////        } else if (gadget.getItem() instanceof GadgetCopyPaste || gadget.getItem() instanceof GadgetCutPaste) {
-//            renderPos = renderPos.above();
-//            renderPos.offset(GadgetNBT.getRelativePaste(gadget));
-//            if (mode.getId().getPath().equals("paste")) { //Paste Mode Only
-//                if (!BG2DataClient.isClientUpToDate(gadget)) { //Have the BG2DataClient class check if its up to date
-//                    return false; //If not up to date, we need to return false, since theres no need to regen the render if its out of date! We'll check again next draw frame
-//                }
-//                UUID BG2ClientUUID = BG2DataClient.getCopyUUID(gadgetUUID);
-//                if (BG2ClientUUID != null && copyPasteUUIDCache.equals(BG2ClientUUID)) //If the cache this class has matches the client cache for this gadget, no need to rebuild
-//                    return false;
-//                //If we get here, the copy paste we have stored here differs from whats in the client AND the client is up to date, so rebuild!
-//                copyPasteUUIDCache = BG2ClientUUID; //Cache the new copyPasteUUID for next cycle
-//                statePosCache = BG2DataClient.getLookupFromUUID(gadgetUUID);
-//                return true; //Need a render update!
-//            }
-////        } else { //Not a gadget that needs updates
-////            return false;
-////        }
-        return true;
+    public static boolean shouldUpdateRender(StructureRenderData data, BlockPos renderPos) {
+        if(data.lastRenderPos == null || !data.lastRenderPos.equals(renderPos)){
+            return true;
+        }
+        return false;
     }
-
+    public static void clearByteBuffers(StructureRenderData data) { //Prevents leaks - Unused?
+        for (Map.Entry<RenderType, ByteBufferBuilder> entry : data.builders.entrySet()) {
+            entry.getValue().clear();
+        }
+        data.bufferBuilders.clear();
+        data.sortStates.clear();
+        data.meshDatas.clear();
+//        data.vertexBuffers = RenderType.chunkBufferLayers().stream().collect(Collectors.toMap((renderType) -> renderType, (type) -> new VertexBuffer(VertexBuffer.Usage.STATIC)));
+    }
     /**
      * This method creates a Map<RenderType, VertexBuffer> when given an ArrayList<StatePos> statePosCache - its used both here to draw in-game AND in the TemplateManagerGUI.java class
      */
@@ -128,6 +80,7 @@ public class StructureRenderer {
         BlockRenderDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
         ModelBlockRenderer modelBlockRenderer = dispatcher.getModelRenderer();
         final RandomSource random = RandomSource.create();
+        clearByteBuffers(data);
         //Iterate through the state pos cache and start drawing to the VertexBuffers - skip modelRenders(like chests) - include fluids (even though they don't work yet)
         for (StatePos pos : statePosCache.stream().filter(pos -> isModelRender(pos.state) || !pos.state.getFluidState().isEmpty()).toList()) {
             BlockState renderState = data.fakeRenderingWorld.getBlockStateWithoutReal(pos.pos);
@@ -141,10 +94,10 @@ public class StructureRenderer {
                 //Flowers render weirdly so we use a custom renderer to make them look better. Glass and Flowers are both cutouts, so we only want this for non-cube blocks
                 if (renderType.equals(RenderType.cutout()) && renderState.getShape(level, pos.pos.offset(renderPos)).equals(Shapes.block()))
                     renderType = RenderType.translucent();
-                DireVertexConsumer direVertexConsumer = new DireVertexConsumer(getBuffer(renderType), transparency);
+                BufferBuilder builder = data.bufferBuilders.computeIfAbsent(renderType, rt -> new BufferBuilder(data.getByteBuffer(rt), rt.mode(), rt.format()));
+                DireVertexConsumer direVertexConsumer = new DireVertexConsumer(builder, transparency);
                 //Use tesselateBlock to skip the block.isModel check - this helps render Create blocks that are both models AND animated
                 if (renderState.getFluidState().isEmpty()) {
-                    //modelBlockRenderer.tesselateBlock(level, ibakedmodel, renderState, pos.pos.offset(renderPos).above(255), matrix, direVertexConsumer, false, random, renderState.getSeed(pos.pos.offset(renderPos)), OverlayTexture.NO_OVERLAY, ModelData.EMPTY, renderType);
                     try {
                         modelBlockRenderer.tesselateBlock(data.fakeRenderingWorld, ibakedmodel, renderState, pos.pos.offset(renderPos).above(255), matrix, direVertexConsumer, false, random, renderState.getSeed(pos.pos.offset(renderPos)), OverlayTexture.NO_OVERLAY);
                     } catch (Exception e) {
@@ -152,7 +105,11 @@ public class StructureRenderer {
                         //System.out.println(e);
                     }
                 } else {
-                    RenderFluidBlock.renderFluidBlock(renderState, level, pos.pos.offset(renderPos).above(255), matrix, direVertexConsumer, true);
+                    try {
+                        RenderFluidBlock.renderFluidBlock(renderState, level, pos.pos.offset(renderPos).above(255), matrix, direVertexConsumer, true);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
             }
             matrix.popPose();
@@ -161,26 +118,22 @@ public class StructureRenderer {
         Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         Vec3 subtracted = projectedView.subtract(renderPos.getX(), renderPos.getY(), renderPos.getZ());
         Vector3f sortPos = new Vector3f((float) subtracted.x, (float) subtracted.y, (float) subtracted.z);
-        for (Map.Entry<RenderType, DireBufferBuilder> entry : builders.entrySet()) {
+        for (Map.Entry<RenderType, BufferBuilder> entry : data.bufferBuilders.entrySet()) {
             RenderType renderType = entry.getKey();
-            DireBufferBuilder direBufferBuilder = getBuffer(renderType);
-            direBufferBuilder.setQuadSorting(VertexSorting.byDistance(sortPos));
-            data.sortStates.put(renderType, direBufferBuilder.getSortState());
-            VertexBuffer vertexBuffer = vertexBuffers.get(entry.getKey());
-            vertexBuffer.bind();
-            vertexBuffer.upload(direBufferBuilder.end());
-            VertexBuffer.unbind();
+            ByteBufferBuilder byteBufferBuilder = data.getByteBuffer(renderType);
+            BufferBuilder builder = entry.getValue();
+            var meshDatas = data.meshDatas;
+            if (meshDatas.containsKey(renderType) && meshDatas.get(renderType) != null)
+                meshDatas.get(renderType).close();
+            meshDatas.put(renderType, builder.build());
+            if (meshDatas.containsKey(renderType) && meshDatas.get(renderType) != null) {
+                data.sortStates.put(renderType, meshDatas.get(renderType).sortQuads(byteBufferBuilder, VertexSorting.byDistance(v -> -sortPos.distanceSquared(v))));
+                VertexBuffer vertexBuffer = vertexBuffers.get(entry.getKey());
+                vertexBuffer.bind();
+                vertexBuffer.upload(meshDatas.get(renderType));
+                VertexBuffer.unbind();
+            }
         }
-    }
-
-    public static void drawCopyBox(PoseStack matrix, BlockPos start, BlockPos end) {
-        Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-        matrix.pushPose();
-        matrix.translate(-projectedView.x(), -projectedView.y(), -projectedView.z());
-        Color color = Color.GREEN;// mode.equals("copy") ? Color.GREEN : Color.RED;
-        DireRenderMethods.renderCopy(matrix, start, end, color);
-
-        matrix.popPose();
     }
 
     public static void drawBoundBox(StructureRenderData data, PoseStack matrix, BlockPos blockPos) {
@@ -214,8 +167,8 @@ public class StructureRenderer {
     }
 
     //Draw what we've cached
-    public static void drawRender(StructureRenderData data, PoseStack poseStack, Matrix4f projectionMatrix, Player player) {
-        if (vertexBuffers == null) {
+    public static void drawRender(StructureRenderData data, PoseStack poseStack, Matrix4f projectionMatrix, Matrix4f modelViewMatrix, Player player) {
+        if (data.vertexBuffers == null) {
             return;
         }
         BlockPos anchorPos = data.anchorPos;
@@ -229,15 +182,16 @@ public class StructureRenderer {
             return;
         renderPos = renderPos.above();
         //Sort every <X> Frames to prevent screendoor effect
-        if (sortCounter > 20) {
+        if (data.sortCounter > 20) {
             sortAll(data, renderPos);
-            sortCounter = 0;
+            data.sortCounter = 0;
         } else {
-            sortCounter++;
+            data.sortCounter++;
         }
 
         PoseStack matrix = poseStack;
         matrix.pushPose();
+        matrix.mulPose(modelViewMatrix);
         matrix.translate(-projectedView.x(), -projectedView.y(), -projectedView.z());
         matrix.translate(renderPos.getX(), renderPos.getY(), renderPos.getZ());
         //Draw the renders in the specified order
@@ -254,7 +208,7 @@ public class StructureRenderer {
                     drawRenderType = DireRenderTypes.RenderBlock;
                 else
                     drawRenderType = RenderType.translucent();
-                VertexBuffer vertexBuffer = vertexBuffers.get(renderType);
+                VertexBuffer vertexBuffer = data.vertexBuffers.get(renderType);
                 if (vertexBuffer.getFormat() == null)
                     continue; //IDE says this is never null, but if we remove this check we crash because its null so....
                 drawRenderType.setupRenderState();
@@ -287,69 +241,25 @@ public class StructureRenderer {
                 DireRenderMethods.renderBETransparent(data.fakeRenderingWorld.getBlockState(pos.pos), matrix, buffersource, 15728640, 655360, 0.5f);
             matrix.popPose();
         }
-
-        //Fluid Rendering
-        /*for (StatePos pos : statePosCache.stream().filter(pos -> (!pos.state.getFluidState().isEmpty())).toList()) {
-            matrix.pushPose();
-            matrix.translate(-projectedView.x(), -projectedView.y(), -projectedView.z());
-            matrix.translate(renderPos.getX(), renderPos.getY(), renderPos.getZ());
-            FluidState fluidstate = pos.state.getFluidState();
-            RenderType rendertype = ItemBlockRenderTypes.getRenderLayer(fluidstate);
-            DireVertexConsumer direVertexConsumer = new DireVertexConsumer(buffersource.getBuffer(rendertype), 0.5f);
-            dispatcher.renderLiquid(pos.pos, player.level(), direVertexConsumer, pos.state, fluidstate);
-            buffersource.endBatch(rendertype);
-            matrix.popPose();
-        }*/
-
-        //Red Overlay for missing Items
-//        boolean hasBound = GadgetNBT.getBoundPos(gadget) != null;
-//        BlockState renderBlockState = GadgetNBT.getGadgetBlockState(gadget);
-//        if (!player.isCreative() && !hasBound && renderBlockState.getFluidState().isEmpty()) {
-//
-////            ItemStack findStack = GadgetUtils.getItemForBlock(renderBlockState, player.level(), BlockPos.ZERO, player);
-////            int availableItems = BuildingUtils.countItemStacks(player, findStack);
-////            int energyStored = BuildingUtils.getEnergyStored(gadget);
-////            int energyCost = BuildingUtils.getEnergyCost(gadget);
-//            for (StatePos statePos : buildList) {
-////                if (availableItems <= 0 || energyStored < energyCost) {
-//                matrix.pushPose();
-//                matrix.translate(-projectedView.x(), -projectedView.y(), -projectedView.z());
-//                matrix.translate(renderPos.getX(), renderPos.getY(), renderPos.getZ());
-//                VertexConsumer builder = buffersource.getBuffer(DireRenderTypes.MissingBlockOverlay);
-//                //if (hasBound)
-//                //    MyRenderMethods.renderBoxSolid(evt.getPoseStack().last().pose(), builder, statePos.pos, 1, 1, 0, 0.35f);
-//                //else
-//                DireRenderMethods.renderBoxSolid(poseStack.last().pose(), builder, statePos.pos, 1, 0, 0, 0.35f);
-//                matrix.popPose();
-////              }
-////                availableItems--;
-////                energyStored -= energyCost;
-//            }
-//        }
     }
 
     //Sort all the RenderTypes
     public static void sortAll(StructureRenderData data, BlockPos lookingAt) {
-        for (Map.Entry<RenderType, BufferBuilder.SortState> entry : data.sortStates.entrySet()) {
+        for (Map.Entry<RenderType, MeshData.SortState> entry : data.sortStates.entrySet()) {
             RenderType renderType = entry.getKey();
-            BufferBuilder.RenderedBuffer renderedBuffer = sort(data, lookingAt, renderType);
-            VertexBuffer vertexBuffer = vertexBuffers.get(renderType);
+            var renderedBuffer = sort(data, lookingAt, renderType);
+            VertexBuffer vertexBuffer = data.vertexBuffers.get(renderType);
             vertexBuffer.bind();
-            vertexBuffer.upload(renderedBuffer);
+            vertexBuffer.uploadIndexBuffer(renderedBuffer);
             VertexBuffer.unbind();
         }
     }
 
     //Sort the render type we pass in - using DireBufferBuilder because we want to sort in the opposite direction from normal
-    public static BufferBuilder.RenderedBuffer sort(StructureRenderData data, BlockPos lookingAt, RenderType renderType) {
+    public static ByteBufferBuilder.Result sort(StructureRenderData data, BlockPos lookingAt, RenderType renderType) {
         Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         Vec3 subtracted = projectedView.subtract(lookingAt.getX(), lookingAt.getY(), lookingAt.getZ());
         Vector3f sortPos = new Vector3f((float) subtracted.x, (float) subtracted.y, (float) subtracted.z);
-        DireBufferBuilder bufferBuilder = getBuffer(renderType);
-        BufferBuilder.SortState sortState = data.sortStates.get(renderType);
-        bufferBuilder.restoreSortState(sortState);
-        bufferBuilder.setQuadSorting(VertexSorting.byDistance(sortPos));
-        data.sortStates.put(renderType, bufferBuilder.getSortState());
-        return bufferBuilder.end();
+        return data.sortStates.get(renderType).buildSortedIndexBuffer(data.getByteBuffer(renderType), VertexSorting.byDistance(v -> -sortPos.distanceSquared(v)));
     }
 }

@@ -36,7 +36,7 @@ import static com.hollingsworth.schematic.api.SceneExporter.STRUCTURE_FOLDER;
 import static com.hollingsworth.schematic.api.SceneExporter.sanitize;
 
 public class DownloadScreen extends BaseSchematicScreen {
-    public static final ResourceLocation PREVIEW_TEXTURE = new ResourceLocation(Constants.MOD_ID, "download_preview");
+    public static final ResourceLocation PREVIEW_TEXTURE = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "download_preview");
     DynamicTexture dynamicTexture;
     PreviewDownloadResult preview;
     Screen previousScreen;
@@ -49,7 +49,7 @@ public class DownloadScreen extends BaseSchematicScreen {
         this.preview = preview;
 
         for (var entry : preview.downloadResponse.blockCounts) {
-            ResourceLocation resourceLocation = new ResourceLocation(entry.getA().toString());
+            ResourceLocation resourceLocation = ResourceLocation.parse(entry.getA().toString());
             int count = entry.getB();
             boolean exists = BuiltInRegistries.BLOCK.containsKey(resourceLocation);
             Block thing = BuiltInRegistries.BLOCK.get(resourceLocation);
@@ -87,7 +87,7 @@ public class DownloadScreen extends BaseSchematicScreen {
             e.printStackTrace();
         }
 
-        var downloadButton = new GuiImageButton(bookRight - 119, bookTop + 153, 95, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
+        var downloadButton = new GuiImageButton(bookRight - 119, bookTop + 153, 95, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
             startDownload(path ->{
                 Minecraft.getInstance().setScreen(null);
                 if (path != null) {
@@ -100,10 +100,10 @@ public class DownloadScreen extends BaseSchematicScreen {
         var fileName = sanitize(preview.downloadResponse.structureName + "_" + preview.downloadResponse.id) +".nbt";
         var path = Paths.get(STRUCTURE_FOLDER, fileName);
         var alreadyDownloaded = Files.exists(path);
-        addRenderableWidget(new GuiImageButton(bookLeft + 25, bookTop + 153, 143, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_9.png"), b -> {
+        addRenderableWidget(new GuiImageButton(bookLeft + 25, bookTop + 153, 143, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_9.png"), b -> {
             Minecraft.getInstance().setScreen(new BlockListScreen(this, entries));
         }));
-        var visualizeButton = new GuiImageButton(bookLeft + 25, bookTop + 153 + 16, 143, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_9.png"), b -> {
+        var visualizeButton = new GuiImageButton(bookLeft + 25, bookTop + 153 + 16, 143, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_9.png"), b -> {
             Consumer<Path> onPath = (templatePath) ->{
                 StructureTemplate structureTemplate = FileUtils.loadStructureTemplate(Minecraft.getInstance().level.holderLookup(Registries.BLOCK), templatePath);
                 var accessor = (StructureTemplateAccessor)structureTemplate;
@@ -134,7 +134,7 @@ public class DownloadScreen extends BaseSchematicScreen {
 
         addRenderableWidget(visualizeButton);
         addRenderableWidget(downloadButton);
-        addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
+        addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
             Minecraft.getInstance().setScreen(previousScreen);
         }));
     }
@@ -146,9 +146,9 @@ public class DownloadScreen extends BaseSchematicScreen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.render(graphics, mouseX, mouseY, partialTicks);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_download.png"), bookRight - 116, bookTop + 155, 0, 0, 9, 11, 9, 11);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_list.png"), bookLeft + 28, bookTop + 157, 0, 0, 9, 7, 9, 7);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/icon_visualize.png"), bookLeft + 28, bookTop + 157 + 16, 0, 0, 9, 7, 9, 7);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_download.png"), bookRight - 116, bookTop + 155, 0, 0, 9, 11, 9, 11);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_list.png"), bookLeft + 28, bookTop + 157, 0, 0, 9, 7, 9, 7);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_visualize.png"), bookLeft + 28, bookTop + 157 + 16, 0, 0, 9, 7, 9, 7);
         GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.download").getVisualOrderText(), bookRight - 67, bookTop + 157);
         GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.view_list").getVisualOrderText(), bookLeft + 34 + 143 / 2, bookTop + 157);
         GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.visualize").getVisualOrderText(), bookLeft + 34 + 143 / 2, bookTop + 157 + 16);
@@ -157,8 +157,8 @@ public class DownloadScreen extends BaseSchematicScreen {
     @Override
     public void drawBackgroundElements(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.drawBackgroundElements(graphics, mouseX, mouseY, partialTicks);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/diologue_preview.png"), 25, 25, 0, 0, 143, 127, 143, 127);
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/diologue_title_body.png"), 185, 25, 0, 0, 95, 127, 95, 127);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/diologue_preview.png"), 25, 25, 0, 0, 143, 127, 143, 127);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/diologue_title_body.png"), 185, 25, 0, 0, 95, 127, 95, 127);
         GuiUtils.drawCenteredOutlinedText(font, graphics, Component.literal(preview.downloadResponse.structureName), 25 + 143 / 2, 29);
         graphics.drawWordWrap(font, Component.literal(preview.downloadResponse.description), 187, 44, 95, 0);
         GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.description_title"), 185 + 94 / 2, 29);

@@ -1,91 +1,43 @@
 plugins {
-    id 'java'
-    id "fabric-loom" version "1.5.+"
-    id "io.github.p03w.machete" version "1.+" // automatic jar compressing on build
-    id 'maven-publish'
-    id 'idea'
+    id 'multiloader-loader'
+    id 'fabric-loom'
 }
 
-archivesBaseName = "${mod_name}-fabric-${minecraft_version}"
-
-repositories {
-    maven { url = "https://maven.shedaniel.me/" } // Cloth Config, REI
-    maven { url = "https://maven.blamejared.com/" } // JEI
-    maven { url = "https://maven.parchmentmc.org" } // Parchment mappings
-    maven { url = "https://maven.quiltmc.org/repository/release" } // Quilt Mappings
-    maven { url = "https://api.modrinth.com/maven" } // LazyDFU
-    maven { url = "https://maven.terraformersmc.com/releases/" } // Mod Menu
-    maven { url = "https://mvn.devos.one/snapshots/" } // Create, Porting Lib, Forge Tags, Milk Lib, Registrate
-    maven { url = "https://mvn.devos.one/releases/" } // Porting Lib Releases
-    maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // Forge Config API Port
-    maven { url = "https://maven.jamieswhiteshirt.com/libs-release" } // Reach Entity Attributes
-    maven { url = "https://jitpack.io/" } // Mixin Extras, Fabric ASM
-    maven { url = "https://maven.tterrag.com/" } // Flywheel
-}
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.officialMojangMappings()
+    mappings loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${parchment_minecraft}:${parchment_version}@zip")
+    }
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    compileOnly group:'org.spongepowered', name:'mixin', version:'0.8.5'
+    compileOnly("org.bytedeco:ffmpeg-platform:6.0-1.5.9")
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
-    implementation project(":common")
-    // Create - dependencies are added transitively
-    modImplementation("com.simibubi.create:create-fabric-${minecraft_version}:0.5.1-f-build.1335+mc1.20.1")
-    compileOnlyApi("org.bytedeco:ffmpeg-platform:6.0-1.5.9")
-
-    include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.2.0-beta.11")))
+    compileOnly "io.github.llamalad7:mixinextras-common:0.2.0-beta.11"
 }
 
-loom {
-    accessWidenerPath = file("${getRootProject().project("common").projectDir}/src/main/resources/blockprints.accesswidener")
 
+loom {
+    def aw = project(':common').file("src/main/resources/${mod_id}.accesswidener")
+    if (aw.exists()) {
+        accessWidenerPath.set(aw)
+    }
+    mixin {
+        defaultRefmapName.set("${mod_id}.refmap.json")
+    }
     runs {
         client {
             client()
-            setConfigName("Fabric Client")
+            setConfigName('Fabric Client')
             ideConfigGenerated(true)
-            runDir("run")
+            runDir('runs/client')
         }
         server {
             server()
-            setConfigName("Fabric Server")
+            setConfigName('Fabric Server')
             ideConfigGenerated(true)
-            runDir("run")
-        }
-    }
-
-    mixin {
-        defaultRefmapName = "blockprints.refmap.json"
-    }
-}
-
-
-processResources {
-    from project(":common").sourceSets.main.resources
-    inputs.property "version", project.version
-
-    filesMatching("fabric.mod.json") {
-        expand "version": project.version
-    }
-}
-
-tasks.withType(JavaCompile) {
-    source(project(":common").sourceSets.main.allSource)
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            groupId project.group
-            artifactId project.archivesBaseName
-            version project.version
-            from components.java
-        }
-    }
-
-    repositories {
-        maven {
-            url "file://" + System.getenv("local_maven")
+            runDir('runs/server')
         }
     }
 }

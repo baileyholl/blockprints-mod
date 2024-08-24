@@ -1,7 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
-import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractScrollWidget;
@@ -12,6 +11,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.StringUtil;
 
 import java.util.Iterator;
 import java.util.Objects;
@@ -92,7 +92,7 @@ public class NoScrollMultiText extends AbstractScrollWidget {
     }
 
     public boolean charTyped(char $$0, int $$1) {
-        if (editable && this.visible && this.isFocused() && SharedConstants.isAllowedChatCharacter($$0)) {
+        if (editable && this.visible && this.isFocused() && StringUtil.isAllowedChatCharacter($$0)) {
             this.textField.insertText(Character.toString($$0));
             return true;
         } else {
@@ -257,6 +257,6 @@ public class NoScrollMultiText extends AbstractScrollWidget {
 
     @Override
     protected void renderBackground(GuiGraphics graphics) {
-        graphics.blit(new ResourceLocation(Constants.MOD_ID, "textures/gui/diologue_large_editable.png"), x, y, 0, 0, width, height, width, height);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/diologue_large_editable.png"), x, y, 0, 0, width, height, width, height);
     }
 }

@@ -1,6 +1,5 @@
 package com.hollingsworth.schematic.client.renderer;
 
-import com.hollingsworth.schematic.mixin.VertexFormatAccessor;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -13,13 +12,13 @@ import java.util.List;
  *
  */
 public interface IQuadTransformer {
-    int STRIDE = DefaultVertexFormat.BLOCK.getIntegerSize();
-    int POSITION = findOffset(DefaultVertexFormat.ELEMENT_POSITION);
-    int COLOR = findOffset(DefaultVertexFormat.ELEMENT_COLOR);
-    int UV0 = findOffset(DefaultVertexFormat.ELEMENT_UV0);
-    int UV1 = findOffset(DefaultVertexFormat.ELEMENT_UV1);
-    int UV2 = findOffset(DefaultVertexFormat.ELEMENT_UV2);
-    int NORMAL = findOffset(DefaultVertexFormat.ELEMENT_NORMAL);
+    int STRIDE = DefaultVertexFormat.BLOCK.getVertexSize() / 4;
+    int POSITION = findOffset(VertexFormatElement.POSITION);
+    int COLOR = findOffset(VertexFormatElement.COLOR);
+    int UV0 = findOffset(VertexFormatElement.UV0);
+    int UV1 = findOffset(VertexFormatElement.UV1);
+    int UV2 = findOffset(VertexFormatElement.UV2);
+    int NORMAL = findOffset(VertexFormatElement.NORMAL);
 
     void processInPlace(BakedQuad quad);
 
@@ -51,7 +50,6 @@ public interface IQuadTransformer {
     }
 
     private static int findOffset(VertexFormatElement element) {
-        var index = DefaultVertexFormat.BLOCK.getElements().indexOf(element);
-        return index < 0 ? -1 : ((VertexFormatAccessor)DefaultVertexFormat.BLOCK).getOffsets().getInt(index) / 4;
+        return DefaultVertexFormat.BLOCK.contains(element) ? DefaultVertexFormat.BLOCK.getOffset(element) / 4 : -1;
     }
 }
