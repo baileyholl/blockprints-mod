@@ -68,10 +68,9 @@ public class DownloadScreen extends BaseSchematicScreen {
                 (result) -> Minecraft.getInstance().setScreen(new DownloadScreen(previousScreen, result)), previousScreen);
     }
 
-    public static DynamicTexture getTexture(PreviewDownloadResult preview) throws IOException {
-        byte[] previewImage = preview.image;
-        ByteBuffer buffer = MemoryUtil.memAlloc(previewImage.length);
-        buffer.put(previewImage);
+    public static DynamicTexture getTexture(byte[] img) throws IOException {
+        ByteBuffer buffer = MemoryUtil.memAlloc(img.length);
+        buffer.put(img);
         NativeImage nativeImage = NativeImage.read(buffer.flip());
         return new DynamicTexture(nativeImage);
     }
@@ -80,7 +79,7 @@ public class DownloadScreen extends BaseSchematicScreen {
     public void init() {
         super.init();
         try {
-            dynamicTexture = getTexture(preview);
+            dynamicTexture = getTexture(preview.image);
             Minecraft.getInstance().getTextureManager().register(PREVIEW_TEXTURE, dynamicTexture);
             addRenderableWidget(new PreviewImage(bookLeft + 25, bookTop + 41, 100, 100, dynamicTexture, PREVIEW_TEXTURE));
         } catch (Exception e) {

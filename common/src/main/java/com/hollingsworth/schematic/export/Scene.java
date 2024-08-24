@@ -1,11 +1,8 @@
 package com.hollingsworth.schematic.export;
 
 import com.hollingsworth.schematic.export.level.GuidebookLevel;
-import net.minecraft.core.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.joml.*;
-
-import java.util.stream.Stream;
 
 public class Scene {
 
@@ -48,10 +45,15 @@ public class Scene {
         cameraSettings.setOffsetY(h - bounds.y);
     }
 
+    Bounds cachedBounds = null;
+
     @NotNull
     private Bounds getBounds(Matrix4f viewMatrix) {
         if (!level.hasFilledBlocks()) {
             return new Bounds(new Vector3f(), new Vector3f());
+        }
+        if(cachedBounds != null){
+            return cachedBounds;
         }
 
         // This is doing more work than needed since touching blocks create unneeded corners
@@ -73,58 +75,17 @@ public class Scene {
                 }
             }
         });
-        return new Bounds(min, max);
+        cachedBounds = new Bounds(min, max);
+        return cachedBounds;
     }
 
     private record Bounds(Vector3f min, Vector3f max) {
     }
-
-    /**
-     * Return the given world position in normalized device coordinates.
-     */
-    public Vector2f worldToScreen(float x, float y, float z) {
-        var viewMatrix = cameraSettings.getViewMatrix();
-        var projectionMatrix = cameraSettings.getProjectionMatrix();
-
-        Vector3f screenPos = new Vector3f();
-        viewMatrix.transformPosition(x, y, z, screenPos);
-        projectionMatrix.transformProject(screenPos);
-        return new Vector2f(screenPos.x, screenPos.y);
-    }
-
-    private static Vector2f worldToScreen(Matrix4f viewMatrix, Matrix4f projectionMatrix, float x, float y, float z) {
-        Vector3f screenPos = new Vector3f();
-        viewMatrix.transformPosition(x, y, z, screenPos);
-        projectionMatrix.transformProject(screenPos);
-        /*
-         * var screenX = this.bounds.x() + (screenPos.x + 1) * this.bounds.width() / 2; var screenY =
-         * this.bounds.bottom() - (screenPos.y + 1) * this.bounds.height() / 2; return new Vector2f(screenX, screenY);/*
-         */
-        return new Vector2f();
-    }
-
-    private void buildPickRay(float screenX, float screenY, Vector3f rayOrigin, Vector3f rayDir) {
-        var viewProj = new Matrix4f(cameraSettings.getProjectionMatrix());
-        viewProj.mul(cameraSettings.getViewMatrix());
-        viewProj.unprojectRay(
-                screenX, screenY,
-                // We already expect normalized device coordinates,
-                // so the viewport is set in such a way as to leave the coordinates alone
-                new int[] {
-                        -1, -1,
-                        2, 2
-                },
-                rayOrigin,
-                rayDir);
-
-    }
-
-
-    public Stream<BlockPos> getFilledBlocks() {
-        return level.getFilledBlocks();
-    }
-
+    Vector3f cachedCenter = null;
     public Vector3fc getWorldCenter() {
+        if(cachedCenter != null){
+            return cachedCenter;
+        }
         // This is doing more work than needed since touching blocks create unneeded corners
         var tmpPos = new Vector3f();
         var min = new Vector3f(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
@@ -148,7 +109,8 @@ public class Scene {
         var avg = new Vector3f(min);
         avg.add(max);
         avg.div(2);
-        return avg;
+        cachedCenter = avg;
+        return cachedCenter;
     }
 
     public GuidebookLevel getLevel() {
