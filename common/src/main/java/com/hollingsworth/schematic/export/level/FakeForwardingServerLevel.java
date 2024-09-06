@@ -431,6 +431,11 @@ public class FakeForwardingServerLevel extends Level implements ServerLevelAcces
     }
 
     @Override
+    public ResourceKey<Level> dimension() {
+        return OVERWORLD;
+    }
+
+    @Override
     public int getMinBuildHeight() {
         return delegate.getMinBuildHeight();
     }
