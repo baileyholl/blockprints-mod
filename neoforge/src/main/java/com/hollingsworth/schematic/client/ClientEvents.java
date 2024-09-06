@@ -23,7 +23,7 @@ public class ClientEvents {
             return;
 
         for(ClientData.KeyFunction keyMapping : ClientData.KEY_FUNCTIONS){
-            if(keyMapping.mapping().getKey().getValue() == event.getKey()){
+            if(!keyMapping.mapping().isUnbound() && keyMapping.mapping().getKey().getValue() == event.getKey()){
                 keyMapping.function().run();
             }
         }
