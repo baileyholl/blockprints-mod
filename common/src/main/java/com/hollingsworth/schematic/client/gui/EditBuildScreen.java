@@ -41,7 +41,7 @@ public class EditBuildScreen extends BaseSchematicScreen {
         super.init();
 
         try {
-            dynamicTexture = DownloadScreen.getTexture(preview);
+            dynamicTexture = DownloadScreen.getTexture(preview.image);
             Minecraft.getInstance().getTextureManager().register(PREVIEW_TEXTURE, dynamicTexture);
             addRenderableWidget(new PreviewImage(bookLeft + 25, bookTop + 41, 100, 100, dynamicTexture, PREVIEW_TEXTURE));
         } catch (Exception e) {
