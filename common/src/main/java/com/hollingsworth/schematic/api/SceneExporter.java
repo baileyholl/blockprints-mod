@@ -85,8 +85,13 @@ public class SceneExporter {
                 imageFiles.add(path);
                 count++;
             }
-            var template = new Template(name, start, end);
-            var uploadResponse = BlockprintsApi.getInstance().upload().postUpload(name, description, template.toJson(), makePublic);
+            Template template = new Template(name, start, end);
+            String gadgetString = template.toJson();
+            // Hard limit on the size of the gadget string because blockprints will reject it if it's too large
+            if (gadgetString.length() * 2 > 900 * 900) {
+                gadgetString = null;
+            }
+            var uploadResponse = BlockprintsApi.getInstance().upload().postUpload(name, description, gadgetString, makePublic);
             if (!uploadResponse.wasSuccessful() || uploadResponse.response == null) {
                 return ApiResponse.error(uploadResponse);
             }
