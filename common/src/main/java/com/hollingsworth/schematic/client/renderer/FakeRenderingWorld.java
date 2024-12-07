@@ -86,6 +86,9 @@ public class FakeRenderingWorld extends Level implements LevelAccessor {
         BlockState blockState = getBlockState(pos);
         if (blockState.hasBlockEntity()) {
             BlockEntity blockEntity = ((EntityBlock) blockState.getBlock()).newBlockEntity(pos.offset(lookingAt), blockState);
+            if(blockEntity == null){
+                return null;
+            }
             blockEntity.setLevel(this.realWorld);
             return blockEntity;
         }
