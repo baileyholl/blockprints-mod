@@ -176,6 +176,11 @@ public class GuidebookLevel extends Level {
                 });
     }
 
+    @Override
+    public ResourceKey<Level> dimension() {
+        return OVERWORLD;
+    }
+
     /**
      * @return All block entities in the level.
      */

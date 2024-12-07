@@ -64,7 +64,7 @@
   "blockprints.make_public_tooltip": "Checking this will allow other users to view and download your build from Blockprints.io. If this is disabled, you can still share your build via the code in View Builds.",
   "blockprints.delete_tooltip": "Delete this build from Blockprints.io. This action cannot be undone.",
   "blockprints.delete_confirm": "Delete it!",
-  "blockprints.visualize": "Visualze In-World",
+  "blockprints.visualize": "Visualize In-World",
   "blockprints.already_downloaded_tooltip": "This file has already been downloaded at %s. Download it again?",
   "blockprints.visualize_download": "Download and visualize",
   "blockprints.remove_visual": "Remove Visual",
@@ -72,5 +72,7 @@
   "blockprints.visualize_list_tooltip": "Manage, remove, and edit placed visualizations.",
   "blockprints.visualizations": "Visualizations",
   "blockprints.start_placing": "Right click to anchor to a position, use %s and %s to rotate. Press %s to confirm or %s to cancel. ",
-  "blockprints.invalid_upload": "Invalid build. Cannot be empty or contain only air blocks."
+  "blockprints.invalid_upload": "Invalid build. Cannot be empty or contain only air blocks.",
+  "key.blockprints.rotate_left": "Rotate Left",
+  "key.blockprints.rotate_right": "Rotate Right"
 }

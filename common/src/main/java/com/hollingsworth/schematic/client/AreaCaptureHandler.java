@@ -146,7 +146,7 @@ public class AreaCaptureHandler {
     }
 
     public static void renderBoundaryUI(GuiGraphics graphics, Window window) {
-        if (!showBoundary)
+        if (!showBoundary || Minecraft.getInstance().options.hideGui)
             return;
         float screenY = window.getGuiScaledHeight() / 2f;
         float screenX = window.getGuiScaledWidth() / 2f;
