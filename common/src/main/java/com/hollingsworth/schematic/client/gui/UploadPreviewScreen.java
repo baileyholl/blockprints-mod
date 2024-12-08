@@ -24,7 +24,7 @@ import static com.hollingsworth.schematic.client.gui.DownloadScreen.PREVIEW_TEXT
 
 public class UploadPreviewScreen extends BaseSchematicScreen {
 
-//    ScenePreview scenePreview;
+    ScenePreview scenePreview;
     HorizontalSlider yawSlider;
     HorizontalSlider pitchSlider;
     ShortTextField nameField;
@@ -42,6 +42,8 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     DynamicTexture dynamicTexture;
     WrappedScene wrappedScene;
     int pitch, yaw;
+    boolean useRealtimeRender = true;
+
     public UploadPreviewScreen(StructureTemplate structureTemplate, BlockPos start, BlockPos end) {
         super();
         this.structureTemplate = structureTemplate;
@@ -89,14 +91,18 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         addRenderableWidget(yawSlider);
         addRenderableWidget(pitchSlider);
 
-
-//        this.scenePreview = new ScenePreview(bookLeft + 25, bookTop + 41, 100, 100, scene, wrappedScene);
-//
-//        scenePreview.yaw = 225;
-//        scenePreview.pitch = 30;
         updateExport();
-        this.previewImage = addRenderableWidget(new PreviewImage(bookLeft + 25, bookTop + 41, 100, 100, dynamicTexture, PREVIEW_TEXTURE));
-//        addRenderableWidget(scenePreview);
+        this.previewImage = new PreviewImage(bookLeft + 25, bookTop + 41, 100, 100, dynamicTexture, PREVIEW_TEXTURE);
+        this.useRealtimeRender = true;
+        if(useRealtimeRender){
+            this.scenePreview = new ScenePreview(bookLeft + 25, bookTop + 41, 100, 100, scene, wrappedScene, structureTemplate);
+
+            scenePreview.yaw = 225;
+            scenePreview.pitch = 30;
+            addRenderableWidget(scenePreview);
+        }else{
+            addRenderableWidget(previewImage);
+        }
         addRenderableWidget(new GimbalButton(bookLeft + 155, bookTop + 47, "northeast", b -> {
             setYaw(225);
             setPitch(30);
@@ -124,27 +130,30 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     @Override
     public void removed() {
         super.removed();
-//        scenePreview.removed();
+        scenePreview.removed();
         if(this.dynamicTexture != null){
             this.dynamicTexture.close();
         }
     }
 
     public void setYaw(int yaw) {
-//        scenePreview.yaw = yaw;
+        scenePreview.yaw = yaw;
         this.yaw = yaw;
         yawSlider.setValue(yaw);
         updateExport();
     }
 
     public void setPitch(int pitch) {
-//        scenePreview.pitch = pitch;
+        scenePreview.pitch = pitch;
         this.pitch = pitch;
         pitchSlider.setValue(pitch);
         updateExport();
     }
 
     public void updateExport(){
+        if(useRealtimeRender){
+            return;
+        }
         try {
             var scene = wrappedScene.scene;
             scene.getCameraSettings().setIsometricYawPitchRoll(yaw, pitch, 0);

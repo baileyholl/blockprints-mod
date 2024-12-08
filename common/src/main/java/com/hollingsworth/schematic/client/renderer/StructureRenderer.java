@@ -50,7 +50,7 @@ public class StructureRenderer {
         renderPos = renderPos.above();
         //Start drawing the Render and cache it, used for both Building and Copy/Paste
         if (shouldUpdateRender(data, renderPos)) {
-            generateRender(data, player.level(), renderPos, 0.5f, data.statePosCache, data.vertexBuffers);
+            generateRender(data, player.level(), renderPos, 0.5f);
             data.lastRenderPos = renderPos;
         }
     }
@@ -70,10 +70,15 @@ public class StructureRenderer {
         data.meshDatas.clear();
 //        data.vertexBuffers = RenderType.chunkBufferLayers().stream().collect(Collectors.toMap((renderType) -> renderType, (type) -> new VertexBuffer(VertexBuffer.Usage.STATIC)));
     }
+    public static void generateRender(StructureRenderData data, Level level, BlockPos renderPos, float transparency) {
+        generateRender(data, level, renderPos, transparency, Minecraft.getInstance().gameRenderer.getMainCamera().getPosition());
+    }
     /**
      * This method creates a Map<RenderType, VertexBuffer> when given an ArrayList<StatePos> statePosCache - its used both here to draw in-game AND in the TemplateManagerGUI.java class
      */
-    public static void generateRender(StructureRenderData data, Level level, BlockPos renderPos, float transparency, ArrayList<StatePos> statePosCache, Map<RenderType, VertexBuffer> vertexBuffers) {
+    public static void generateRender(StructureRenderData data, Level level, BlockPos renderPos, float transparency, Vec3 cameraPosition) {
+        ArrayList<StatePos> statePosCache = data.statePosCache;
+        Map<RenderType, VertexBuffer> vertexBuffers = data.vertexBuffers;
         if (statePosCache == null || statePosCache.isEmpty()) return;
         data.fakeRenderingWorld = new FakeRenderingWorld(level, statePosCache, renderPos);
         PoseStack matrix = new PoseStack(); //Create a new matrix stack for use in the buffer building process
@@ -82,9 +87,10 @@ public class StructureRenderer {
         final RandomSource random = RandomSource.create();
         clearByteBuffers(data);
         //Iterate through the state pos cache and start drawing to the VertexBuffers - skip modelRenders(like chests) - include fluids (even though they don't work yet)
-        for (StatePos pos : statePosCache.stream().filter(pos -> isModelRender(pos.state) || !pos.state.getFluidState().isEmpty()).toList()) {
+        for (StatePos pos : statePosCache) {
             BlockState renderState = data.fakeRenderingWorld.getBlockStateWithoutReal(pos.pos);
-            if (renderState.isAir()) continue;
+            if (renderState.isAir() || !(isModelRender(pos.state) || !pos.state.getFluidState().isEmpty()))
+                continue;
 
             BakedModel ibakedmodel = dispatcher.getBlockModel(renderState);
             matrix.pushPose();
@@ -114,9 +120,8 @@ public class StructureRenderer {
             }
             matrix.popPose();
         }
-        //Sort all the builder's vertices and then upload them to the vertex buffers
-        Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-        Vec3 subtracted = projectedView.subtract(renderPos.getX(), renderPos.getY(), renderPos.getZ());
+
+        Vec3 subtracted = cameraPosition.subtract(renderPos.getX(), renderPos.getY(), renderPos.getZ());
         Vector3f sortPos = new Vector3f((float) subtracted.x, (float) subtracted.y, (float) subtracted.z);
         for (Map.Entry<RenderType, BufferBuilder> entry : data.bufferBuilders.entrySet()) {
             RenderType renderType = entry.getKey();
@@ -226,8 +231,9 @@ public class StructureRenderer {
         DireRenderMethods.MultiplyAlphaRenderTypeBuffer multiplyAlphaRenderTypeBuffer = new DireRenderMethods.MultiplyAlphaRenderTypeBuffer(buffersource, 0.5f);
         //If any of the blocks in the render didn't have a model (like chests) we draw them here. This renders AND draws them, so more expensive than caching, but I don't think we have a choice
         data.fakeRenderingWorld = new FakeRenderingWorld(player.level(), data.statePosCache, renderPos);
-        for (StatePos pos : data.statePosCache.stream().filter(pos -> !isModelRender(pos.state)).toList()) {
-            if (pos.state.isAir()) continue;
+        for (StatePos pos : data.statePosCache) {
+            if (pos.state.isAir() || isModelRender(pos.state))
+                continue;
             matrix.pushPose();
             matrix.translate(-projectedView.x(), -projectedView.y(), -projectedView.z());
             matrix.translate(renderPos.getX(), renderPos.getY(), renderPos.getZ());
