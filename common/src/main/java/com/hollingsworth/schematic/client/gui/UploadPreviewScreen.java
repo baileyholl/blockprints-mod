@@ -97,8 +97,8 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         if(useRealtimeRender){
             this.scenePreview = new ScenePreview(bookLeft + 25, bookTop + 41, 100, 100, scene, wrappedScene, structureTemplate);
 
-            scenePreview.yaw = 225;
-            scenePreview.pitch = 30;
+            scenePreview.setYaw(225);
+            scenePreview.setPitch(30);
             addRenderableWidget(scenePreview);
         }else{
             addRenderableWidget(previewImage);
@@ -128,6 +128,12 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     }
 
     @Override
+    public void tick() {
+        super.tick();
+        scenePreview.tick();
+    }
+
+    @Override
     public void removed() {
         super.removed();
         scenePreview.removed();
@@ -137,14 +143,14 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     }
 
     public void setYaw(int yaw) {
-        scenePreview.yaw = yaw;
+        scenePreview.setYaw(yaw);
         this.yaw = yaw;
         yawSlider.setValue(yaw);
         updateExport();
     }
 
     public void setPitch(int pitch) {
-        scenePreview.pitch = pitch;
+        scenePreview.setPitch(pitch);
         this.pitch = pitch;
         pitchSlider.setValue(pitch);
         updateExport();

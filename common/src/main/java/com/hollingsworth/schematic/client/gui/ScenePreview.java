@@ -24,29 +24,32 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.Map;
 
 public class ScenePreview extends AbstractWidget {
-    public int yaw = 225;
-    public int pitch = 30;
-    public int roll;
+    private int yaw = 225;
+    private int pitch = 30;
+    private int roll;
     public WrappedScene wrappedScene;
     public Scene scene;
     public OffScreenRenderer renderer;
     StructureTemplate template;
     FakeRenderingWorld fakeRenderingWorld;
     StructureRenderData cachedRender;
+
+    boolean doSort;
+    int sortDebounce;
+
     public ScenePreview(int x, int y, int width, int height, Scene scene, WrappedScene wrappedScene, StructureTemplate template) {
         super(x, y, width, height, Component.empty());
         this.wrappedScene = wrappedScene;
         this.scene = scene;
         cachedRender = new StructureRenderData(template, null, null);
-//        StructureRenderer.generateRender(cachedRender, Minecraft.getInstance().level, BlockPos.ZERO, 1f);
         StructureRenderer.generateRender(cachedRender, Minecraft.getInstance().level, BlockPos.ZERO, 1f, new Vec3(0,0,0));
+        scheduleSort();
     }
 
     public void updateSceneTexture() {
@@ -88,30 +91,23 @@ public class ScenePreview extends AbstractWidget {
         }
     }
 
+    public void tick(){
+        if(doSort){
+            if(sortDebounce > 0){
+                sortDebounce--;
+            }else{
+                doSort = false;
+                sortAll(cachedRender, new Vec3(0, 0, 0));
+            }
+        }
+    }
+
 
     @Override
     protected void renderWidget(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
-//        updateSceneTexture();
         int previewX = x;
         int previewY = y;
         final float scale = (float) Minecraft.getInstance().getWindow().getGuiScale();
-//        if (renderer != null) {
-//            int imageWidth = renderer.width;
-//            int imageHeight = renderer.height;
-//
-//            // scale width and height to fit in the box of 100,100
-//            LytSize origDim = new LytSize(imageWidth, imageHeight);
-//            LytSize boundary = new LytSize(width, height);
-//            LytSize newDim = getScaledDimension(origDim, boundary);
-//            // Offset x and Y so the image is centered
-//            // center x and y on point 50, 50
-//            int x = previewX + 143 / 2;
-//            int y = previewY + 111 / 2;
-//            x -= newDim.width() / 2;
-//            y -= newDim.height() / 2;
-//
-//            innerBlit(graphics.pose(), renderer, x, x + newDim.width(), y, y + newDim.height(), 0);
-//        }
 
         boolean doOldRender = false;
         if(doOldRender){
@@ -147,34 +143,21 @@ public class ScenePreview extends AbstractWidget {
         CameraSettings cameraSettings = scene.getCameraSettings();
         Matrix4f projectionMatrix = cameraSettings.getProjectionMatrix();
         Matrix4f viewMatrix = cameraSettings.getViewMatrix();
-        var invertedView = new Matrix4f(projectionMatrix).invert().transformPosition(new Vector3f(0f, 0f, 0f));
-        Vec3 cameraPosition = new Vec3(invertedView.x(), invertedView.y(), invertedView.z());
-        if(Minecraft.getInstance().level.getGameTime() % 20 == 0 ) {
-            sortAll(cachedRender, new Vec3(0, 0, 0));
-        }
 
-        float fov = 60.0F;  // or whatever field of view you want
-        float aspectRatio = (float) width / height;  // width and height of your GUI or the "viewport" you want to use
-        float near = 0.1F;
-        float far = 1000.0F;
         var prefSize = wrappedScene.getPreferredSize();
-            // We only scale the viewport, not scaling the view matrix means the scene will still fill it
-            var renderWidth = (int) Math.max(1, prefSize.width() * scale);
-            var renderHeight = (int) Math.max(1, prefSize.height() * scale);
+        // We only scale the viewport, not scaling the view matrix means the scene will still fill it
+        var renderWidth = (int) Math.max(1, prefSize.width() * scale);
+        var renderHeight = (int) Math.max(1, prefSize.height() * scale);
 
         LytSize origDim = new LytSize(renderWidth, renderHeight);
         LytSize boundary = new LytSize(width, height);
         LytSize newDim = getScaledDimension(origDim, boundary);
-        // Offset x and Y so the image is centered
-        // center x and y on point 50, 50
         int x = previewX + 143 / 2;
         int y = previewY + 143 / 2;
         x -= newDim.width() / 2;
         y -= newDim.height() / 2;
 
-//        var renderWidth = (int) Math.max(1, size.width() * aspectRatio * scale);
-//        var renderHeight = (int) Math.max(1, size.height() * aspectRatio * scale);
-        Vector3fc worldCenter = scene.getWorldCenter();
+
         RenderSystem.viewport((int) ((x) * scale), (int) (y * scale), (int) (newDim.width() * scale), (int) (newDim.height() * scale)); //The viewport is like a mini world where things get drawn
         RenderSystem.backupProjectionMatrix();
 
@@ -263,10 +246,11 @@ public class ScenePreview extends AbstractWidget {
         try {
             for (RenderType renderType : drawSet) {
                 RenderType drawRenderType;
-                if (renderType.equals(RenderType.cutout()))
-                    drawRenderType = DireRenderTypes.RenderBlock;
-                else
-                    drawRenderType = RenderType.translucent();
+//                if (renderType.equals(RenderType.cutout()))
+//                    drawRenderType = DireRenderTypes.RenderBlock;
+//                else
+                    drawRenderType = renderType;
+
                 VertexBuffer vertexBuffer = cachedRender.vertexBuffers.get(renderType);
                 if (vertexBuffer.getFormat() == null)
                     continue; //IDE says this is never null, but if we remove this check we crash because its null so....
@@ -338,5 +322,37 @@ public class ScenePreview extends AbstractWidget {
 
         Vector3f sortPos = new Vector3f((float) -subtracted.x, (float)- subtracted.y, (float) -subtracted.z);
         return data.sortStates.get(renderType).buildSortedIndexBuffer(data.getByteBuffer(renderType), VertexSorting.byDistance(v -> -sortPos.distanceSquared(v)));
+    }
+
+    public int getYaw() {
+        return yaw;
+    }
+
+    public void setYaw(int yaw) {
+        this.yaw = yaw;
+        scheduleSort();
+    }
+
+    public int getPitch() {
+        return pitch;
+    }
+
+    public void setPitch(int pitch) {
+        this.pitch = pitch;
+        scheduleSort();
+    }
+
+    public int getRoll() {
+        return roll;
+    }
+
+    public void setRoll(int roll) {
+        this.roll = roll;
+        scheduleSort();
+    }
+
+    private void scheduleSort(){
+        doSort = true;
+        sortDebounce = 20;
     }
 }
