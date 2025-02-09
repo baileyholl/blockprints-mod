@@ -7,6 +7,7 @@ import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexSorting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
@@ -90,7 +91,7 @@ public class GuidebookLevelRenderer {
      * Render without any setup.
      */
     public void renderContent(GuidebookLevel level, MultiBufferSource.BufferSource buffers) {
-        RenderSystem.runAsFancy(() -> {
+//        RenderSystem.runAsFancy(() -> {
             renderBlocks(level, buffers, false);
             renderBlockEntities(level, buffers);
 
@@ -121,7 +122,7 @@ public class GuidebookLevelRenderer {
 
             renderBlocks(level, buffers, true);
             buffers.endBatch(RenderType.translucent());
-        });
+//        });
     }
 
     private void renderBlocks(GuidebookLevel level, MultiBufferSource buffers, boolean translucent) {
@@ -148,7 +149,7 @@ public class GuidebookLevelRenderer {
             if (blockState.getRenderShape() != RenderShape.INVISIBLE) {
                 var renderType = ItemBlockRenderTypes.getChunkRenderType(blockState);
                 if (renderType != RenderType.translucent() || translucent) {
-                    var bufferBuilder = buffers.getBuffer(renderType);
+                    VertexConsumer bufferBuilder = buffers.getBuffer(renderType);
 
                     poseStack.pushPose();
                     poseStack.translate(pos.getX(), pos.getY(), pos.getZ());

@@ -84,6 +84,8 @@ idea {
 dependencies {
     compileOnly("org.bytedeco:ffmpeg-platform:6.0-1.5.9")
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+    implementation "curse.maven:building-gadgets-298187:5968587"
+    implementation "curse.maven:spark-361579:5759671"
 }
 
 

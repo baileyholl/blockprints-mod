@@ -10,6 +10,7 @@ import com.hollingsworth.schematic.export.level.GuidebookLevel;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -18,6 +19,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 import java.util.List;
+
+import static com.hollingsworth.schematic.client.gui.DownloadScreen.PREVIEW_TEXTURE;
 
 public class UploadPreviewScreen extends BaseSchematicScreen {
 
@@ -35,17 +38,24 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     public boolean makePublic = false;
     public BlockPos start;
     public BlockPos end;
+
+    DynamicTexture dynamicTexture;
+    WrappedScene wrappedScene;
+    int pitch, yaw;
+    boolean useRealtimeRender = true;
+
     public UploadPreviewScreen(StructureTemplate structureTemplate, BlockPos start, BlockPos end) {
         super();
         this.structureTemplate = structureTemplate;
         this.start = start;
         this.end = end;
     }
+    PreviewImage previewImage;
 
     @Override
     public void init() {
         super.init();
-        WrappedScene wrappedScene = new WrappedScene();
+        wrappedScene = new WrappedScene();
         Scene scene = new Scene(new GuidebookLevel(), new CameraSettings());
         wrappedScene.setScene(scene);
         wrappedScene.placeStructure(structureTemplate);
@@ -80,10 +90,19 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         this.pitchSlider = new HorizontalSlider(bookLeft + 41, bookTop + 169, Component.empty(), Component.empty(), 0, 90, 30, 5, 1, true, this::setPitch);
         addRenderableWidget(yawSlider);
         addRenderableWidget(pitchSlider);
-        this.scenePreview = new ScenePreview(bookLeft + 25, bookTop + 41, 100, 100, scene, wrappedScene);
-        scenePreview.yaw = 225;
-        scenePreview.pitch = 30;
-        addRenderableWidget(scenePreview);
+
+        updateExport();
+        this.previewImage = new PreviewImage(bookLeft + 25, bookTop + 41, 100, 100, dynamicTexture, PREVIEW_TEXTURE);
+        this.useRealtimeRender = true;
+        if(useRealtimeRender){
+            this.scenePreview = new ScenePreview(bookLeft + 25, bookTop + 41, 100, 100, scene, wrappedScene, structureTemplate);
+
+            scenePreview.setYaw(225);
+            scenePreview.setPitch(30);
+            addRenderableWidget(scenePreview);
+        }else{
+            addRenderableWidget(previewImage);
+        }
         addRenderableWidget(new GimbalButton(bookLeft + 155, bookTop + 47, "northeast", b -> {
             setYaw(225);
             setPitch(30);
@@ -109,19 +128,66 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     }
 
     @Override
+    public void tick() {
+        super.tick();
+        scenePreview.tick();
+    }
+
+    @Override
     public void removed() {
         super.removed();
         scenePreview.removed();
+        if(this.dynamicTexture != null){
+            this.dynamicTexture.close();
+        }
     }
 
     public void setYaw(int yaw) {
-        scenePreview.yaw = yaw;
+        scenePreview.setYaw(yaw);
+        this.yaw = yaw;
         yawSlider.setValue(yaw);
+        updateExport();
     }
 
     public void setPitch(int pitch) {
-        scenePreview.pitch = pitch;
+        scenePreview.setPitch(pitch);
+        this.pitch = pitch;
         pitchSlider.setValue(pitch);
+        updateExport();
+    }
+
+    public void updateExport(){
+        if(useRealtimeRender){
+            return;
+        }
+        try {
+            var scene = wrappedScene.scene;
+            scene.getCameraSettings().setIsometricYawPitchRoll(yaw, pitch, 0);
+            scene.getCameraSettings().setRotationCenter(scene.getWorldCenter());
+
+            scene.getCameraSettings().setZoom(1.0f);
+            scene.centerScene();
+            var res = wrappedScene.exportPreviewPng();
+            if(res == null){
+                System.out.println("Failed to export preview");
+                return;
+            }
+
+//            var res = wrappedScene.capturePreviewNative();
+//            if(res == null){
+//                System.out.println("Failed to export preview");
+//                return;
+//            }
+//            if(dynamicTexture != null){
+//                dynamicTexture.close();
+//            }
+
+            dynamicTexture = DownloadScreen.getTexture(res.image());
+            Minecraft.getInstance().getTextureManager().register(PREVIEW_TEXTURE, dynamicTexture);
+            previewImage.dynamicTexture = dynamicTexture;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override

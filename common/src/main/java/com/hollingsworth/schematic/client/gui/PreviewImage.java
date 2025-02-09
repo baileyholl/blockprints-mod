@@ -23,12 +23,15 @@ public class PreviewImage extends AbstractWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
+        if(dynamicTexture == null || dynamicTexture.getPixels() == null){
+            return;
+        }
         int imageWidth = dynamicTexture.getPixels().getWidth();
         int imageHeight = dynamicTexture.getPixels().getHeight();
 
         // scale width and height to fit in the box of 100,100
         LytSize origDim = new LytSize(imageWidth, imageHeight);
-        LytSize boundary = new LytSize(100, 100);
+        LytSize boundary = new LytSize(width, height);
         LytSize newDim = getScaledDimension(origDim, boundary);
         // Offset x and Y so the image is centered
         // center x and y on point 50, 50

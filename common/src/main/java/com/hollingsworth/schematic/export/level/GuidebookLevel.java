@@ -27,8 +27,10 @@ import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.chunk.DataLayer;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraft.world.level.entity.LevelCallback;
 import net.minecraft.world.level.entity.LevelEntityGetter;
@@ -205,6 +207,22 @@ public class GuidebookLevel extends Level {
     @Override
     public TickRateManager tickRateManager() {
         return null;
+    }
+
+    @Override
+    public boolean isOutsideBuildHeight(BlockPos pPos) {
+        return false;
+    }
+
+    @Override
+    public boolean isOutsideBuildHeight(int pY) {
+        return false;
+    }
+
+    @Nullable
+    @Override
+    public ChunkAccess getChunk(int pX, int pZ, ChunkStatus pChunkStatus, boolean pRequireChunk) {
+        return super.getChunk(pX, pZ, pChunkStatus, pRequireChunk);
     }
 
     @Override
