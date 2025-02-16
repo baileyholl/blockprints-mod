@@ -4,7 +4,6 @@ import com.hollingsworth.schematic.SchematicMod;
 import com.hollingsworth.schematic.client.ClientData;
 import com.hollingsworth.schematic.client.RenderStructureHandler;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -25,6 +24,8 @@ public class PlaceSchematicScreen extends Screen {
     public static ConfirmTool confirmTool = new ConfirmTool();
     public static PrintTool printTool = new PrintTool();
     public static DeleteTool deleteTool = new DeleteTool();
+    public static MirrorTool mirrorTool = new MirrorTool();
+
     public final String holdToFocus = "blockprints.gui.toolmenu.focusKey";
 
     public boolean focused;
@@ -53,6 +54,7 @@ public class PlaceSchematicScreen extends Screen {
         tools.add(moveHorizontalTool);
         tools.add(moveVerticalTool);
         tools.add(rotateTool);
+//        tools.add(mirrorTool);
         tools.add(confirmTool);
         if(Minecraft.getInstance().player.isCreative()) {
             tools.add(printTool);
@@ -83,7 +85,7 @@ public class PlaceSchematicScreen extends Screen {
             init(minecraft, mainWindow.getGuiScaledWidth(), mainWindow.getGuiScaledHeight());
 
         int x = (mainWindow.getGuiScaledWidth() - w) / 2 + 15;
-        int y = mainWindow.getGuiScaledHeight() - h - 75;
+        int y = mainWindow.getGuiScaledHeight() - h - 50;
 
         matrixStack.pushPose();
         matrixStack.translate(0, -yOffset, focused ? 100 : 0);
@@ -95,15 +97,11 @@ public class PlaceSchematicScreen extends Screen {
                 .getDescription();
 
         if (toolTipAlpha > 0.25f) {
-            graphics.blit(SchematicMod.prefix("textures/gui/hud_background.png"), x - 15, y + 33, 0, 0, w, h + 22, 16, 16);
+            graphics.blit(SchematicMod.prefix("textures/gui/visualizer_background2.png"), x - 15, y + 33, 0, 0, w, h, 16, 16);
             if (!toolTip.isEmpty())
                 GuiUtils.drawOutlinedText(minecraft.font, graphics, toolTip.get(0), x - 10, y + 38);
             if (toolTip.size() > 1)
                 GuiUtils.drawOutlinedText(minecraft.font, graphics, toolTip.get(1), x - 10, y + 50);
-            if (toolTip.size() > 2)
-                GuiUtils.drawOutlinedText(minecraft.font, graphics, toolTip.get(2), x - 10, y + 60);
-            if (toolTip.size() > 3)
-                GuiUtils.drawOutlinedText(minecraft.font, graphics, toolTip.get(3), x - 10, y + 70);
         }
 
         if (tools.size() > 1) {
@@ -179,6 +177,11 @@ public class PlaceSchematicScreen extends Screen {
         }
 
         @Override
+        public void onClick() {
+            RenderStructureHandler.cancelRender();
+        }
+
+        @Override
         List<Component> getDescription() {
             List<Component> list = new ArrayList<>();
             list.add(Component.translatable("blockprints.delete_description"));
@@ -228,10 +231,36 @@ public class PlaceSchematicScreen extends Screen {
         }
     }
 
+    public static class MirrorTool extends ToolType {
+
+        public MirrorTool() {
+            super(Component.translatable("blockprints.mirror_tool"), SchematicMod.prefix("textures/gui/visualizer_icon_mirror.png"));
+        }
+
+        @Override
+        public boolean handleMouseWheel(double delta) {
+            RenderStructureHandler.onFlip();
+            return true;
+        }
+
+        @Override
+        List<Component> getDescription() {
+            List<Component> list = new ArrayList<>();
+            list.add(Component.translatable("blockprints.mirror_description"));
+            return list;
+        }
+    }
+
+
     public static class ConfirmTool extends ToolType{
 
         public ConfirmTool() {
             super(Component.translatable("blockprints.confirm_tool"), SchematicMod.prefix("textures/gui/visualizer_icon_confirm.png"));
+        }
+
+        @Override
+        public void onClick() {
+            RenderStructureHandler.onConfirmHit();
         }
 
         @Override

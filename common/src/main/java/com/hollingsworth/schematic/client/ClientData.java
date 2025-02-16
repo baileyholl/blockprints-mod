@@ -52,7 +52,6 @@ public class ClientData {
             return;
         }
         AreaCaptureHandler.onConfirmHit();
-        RenderStructureHandler.onConfirmHit();
     }
 
     public static void onCancelHit(KeyEvent event) {
@@ -60,7 +59,6 @@ public class ClientData {
             return;
         }
         AreaCaptureHandler.onCancelHit();
-        RenderStructureHandler.onCancelHit();
     }
 
     public static void renderAfterSky(PoseStack poseStack, Matrix4f modelViewMatrix) {

@@ -30,6 +30,7 @@ public class StructureRenderData {
     public StructureTemplate structureTemplate;
     public Rotation rotation;
     public Mirror mirror;
+    public boolean flipped = false;
     public BlockPos lastRenderPos = null;
     public int sortCounter;
     //A map of RenderType -> DireBufferBuilder, so we can draw the different render types in proper order later
@@ -60,6 +61,7 @@ public class StructureRenderData {
     public void rotate(Rotation rotateBy){
         rotation = rotation.getRotated(rotateBy);
         statePosCache = StatePos.rotate(statePosCache, new ArrayList<>(), rotateBy);
+
         boundingBox = structureTemplate.getBoundingBox(new StructurePlaceSettings().setRotation(rotation), new BlockPos(0, 0, 0));
     }
 
@@ -67,6 +69,11 @@ public class StructureRenderData {
         this.mirror = mirror ? Mirror.FRONT_BACK : Mirror.NONE;
 
         boundingBox = structureTemplate.getBoundingBox(new StructurePlaceSettings().setMirror(this.mirror).setRotation(rotation), new BlockPos(0, 0, 0));
+    }
+
+    public void flip(){
+        flipped = !flipped;
+        this.mirror(flipped);
     }
 
     //Get the buffer from the map, and ensure its building

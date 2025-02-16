@@ -48,13 +48,6 @@ public class RenderStructureHandler {
         placingData = null;
     }
 
-    public static void onCancelHit() {
-        if (placingData == null) {
-            return;
-        }
-        cancelRender();
-    }
-
     public static void setAnchor(){
         if(placingData == null){
             return;
@@ -75,6 +68,7 @@ public class RenderStructureHandler {
             return;
         }
         placingData.rotate(clockwise ? Rotation.CLOCKWISE_90 : Rotation.COUNTERCLOCKWISE_90);
+        placingData.lastRenderPos = null;
     }
 
     public static void offsetAnchor(BlockPos pos){
@@ -84,11 +78,12 @@ public class RenderStructureHandler {
         placingData.anchorPos = placingData.anchorPos.offset(pos);
     }
 
-    public static void onMirrorHit() {
+    public static void onFlip() {
         if (placingData == null) {
             return;
         }
-        placingData.mirror(true);
+        placingData.flip();
+        placingData.lastRenderPos = null;
     }
 
     public static void toolKeyHit(KeyEvent event){
