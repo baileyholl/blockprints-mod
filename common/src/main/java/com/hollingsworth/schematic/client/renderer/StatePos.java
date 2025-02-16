@@ -21,11 +21,25 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class StatePos {
+//    public static StreamCodec<StatePos, RegistryFriendlyByteBuf> STREAM = StreamCodec.of((buf, val) ->{
+//
+//    }, (buf) -> {
+//        return new StatePos(buf.readNbt(), buf.readBlockPos());
+//    });
+
     public BlockState state;
     public BlockPos pos;
+    private CompoundTag tag;
+
 
     public StatePos(BlockState state, BlockPos pos) {
         this.state = state;
+        this.pos = pos;
+    }
+
+    public StatePos(CompoundTag tag, BlockPos pos){
+        this.state = null;
+        this.tag = tag;
         this.pos = pos;
     }
 
