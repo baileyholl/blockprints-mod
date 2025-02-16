@@ -92,5 +92,7 @@
   "blockprints.delete_tool": "Delete Visual",
   "blockprints.delete_description": "Deletes the visual and closes the GUI.",
   "blockprints.mirror_tool": "Mirror",
-  "blockprints.mirror_description": "Hold Control + Scroll to mirror the structure."
+  "blockprints.mirror_description": "Hold Control + Scroll to mirror the structure.",
+  "blockprints.dimensions": "Size: %s x %s x %s",
+  "blockprints.expand_box": "Hold Control + Scroll to adjust the boundary"
 }

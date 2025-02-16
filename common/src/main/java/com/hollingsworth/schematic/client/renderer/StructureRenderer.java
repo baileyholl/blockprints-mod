@@ -56,10 +56,7 @@ public class StructureRenderer {
     }
 
     public static boolean shouldUpdateRender(StructureRenderData data, BlockPos renderPos) {
-        if(data.lastRenderPos == null || !data.lastRenderPos.equals(renderPos)){
-            return true;
-        }
-        return false;
+        return data.lastRenderPos == null || !data.lastRenderPos.equals(renderPos);
     }
     public static void clearByteBuffers(StructureRenderData data) { //Prevents leaks - Unused?
         for (Map.Entry<RenderType, ByteBufferBuilder> entry : data.builders.entrySet()) {
@@ -68,7 +65,6 @@ public class StructureRenderer {
         data.bufferBuilders.clear();
         data.sortStates.clear();
         data.meshDatas.clear();
-//        data.vertexBuffers = RenderType.chunkBufferLayers().stream().collect(Collectors.toMap((renderType) -> renderType, (type) -> new VertexBuffer(VertexBuffer.Usage.STATIC)));
     }
     public static void generateRender(StructureRenderData data, Level level, BlockPos renderPos, float transparency) {
         generateRender(data, level, renderPos, transparency, Minecraft.getInstance().gameRenderer.getMainCamera().getPosition());

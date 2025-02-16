@@ -110,18 +110,5 @@ public class RenderStructureHandler {
         if (placingData == null)
             return;
         schematicTools.renderPassive(graphics, 0);
-//        float screenY = window.getGuiScaledHeight() / 2f;
-//        float screenX = window.getGuiScaledWidth() / 2f;
-//        float instructionY = window.getGuiScaledHeight() - 42;
-//        graphics.pose().pushPose();
-//        graphics.pose().translate(screenX, instructionY, 0);
-//
-//        GuiUtils.drawCenteredOutlinedText(Minecraft.getInstance().font, graphics, Component.translatable(Constants.MOD_ID + ".confirm_selection", CONFIRM.getTranslatedKeyMessage()).getVisualOrderText(), 0, 0);
-//
-//        graphics.pose().popPose();
-//        graphics.pose().pushPose();
-//        graphics.pose().translate(screenX,  instructionY+ 10, 0);
-//        GuiUtils.drawCenteredOutlinedText(Minecraft.getInstance().font, graphics, Component.translatable(Constants.MOD_ID + ".cancel_selection", CANCEL.getTranslatedKeyMessage()).getVisualOrderText(), 0, 0);
-//        graphics.pose().popPose();
     }
 }

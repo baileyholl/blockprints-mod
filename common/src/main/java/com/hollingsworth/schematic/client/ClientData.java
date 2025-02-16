@@ -75,7 +75,7 @@ public class ClientData {
    }
 
    public static boolean mouseScrolled(double delta){
-        return RenderStructureHandler.mouseScrolled(delta);
+        return RenderStructureHandler.mouseScrolled(delta) || AreaCaptureHandler.mouseScrolled(delta);
    }
 
 
@@ -91,6 +91,7 @@ public class ClientData {
 
     public static void tickEvent(){
         RenderStructureHandler.tick();
+        AreaCaptureHandler.tick();
     }
 
     public record KeyFunction(KeyMapping mapping, Consumer<KeyEvent> function){}

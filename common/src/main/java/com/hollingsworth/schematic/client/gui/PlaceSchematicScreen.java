@@ -44,7 +44,6 @@ public class PlaceSchematicScreen extends Screen {
         yOffset = 0;
         selection = 0;
         initialized = false;
-        w = Math.max(tools.size() * 50 + 30, 220);
         h = 34;
         tools.add(new PlaceTool());
     }
@@ -60,7 +59,6 @@ public class PlaceSchematicScreen extends Screen {
             tools.add(printTool);
         }
         tools.add(deleteTool);
-        w = Math.max(tools.size() * 50 + 30, 220);
     }
 
     public void setSelectedElement(ToolType tool) {
@@ -79,13 +77,14 @@ public class PlaceSchematicScreen extends Screen {
     }
 
     private void draw(GuiGraphics graphics, float partialTicks) {
+        w = Math.max(tools.size() * 50 + 32, 220);
         PoseStack matrixStack = graphics.pose();
         Window mainWindow = minecraft.getWindow();
         if (!initialized)
             init(minecraft, mainWindow.getGuiScaledWidth(), mainWindow.getGuiScaledHeight());
 
-        int x = (mainWindow.getGuiScaledWidth() - w) / 2 + 15;
-        int y = mainWindow.getGuiScaledHeight() - h - 50;
+        int x = (mainWindow.getGuiScaledWidth() - w) / 2 + 14;
+        int y = mainWindow.getGuiScaledHeight() - h - 34;
 
         matrixStack.pushPose();
         matrixStack.translate(0, -yOffset, focused ? 100 : 0);
@@ -97,7 +96,7 @@ public class PlaceSchematicScreen extends Screen {
                 .getDescription();
 
         if (toolTipAlpha > 0.25f) {
-            graphics.blit(SchematicMod.prefix("textures/gui/visualizer_background2.png"), x - 15, y + 33, 0, 0, w, h, 16, 16);
+            graphics.blit(SchematicMod.prefix("textures/gui/hud_background.png"), x - 15, y + 16, 0, 0, w, h, 16, 16);
             if (!toolTip.isEmpty())
                 GuiUtils.drawOutlinedText(minecraft.font, graphics, toolTip.get(0), x - 10, y + 38);
             if (toolTip.size() > 1)
@@ -124,7 +123,7 @@ public class PlaceSchematicScreen extends Screen {
                 matrixStack.translate(0, -10, 0);
 
                 GuiUtils.drawCenteredOutlinedText(minecraft.font, graphics, tools.get(i)
-                        .getDisplayName(), x + i * 50 + 24, y + 28);
+                        .getDisplayName(), x + i * 50 + 26, y + 28);
             }
             ResourceLocation icon = tools.get(i)
                     .getIcon();
