@@ -7,10 +7,13 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.AABB;
 
 import java.nio.file.Path;
@@ -48,5 +51,10 @@ public class FabricPlatformHelper implements IPlatformHelper {
         if(Constants.isCreateLoaded){
             CreateCompat.appendGlue(level, aabb, tag);
         }
+    }
+
+    @Override
+    public void sendStructurePacket(StructureTemplate template, StructurePlaceSettings structurePlaceSettings, BlockPos pos) {
+
     }
 }

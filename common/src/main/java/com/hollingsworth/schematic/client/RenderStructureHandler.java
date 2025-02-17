@@ -3,6 +3,7 @@ package com.hollingsworth.schematic.client;
 import com.hollingsworth.schematic.client.gui.PlaceSchematicScreen;
 import com.hollingsworth.schematic.client.renderer.StructureRenderData;
 import com.hollingsworth.schematic.client.renderer.StructureRenderer;
+import com.hollingsworth.schematic.platform.Services;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -26,7 +27,6 @@ public class RenderStructureHandler {
         if(placingData != null){
             cancelRender();
         }
-        anchorPos = null;
         placingData = new StructureRenderData(structureTemplate, name, bpId);
         schematicTools = new PlaceSchematicScreen();
         StructureRenderer.structures.add(placingData);
@@ -36,7 +36,6 @@ public class RenderStructureHandler {
         if(placingData == null){
             return;
         }
-        anchorPos = null;
         StructureRenderer.structures.remove(placingData);
         placingData = null;
     }
@@ -110,5 +109,12 @@ public class RenderStructureHandler {
         if (placingData == null)
             return;
         schematicTools.renderPassive(graphics, 0);
+    }
+
+    public static void placeOnServer(){
+        if(placingData == null){
+            return;
+        }
+        Services.PLATFORM.sendStructurePacket(placingData.structureTemplate, placingData.structurePlaceSettings, placingData.anchorPos.above(1));
     }
 }

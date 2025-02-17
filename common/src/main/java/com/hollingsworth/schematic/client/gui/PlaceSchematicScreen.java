@@ -277,6 +277,11 @@ public class PlaceSchematicScreen extends Screen {
         }
 
         @Override
+        public void onClick() {
+            RenderStructureHandler.placeOnServer();
+        }
+
+        @Override
         List<Component> getDescription() {
             List<Component> list = new ArrayList<>();
             list.add(Component.translatable("blockprints.print_description"));

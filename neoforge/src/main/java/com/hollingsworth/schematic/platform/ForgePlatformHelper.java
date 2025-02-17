@@ -2,13 +2,18 @@ package com.hollingsworth.schematic.platform;
 
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.compat.CreateCompat;
+import com.hollingsworth.schematic.networking.Networking;
+import com.hollingsworth.schematic.networking.PlaceSchematicPacket;
 import com.hollingsworth.schematic.platform.services.IPlatformHelper;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
@@ -48,5 +53,10 @@ public class ForgePlatformHelper implements IPlatformHelper {
         if(Constants.isCreateLoaded){
             CreateCompat.appendGlue(level, aabb, tag);
         }
+    }
+
+    @Override
+    public void sendStructurePacket(StructureTemplate template, StructurePlaceSettings structurePlaceSettings, BlockPos pos) {
+        Networking.sendToServer(new PlaceSchematicPacket(template, structurePlaceSettings, pos));
     }
 }
