@@ -20,6 +20,8 @@ public class ViewFavoritesScreen extends BaseSchematicScreen {
     public boolean showBuilds = true;
     public boolean showRecent = true;
     int scroll = 0;
+
+    VerticalSlider slider;
     public ViewFavoritesScreen(FavoritesResponse favoritesResponse) {
         this(favoritesResponse, true, true, true);
     }
@@ -73,11 +75,8 @@ public class ViewFavoritesScreen extends BaseSchematicScreen {
     public void init() {
         super.init();
         updateList();
-        int scrollSize = Math.max(0, favorites.size() - 10);
-        addRenderableWidget(new VerticalSlider(bookLeft + 265, bookTop + 46, scrollSize, 1, 1, count -> {
-            this.scroll = count;
-            updateList();
-        }));
+        int maxScroll = Math.max(0, favorites.size() - 10);
+        this.slider = addRenderableWidget(new VerticalSlider(bookLeft + 265, bookTop + 46, maxScroll, 1, 1, this::scrollChange));
 
         ResourceLocation unchecked = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container_filter_unchecked.png");
         ResourceLocation checked = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container_filter_checked.png");
@@ -120,6 +119,20 @@ public class ViewFavoritesScreen extends BaseSchematicScreen {
             addRenderableWidget(row);
         }
     }
+
+    public void scrollChange(int change) {
+        this.scroll = change;
+        updateList();
+    }
+
+    @Override
+    public boolean mouseScrolled(double pMouseX, double pMouseY, double pScrollX, double pScrollY) {
+        if(this.slider.mouseScrolled(pMouseX, pMouseY, pScrollX, pScrollY)){
+            return true;
+        }
+        return super.mouseScrolled(pMouseX, pMouseY, pScrollX, pScrollY);
+    }
+
 
     public void queryFavorites() {
         Minecraft.getInstance().setScreen(ViewFavoritesScreen.getTransition(showFavorites, showBuilds, showRecent));

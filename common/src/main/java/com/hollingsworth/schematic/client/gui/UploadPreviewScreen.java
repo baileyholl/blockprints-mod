@@ -219,6 +219,15 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         }
     }
 
+    @Override
+    public boolean mouseScrolled(double pMouseX, double pMouseY, double pScrollX, double pScrollY) {
+        if(GuiUtils.isMouseInRelativeRange(pMouseX, pMouseY, yawSlider)) {
+            return yawSlider.mouseScrolled(pMouseX, pMouseY, pScrollX, pScrollY);
+        }else if(GuiUtils.isMouseInRelativeRange(pMouseX, pMouseY, pitchSlider)){
+            return pitchSlider.mouseScrolled(pMouseX, pMouseY, pScrollX, pScrollY);
+        }
+        return super.mouseScrolled(pMouseX, pMouseY, pScrollX, pScrollY);
+    }
 
     @Override
     public void drawBackgroundElements(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {

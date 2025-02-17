@@ -25,6 +25,21 @@ public class HorizontalSlider extends BaseSlider {
     }
 
     @Override
+    public void setValueFromMouse(double mouseX, double mouseY) {
+        this.setSliderValue((mouseX - (double)(this.getX() + 4)) / (double)(this.width - 8));
+    }
+
+    @Override
+    public boolean mouseScrolled(double pMouseX, double pMouseY, double pScrollX, double pScrollY) {
+        if(pScrollY != 0){
+            this.setValue(this.getValue() + (pScrollY > 0 ? -1 : 1) * stepSize);
+            applyValue();
+            return true;
+        }
+        return super.mouseScrolled(pMouseX, pMouseY, pScrollX, pScrollY);
+    }
+
+    @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         final Minecraft mc = Minecraft.getInstance();
         String image = isPitch ? "textures/gui/container_scroll_pitch.png" : "textures/gui/container_scroll_yaw.png";

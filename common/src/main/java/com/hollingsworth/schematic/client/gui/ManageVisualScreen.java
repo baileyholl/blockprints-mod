@@ -15,6 +15,7 @@ public class ManageVisualScreen extends BaseSchematicScreen{
     List<VisualEntryRow> rows = new ArrayList<>();
     ArrayList<StructureRenderData> structures;
     int scroll = 0;
+    VerticalSlider slider;
     public ManageVisualScreen() {
         super();
         structures = StructureRenderer.structures;
@@ -24,14 +25,24 @@ public class ManageVisualScreen extends BaseSchematicScreen{
     public void init() {
         super.init();
         updateList();
-        int scrollSize = Math.max(0, structures.size() - 10);
-        addRenderableWidget(new VerticalSlider(bookLeft + 265, bookTop + 46, scrollSize, 1, 1, count -> {
-            this.scroll = count;
-            updateList();
-        }));
+        int maxScroll = Math.max(0, structures.size() - 10);
+        this.slider = addRenderableWidget(new VerticalSlider(bookLeft + 265, bookTop + 46, maxScroll, 1, 1, this::scrollChange));
         addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
             Minecraft.getInstance().setScreen(new HomeScreen());
         }));
+    }
+
+    public void scrollChange(int change) {
+        this.scroll = change;
+        updateList();
+    }
+
+    @Override
+    public boolean mouseScrolled(double pMouseX, double pMouseY, double pScrollX, double pScrollY) {
+        if(slider.mouseScrolled(pMouseX, pMouseY, pScrollX, pScrollY)){
+            return true;
+        }
+        return super.mouseScrolled(pMouseX, pMouseY, pScrollX, pScrollY);
     }
 
     public void updateList() {

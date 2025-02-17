@@ -15,6 +15,7 @@ public class BlockListScreen extends BaseSchematicScreen {
     List<DownloadScreen.BlockListEntry> entries;
     List<BlockEntryRow> rows = new ArrayList<>();
     int scroll = 0;
+    VerticalSlider slider;
 
     public BlockListScreen(Screen previousScreen, List<DownloadScreen.BlockListEntry> entries) {
         super();
@@ -38,12 +39,23 @@ public class BlockListScreen extends BaseSchematicScreen {
             Minecraft.getInstance().setScreen(previousScreen);
         }));
         updateList();
-        int scrollSize = Math.max(0, entries.size() - 10);
-        addRenderableWidget(new VerticalSlider(bookLeft + 265, bookTop + 46, scrollSize, 1, 1, count -> {
-            this.scroll = count;
-            updateList();
-        }));
+        int maxScroll = Math.max(0, entries.size() - 10);
+        slider = addRenderableWidget(new VerticalSlider(bookLeft + 265, bookTop + 46, maxScroll, 1, 1, this::scrollChange));
     }
+
+    public void scrollChange(int change) {
+        this.scroll = change;
+        updateList();
+    }
+
+    @Override
+    public boolean mouseScrolled(double pMouseX, double pMouseY, double pScrollX, double pScrollY) {
+        if(slider.mouseScrolled(pMouseX, pMouseY, pScrollX, pScrollY)){
+            return true;
+        }
+        return super.mouseScrolled(pMouseX, pMouseY, pScrollX, pScrollY);
+    }
+
 
     public void updateList() {
         for (BlockEntryRow row : rows) {

@@ -1,7 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -30,12 +29,18 @@ public class VerticalSlider extends BaseSlider {
 
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-//        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
-        final Minecraft mc = Minecraft.getInstance();
         guiGraphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container_scroll.png"), x, y - 21, 0, 0, 15, 159, 15, 159);
         guiGraphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/scroll_bar_vertical.png"), x + 3, y + (int) (this.value * (double) (this.height - 20)), 0, 0, 9, 15, 9, 15);
-//        GuiUtils.drawCenteredOutlinedText(mc.font, guiGraphics, Component.literal(String.valueOf(this.getValueInt())).getVisualOrderText(), x + 116, y + 4);
+    }
 
+    @Override
+    public boolean mouseScrolled(double pMouseX, double pMouseY, double pScrollX, double pScrollY) {
+        if(pScrollY != 0){
+            this.setValue(this.getValue() + (pScrollY > 0 ? -1 : 1) * stepSize);
+            applyValue();
+            return true;
+        }
+        return super.mouseScrolled(pMouseX, pMouseY, pScrollX, pScrollY);
     }
 
     @Override

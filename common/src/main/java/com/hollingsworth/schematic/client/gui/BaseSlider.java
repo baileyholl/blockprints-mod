@@ -14,7 +14,7 @@ import java.text.DecimalFormat;
  * Slider widget implementation which allows inputting values in a certain range with optional step size.
  * Copy of ExtendedSlider
  */
-public class BaseSlider extends AbstractSliderButton {
+public abstract class BaseSlider extends AbstractSliderButton {
     protected Component prefix;
     protected Component suffix;
     protected double minValue;
@@ -79,12 +79,12 @@ public class BaseSlider extends AbstractSliderButton {
     }
 
     public void onClick(double mouseX, double mouseY) {
-        this.setValueFromMouse(mouseX);
+        this.setValueFromMouse(mouseX, mouseY);
     }
 
     protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
         super.onDrag(mouseX, mouseY, dragX, dragY);
-        this.setValueFromMouse(mouseX);
+        this.setValueFromMouse(mouseX, mouseY);
     }
 
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
@@ -105,13 +105,7 @@ public class BaseSlider extends AbstractSliderButton {
         return false;
     }
 
-    public void setValueFromMouse(double mouseX) {
-        this.setSliderValue((mouseX - (double)(this.getX() + 4)) / (double)(this.width - 8));
-    }
-
-    public void setValueFromMouse(double mouseX, double mouseY){
-        this.setSliderValue((mouseY - (double)(this.getY() + 4)) / (double)(this.height - 8));
-    }
+    public abstract void setValueFromMouse(double mouseX, double mouseY);
 
     public void setSliderValue(double value) {
         double oldValue = this.value;
