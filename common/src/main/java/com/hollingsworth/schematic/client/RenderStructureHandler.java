@@ -13,8 +13,8 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 public class RenderStructureHandler {
-    public static StructureRenderData placingData;
-    public static PlaceSchematicScreen schematicTools = new PlaceSchematicScreen();
+    private static StructureRenderData placingData;
+    private static PlaceSchematicScreen schematicTools = new PlaceSchematicScreen();
 
     public static void tick(){
         if(placingData == null){
@@ -51,8 +51,19 @@ public class RenderStructureHandler {
         if(placingData == null){
             return;
         }
-        placingData.anchorPos = RaycastHelper.getLookingAt(Minecraft.getInstance().player, true).getBlockPos();
+        placingData.anchorPos = RaycastHelper.getLookingAt(placingData.distanceFromCameraCast, Minecraft.getInstance().player, true).getBlockPos();
         schematicTools.setupManipulationTools();
+    }
+
+    public static void onZoom(boolean zoomIn){
+        if(placingData == null){
+            return;
+        }
+        if(zoomIn){
+            placingData.distanceFromCameraCast += 1;
+        }else{
+            placingData.distanceFromCameraCast -= 1;
+        }
     }
 
     public static void positionClicked() {

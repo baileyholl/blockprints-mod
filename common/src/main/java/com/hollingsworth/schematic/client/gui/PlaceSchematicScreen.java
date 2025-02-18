@@ -112,6 +112,7 @@ public class PlaceSchematicScreen extends Screen {
                 GuiUtils.drawCenteredOutlinedText(minecraft.font, graphics, Component.translatable("blockprints.scroll"), width / 2, y - 10);
             }
         } else {
+            GuiUtils.drawCenteredOutlinedText(minecraft.font, graphics, Component.translatable("blockprints.place_description"), width / 2, y - 10);
             x += 65;
         }
 
@@ -327,6 +328,12 @@ public class PlaceSchematicScreen extends Screen {
         @Override
         public void onClick() {
             RenderStructureHandler.setAnchor();
+        }
+
+        @Override
+        public boolean handleMouseWheel(double delta) {
+            RenderStructureHandler.onZoom(delta > 0);
+            return true;
         }
     }
 

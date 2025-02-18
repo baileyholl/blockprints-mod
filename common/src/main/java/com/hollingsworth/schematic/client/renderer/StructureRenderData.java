@@ -39,6 +39,7 @@ public class StructureRenderData {
     public Map<RenderType, VertexBuffer> vertexBuffers = RenderType.chunkBufferLayers().stream().collect(Collectors.toMap((renderType) -> renderType, (type) -> new VertexBuffer(VertexBuffer.Usage.STATIC)));
     public final Map<RenderType, BufferBuilder> bufferBuilders = new HashMap<>();
     public StructurePlaceSettings structurePlaceSettings;
+    public double distanceFromCameraCast = 25;
 
     public StructureRenderData(StructureTemplate structureTemplate, String name, String blockprintsId){
         var accessor = (StructureTemplateAccessor)structureTemplate;

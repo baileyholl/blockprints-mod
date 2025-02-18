@@ -77,7 +77,7 @@
   "key.blockprints.rotate_right": "Rotate Right",
   "blockprints.place_tool": "Place",
   "blockprints.gui.toolmenu.focusKey": "Hold %s to focus",
-  "blockprints.place_description": "Right-click to place.",
+  "blockprints.place_description": "Right-click to place. Ctrl + Scroll to adjust the maximum placement distance.",
   "blockprints.scroll": "Scroll to cycle",
   "blockprints.rotate_tool": "Rotate",
   "blockprints.move_horizontal_tool": "Move Horizontal",
