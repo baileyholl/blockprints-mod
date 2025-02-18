@@ -1,6 +1,7 @@
 package com.hollingsworth.schematic;
 
 import com.hollingsworth.schematic.client.ClientData;
+import com.hollingsworth.schematic.client.KeyEvent;
 import com.hollingsworth.schematic.platform.FabricPlatformHelper;
 import com.hollingsworth.schematic.platform.Services;
 import net.fabricmc.api.ClientModInitializer;
@@ -20,13 +21,12 @@ public class SchematicFabricClient implements ClientModInitializer {
         }
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             for(ClientData.KeyFunction keyMapping : ClientData.KEY_FUNCTIONS){
-                if(keyMapping.mapping().isDown()){
-                    keyMapping.function().run();
-                }
+                keyMapping.function().accept(new KeyEvent(keyMapping.mapping(), keyMapping.mapping().isDown() ? 1 : 0));
             }
             if(Minecraft.getInstance().options.keyUse.isDown()){
                 ClientData.rightClickEvent();
             }
+            ClientData.tickEvent();
         });
 
         WorldRenderEvents.LAST.register((context) -> {

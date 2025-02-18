@@ -2,7 +2,9 @@ package com.hollingsworth.schematic.platform;
 
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.compat.CreateCompat;
+import com.hollingsworth.schematic.networking.AbstractPacket;
 import com.hollingsworth.schematic.platform.services.IPlatformHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
@@ -48,5 +50,10 @@ public class FabricPlatformHelper implements IPlatformHelper {
         if(Constants.isCreateLoaded){
             CreateCompat.appendGlue(level, aabb, tag);
         }
+    }
+
+    @Override
+    public void sendClientToServerPacket(AbstractPacket packet) {
+        ClientPlayNetworking.send(packet);
     }
 }

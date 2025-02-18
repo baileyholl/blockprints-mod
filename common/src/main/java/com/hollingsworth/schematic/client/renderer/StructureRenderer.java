@@ -35,7 +35,7 @@ public class StructureRenderer {
 
     //Start rendering - this is the most expensive part, so we render it, then cache it, and draw it over and over (much cheaper)
     public static void buildRender(StructureRenderData data, PoseStack poseStack, Player player) {
-        BlockHitResult lookingAt = RaycastHelper.getLookingAt(player, true);
+        BlockHitResult lookingAt = RaycastHelper.getLookingAt(data.distanceFromCameraCast, player, true);
         BlockPos renderPos = data.anchorPos == null ? lookingAt.getBlockPos() : data.anchorPos;
         if(renderPos == null){
             return;
@@ -56,10 +56,7 @@ public class StructureRenderer {
     }
 
     public static boolean shouldUpdateRender(StructureRenderData data, BlockPos renderPos) {
-        if(data.lastRenderPos == null || !data.lastRenderPos.equals(renderPos)){
-            return true;
-        }
-        return false;
+        return data.lastRenderPos == null || !data.lastRenderPos.equals(renderPos);
     }
     public static void clearByteBuffers(StructureRenderData data) { //Prevents leaks - Unused?
         for (Map.Entry<RenderType, ByteBufferBuilder> entry : data.builders.entrySet()) {
@@ -68,7 +65,6 @@ public class StructureRenderer {
         data.bufferBuilders.clear();
         data.sortStates.clear();
         data.meshDatas.clear();
-//        data.vertexBuffers = RenderType.chunkBufferLayers().stream().collect(Collectors.toMap((renderType) -> renderType, (type) -> new VertexBuffer(VertexBuffer.Usage.STATIC)));
     }
     public static void generateRender(StructureRenderData data, Level level, BlockPos renderPos, float transparency) {
         generateRender(data, level, renderPos, transparency, Minecraft.getInstance().gameRenderer.getMainCamera().getPosition());
@@ -179,7 +175,7 @@ public class StructureRenderer {
         BlockPos anchorPos = data.anchorPos;
         MultiBufferSource.BufferSource buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
         Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-        BlockHitResult lookingAt = RaycastHelper.getLookingAt(player, true);
+        BlockHitResult lookingAt = RaycastHelper.getLookingAt(data.distanceFromCameraCast, player, true);
         BlockPos renderPos = anchorPos == null ? lookingAt.getBlockPos() : anchorPos;
         BlockState lookingAtState = player.level().getBlockState(renderPos);
 

@@ -4,8 +4,10 @@
   "package": "com.hollingsworth.schematic.mixin",
   "compatibilityLevel": "JAVA_21",
   "refmap": "blockprints.refmap.json",
-  "mixins": [],
+  "mixins": [
+  ],
   "client": [
+    "MouseHandlerMix"
   ],
   "injectors": {
     "defaultRequire": 1

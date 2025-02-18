@@ -9,23 +9,38 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class StatePos {
+    public static StreamCodec<RegistryFriendlyByteBuf, StatePos> STREAM = StreamCodec.ofMember((val, buf) ->{
+        ByteBufCodecs.COMPOUND_TAG.encode(buf, val.tag);
+        BlockPos.STREAM_CODEC.encode(buf, val.pos);
+    }, (buf) -> new StatePos(ByteBufCodecs.COMPOUND_TAG.decode(buf), BlockPos.STREAM_CODEC.decode(buf)));
+
+    public static StreamCodec<RegistryFriendlyByteBuf, List<StatePos>> STREAM_LIST = STREAM.apply(ByteBufCodecs.list());
+
     public BlockState state;
     public BlockPos pos;
+    private CompoundTag tag;
+
 
     public StatePos(BlockState state, BlockPos pos) {
         this.state = state;
+        this.pos = pos;
+    }
+
+    public StatePos(CompoundTag tag, BlockPos pos){
+        this.state = null;
+        this.tag = tag;
         this.pos = pos;
     }
 

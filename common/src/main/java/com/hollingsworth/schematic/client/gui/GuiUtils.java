@@ -35,6 +35,10 @@ public class GuiUtils {
     }
 
 
+    public static void drawOutlinedText(Font font, GuiGraphics graphics, Component component, int x, int y) {
+        drawOutlinedText(font, graphics, component.getVisualOrderText(), x, y);
+    }
+
     public static void drawOutlinedText(Font font, GuiGraphics graphics, FormattedCharSequence component, int x, int y) {
         font.drawInBatch8xOutline(component, x, y, DyeColor.WHITE.getTextColor(), DyeColor.BLACK.getTextColor(), graphics.pose().last().pose(), ClientConstants.bufferSource, 15728880);
         ClientConstants.bufferSource.endBatch();

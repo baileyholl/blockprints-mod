@@ -30,6 +30,7 @@ public class StructureRenderData {
     public StructureTemplate structureTemplate;
     public Rotation rotation;
     public Mirror mirror;
+    public boolean flipped = false;
     public BlockPos lastRenderPos = null;
     public int sortCounter;
     //A map of RenderType -> DireBufferBuilder, so we can draw the different render types in proper order later
@@ -37,6 +38,8 @@ public class StructureRenderData {
     //A map of RenderType -> Vertex Buffer to buffer the different render types.
     public Map<RenderType, VertexBuffer> vertexBuffers = RenderType.chunkBufferLayers().stream().collect(Collectors.toMap((renderType) -> renderType, (type) -> new VertexBuffer(VertexBuffer.Usage.STATIC)));
     public final Map<RenderType, BufferBuilder> bufferBuilders = new HashMap<>();
+    public StructurePlaceSettings structurePlaceSettings;
+    public double distanceFromCameraCast = 25;
 
     public StructureRenderData(StructureTemplate structureTemplate, String name, String blockprintsId){
         var accessor = (StructureTemplateAccessor)structureTemplate;
@@ -50,7 +53,8 @@ public class StructureRenderData {
         for(StructureTemplate.StructureBlockInfo blockInfo : palette.blocks()){
             statePosCache.add(new StatePos(blockInfo.state(), blockInfo.pos()));
         }
-        boundingBox = structureTemplate.getBoundingBox(new StructurePlaceSettings(), new BlockPos(0, 0, 0));
+        structurePlaceSettings = new StructurePlaceSettings();
+        boundingBox = structureTemplate.getBoundingBox(structurePlaceSettings, new BlockPos(0, 0, 0));
         this.name = name;
         this.blockprintsId = blockprintsId;
         rotation = Rotation.NONE;
@@ -60,13 +64,18 @@ public class StructureRenderData {
     public void rotate(Rotation rotateBy){
         rotation = rotation.getRotated(rotateBy);
         statePosCache = StatePos.rotate(statePosCache, new ArrayList<>(), rotateBy);
-        boundingBox = structureTemplate.getBoundingBox(new StructurePlaceSettings().setRotation(rotation), new BlockPos(0, 0, 0));
+        boundingBox = structureTemplate.getBoundingBox(structurePlaceSettings.setRotation(rotation), new BlockPos(0, 0, 0));
     }
 
     public void mirror(boolean mirror){
         this.mirror = mirror ? Mirror.FRONT_BACK : Mirror.NONE;
 
-        boundingBox = structureTemplate.getBoundingBox(new StructurePlaceSettings().setMirror(this.mirror).setRotation(rotation), new BlockPos(0, 0, 0));
+        boundingBox = structureTemplate.getBoundingBox(structurePlaceSettings.setMirror(this.mirror), new BlockPos(0, 0, 0));
+    }
+
+    public void flip(){
+        flipped = !flipped;
+        this.mirror(flipped);
     }
 
     //Get the buffer from the map, and ensure its building

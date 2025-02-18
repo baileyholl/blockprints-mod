@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.platform.services;
 
+import com.hollingsworth.schematic.networking.AbstractPacket;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.nbt.CompoundTag;
@@ -44,4 +45,6 @@ public interface IPlatformHelper {
     public Iterable<RenderType> getRenderTypes(BakedModel bakedModel, BlockState blockstate, RandomSource rand);
 
     public void appendCreateGlue(Level level, AABB aabb, CompoundTag tag);
+
+    void sendClientToServerPacket(AbstractPacket packet);
 }
