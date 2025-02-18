@@ -3,6 +3,7 @@ package com.hollingsworth.schematic.client;
 import com.hollingsworth.schematic.client.gui.PlaceSchematicScreen;
 import com.hollingsworth.schematic.client.renderer.StructureRenderData;
 import com.hollingsworth.schematic.client.renderer.StructureRenderer;
+import com.hollingsworth.schematic.networking.PlaceSchematicPacket;
 import com.hollingsworth.schematic.platform.Services;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
@@ -12,7 +13,6 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 public class RenderStructureHandler {
-    public static BlockPos anchorPos;
     public static StructureRenderData placingData;
     public static PlaceSchematicScreen schematicTools = new PlaceSchematicScreen();
 
@@ -115,6 +115,6 @@ public class RenderStructureHandler {
         if(placingData == null){
             return;
         }
-        Services.PLATFORM.sendStructurePacket(placingData.structureTemplate, placingData.structurePlaceSettings, placingData.anchorPos.above(1));
+        Services.PLATFORM.sendClientToServerPacket(new PlaceSchematicPacket(placingData.structureTemplate, placingData.structurePlaceSettings, placingData.anchorPos.above(1)));
     }
 }

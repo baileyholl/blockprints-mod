@@ -19,9 +19,7 @@ public class ClientData {
     public static final KeyMapping OPEN_MENU = new KeyMapping("key." + Constants.MOD_ID + ".open_menu", GLFW.GLFW_KEY_GRAVE_ACCENT, CATEGORY);
     public static final KeyMapping CONFIRM = new KeyMapping("key." + Constants.MOD_ID + ".confirm_selection", GLFW.GLFW_KEY_ENTER, CATEGORY);
     public static final KeyMapping CANCEL = new KeyMapping("key." + Constants.MOD_ID + ".cancel_selection", GLFW.GLFW_KEY_BACKSPACE, CATEGORY);
-    public static final KeyMapping ROTATE_LEFT = new KeyMapping("key." + Constants.MOD_ID + ".rotate_left", GLFW.GLFW_KEY_LEFT, CATEGORY);
-    public static final KeyMapping ROTATE_RIGHT = new KeyMapping("key." + Constants.MOD_ID + ".rotate_right", GLFW.GLFW_KEY_RIGHT, CATEGORY);
-    public static final KeyMapping TOOL_MENU = new KeyMapping("key." + Constants.MOD_ID + ".tool_menu", GLFW.GLFW_MOD_ALT, CATEGORY);
+    public static final KeyMapping TOOL_MENU = new KeyMapping("key." + Constants.MOD_ID + ".tool_menu", GLFW.GLFW_KEY_LEFT_ALT, CATEGORY);
 
     public static final KeyFunction[] KEY_FUNCTIONS = new KeyFunction[]{
             new KeyFunction(OPEN_MENU, ClientData::openMenu),

@@ -1,14 +1,12 @@
 package com.hollingsworth.schematic.platform.services;
 
+import com.hollingsworth.schematic.networking.AbstractPacket;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.AABB;
 
 import java.nio.file.Path;
@@ -48,5 +46,5 @@ public interface IPlatformHelper {
 
     public void appendCreateGlue(Level level, AABB aabb, CompoundTag tag);
 
-    void sendStructurePacket(StructureTemplate template, StructurePlaceSettings structurePlaceSettings, BlockPos pos);
+    void sendClientToServerPacket(AbstractPacket packet);
 }

@@ -20,6 +20,6 @@ public class MouseHandlerMix {
             cancellable = true
     )
     private void blockprints$beforeMouseScroll(long windowPointer, double xOffset, double yOffset, CallbackInfo ci, boolean bl, double d, double e, double f, int i, int j, int k ) {
-        ClientData.mouseScrolled(yOffset);
+        if(ClientData.mouseScrolled(yOffset)) ci.cancel();
     }
 }
