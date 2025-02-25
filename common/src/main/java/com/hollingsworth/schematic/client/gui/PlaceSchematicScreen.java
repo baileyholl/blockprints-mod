@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
+import com.hollingsworth.schematic.ClientConstants;
 import com.hollingsworth.schematic.SchematicMod;
 import com.hollingsworth.schematic.client.ClientData;
 import com.hollingsworth.schematic.client.RenderStructureHandler;
@@ -55,7 +56,7 @@ public class PlaceSchematicScreen extends Screen {
         tools.add(rotateTool);
 //        tools.add(mirrorTool);
         tools.add(confirmTool);
-        if(Minecraft.getInstance().player.isCreative()) {
+        if(Minecraft.getInstance().player.isCreative() && ClientConstants.blockprintsServerside) {
             tools.add(printTool);
         }
         tools.add(deleteTool);

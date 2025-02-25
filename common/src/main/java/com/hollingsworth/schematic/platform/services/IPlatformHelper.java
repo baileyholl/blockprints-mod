@@ -4,6 +4,7 @@ import com.hollingsworth.schematic.networking.AbstractPacket;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -47,4 +48,6 @@ public interface IPlatformHelper {
     public void appendCreateGlue(Level level, AABB aabb, CompoundTag tag);
 
     void sendClientToServerPacket(AbstractPacket packet);
+
+    void sendServerToClientPacket(AbstractPacket packet, ServerPlayer serverPlayer);
 }

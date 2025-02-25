@@ -19,8 +19,9 @@ public class Networking {
 
     public static void register(final RegisterPayloadHandlersEvent event) {
         // Sets the current network version
-        final PayloadRegistrar reg = event.registrar("1");
+        final PayloadRegistrar reg = event.registrar("1").optional();
         reg.playToServer(PlaceSchematicPacket.TYPE, PlaceSchematicPacket.CODEC, Networking::handle);
+        reg.playToClient(WorldJoinPacket.TYPE, WorldJoinPacket.CODEC, Networking::handle);
     }
 
     private static <T extends AbstractPacket> void handle(T message, IPayloadContext ctx) {

@@ -8,6 +8,7 @@ import com.hollingsworth.schematic.platform.services.IPlatformHelper;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -55,5 +56,10 @@ public class ForgePlatformHelper implements IPlatformHelper {
     @Override
     public void sendClientToServerPacket(AbstractPacket packet) {
         Networking.sendToServer(packet);
+    }
+
+    @Override
+    public void sendServerToClientPacket(AbstractPacket packet, ServerPlayer serverPlayer) {
+        Networking.sendToPlayerClient(packet, serverPlayer);
     }
 }

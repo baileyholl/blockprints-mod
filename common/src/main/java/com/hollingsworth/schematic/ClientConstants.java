@@ -6,4 +6,5 @@ import net.minecraft.client.renderer.MultiBufferSource;
 
 public class ClientConstants {
     public static MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(new ByteBufferBuilder(256));
+    public static boolean blockprintsServerside = false;
 }
