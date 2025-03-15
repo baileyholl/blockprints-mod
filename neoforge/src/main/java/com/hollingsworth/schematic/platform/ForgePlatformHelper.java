@@ -60,6 +60,8 @@ public class ForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public void sendServerToClientPacket(AbstractPacket packet, ServerPlayer serverPlayer) {
-        Networking.sendToPlayerClient(packet, serverPlayer);
+        if(serverPlayer.connection.hasChannel(packet.type())) {
+            Networking.sendToPlayerClient(packet, serverPlayer);
+        }
     }
 }

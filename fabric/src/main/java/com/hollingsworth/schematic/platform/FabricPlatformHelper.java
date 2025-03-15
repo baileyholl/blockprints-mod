@@ -61,6 +61,8 @@ public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override
     public void sendServerToClientPacket(AbstractPacket packet, ServerPlayer serverPlayer) {
-        ServerPlayNetworking.send(serverPlayer, packet);
+        if(ServerPlayNetworking.canSend(serverPlayer, packet.type().id())) {
+            ServerPlayNetworking.send(serverPlayer, packet);
+        }
     }
 }
