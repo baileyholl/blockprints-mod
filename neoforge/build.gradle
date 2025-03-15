@@ -71,6 +71,24 @@ repositories {
         name = "OctoStudios"
         url = uri("https://maven.octo-studios.com/releases")
     }
+    maven { url = "https://mvn.devos.one/snapshots" } // Registrate
+    maven { url = "https://maven.createmod.net" } // Ponder, Flywheel
+    maven { url = "https://maven.saps.dev/releases" } // FTB Mods
+    maven { url = "https://maven.architectury.dev" } // Arch API
+    maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven" } // NeoForge config api port, needed by ponder
+
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+
 }
 
 // IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
@@ -84,8 +102,15 @@ idea {
 dependencies {
     compileOnly("org.bytedeco:ffmpeg-platform:6.0-1.5.9")
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
-    implementation "curse.maven:building-gadgets-298187:5968587"
-    implementation "curse.maven:spark-361579:5759671"
+    compileOnly "curse.maven:building-gadgets-298187:5968587"
+    compileOnly "curse.maven:spark-361579:5759671"
+
+    compileOnly "com.simibubi.create:create-1.21.1:6.0.0-6"
+    compileOnly("dev.engine-room.flywheel:flywheel-neoforge-api-${flywheel_minecraft_version}:${flywheel_version}")
+    compileOnly("dev.engine-room.flywheel:flywheel-neoforge-${flywheel_minecraft_version}:${flywheel_version}")
+    compileOnly("dev.engine-room.vanillin:vanillin-neoforge-${flywheel_minecraft_version}:${vanillin_version}")
+    compileOnly("net.createmod.ponder:Ponder-NeoForge-${minecraft_version}:${ponder_version}")
+    compileOnly("com.tterrag.registrate:Registrate:${registrate_version}")
 }
 
 
