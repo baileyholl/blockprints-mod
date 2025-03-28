@@ -1,10 +1,14 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class EnterCodeScreen extends BaseSchematicScreen {
     public LongTextField codeField;
@@ -30,6 +34,11 @@ public class EnterCodeScreen extends BaseSchematicScreen {
             Minecraft.getInstance().setScreen(DownloadScreen.getTransition(codeField.getValue().trim(), this));
         });
         addRenderableWidget(new GuiImageButton(bookLeft + 153, bookTop + 153, 95, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
+            try {
+                Util.getPlatform().openUri(new URI("https://blockprints.io"));
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
         }));
         addRenderableWidget(new GuiImageButton(bookLeft + 9, bookTop + 9, 15, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_back.png"), b -> {
             Minecraft.getInstance().setScreen(new HomeScreen());
