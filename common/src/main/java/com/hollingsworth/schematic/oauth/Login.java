@@ -27,8 +27,32 @@ public class Login {
         if (server != null) {
             server.stop();
         }
+        server = null;
+        for(int i = 0; i < 10; i++){
+            try{
+                server = bootOnPort(3000 + i, onSuccess);
+                break;
+            }catch (Exception e){
+                server = null;
+            }
+        }
+        if(server != null) {
+            server.start();
+        }else{
+            throw new IOException("Failed to find open port");
+        }
+        Util.getPlatform().openUri("https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize" +
+                "?client_id=" + clientId +
+                "&response_type=code" +
+                "&redirect_uri=" + URLEncoder.encode(redirectUri, "UTF-8") +
+                "&response_mode=query" +
+                "&scope=" + URLEncoder.encode("XboxLive.signin offline_access", "UTF-8") +
+                "&state=12345");
+    }
+
+    private static HttpServer bootOnPort(int port, Consumer<BlockprintsToken> onSuccess) throws IOException{
         server = ServerBootstrap.bootstrap()
-                .setListenerPort(3001)
+                .setListenerPort(port)
                 .registerHandler("/ms", (httpRequest, httpResponse, httpContext) -> {
                     // log request
                     httpResponse.setEntity(new StringEntity("<script> javascript:window.close()</script>", ContentType.TEXT_HTML));
@@ -37,7 +61,7 @@ public class Login {
                         List<NameValuePair> pairs = new URIBuilder(httpRequest.getRequestLine().getUri()).getQueryParams();
                         String msCode = pairs.get(0).getValue();
 
-                        var apiResponse = CompletableFuture.supplyAsync(() -> BlockprintsApi.getInstance().auth().postMSCode(msCode), Minecraft.getInstance())
+                        CompletableFuture.supplyAsync(() -> BlockprintsApi.getInstance().auth().postMSCode(msCode), Minecraft.getInstance())
                                 .thenAcceptAsync((response) -> {
                                     CompletableFuture.supplyAsync(() -> {
                                         if (response.wasSuccessful()) {
@@ -53,13 +77,7 @@ public class Login {
                 })
                 .create();
         server.start();
-        Util.getPlatform().openUri("https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize" +
-                "?client_id=" + clientId +
-                "&response_type=code" +
-                "&redirect_uri=" + URLEncoder.encode(redirectUri, "UTF-8") +
-                "&response_mode=query" +
-                "&scope=" + URLEncoder.encode("XboxLive.signin offline_access", "UTF-8") +
-                "&state=12345");
+        return server;
     }
 
     public static void abortAuth() {
