@@ -73,7 +73,6 @@
 "blockprints.visualizations": "Образы",
 "blockprints.start_placing": "Нажмите ПКМ для закрепления на позицию. Воспользуйтесь «%s» и «%s» для вращения. Нажмите «%s» для подтверждения или «%s» для отмены.",
 "blockprints.invalid_upload": "Недопустимая постройка не может быть пустой или содержать только блоки воздуха."
-"blockprints.invalid_upload": "Недопустимая постройка не может быть пустой или содержать только блоки воздуха.",
 "key.blockprints.rotate_left": "Повернуть влево",
 "key.blockprints.rotate_right": "Повернуть вправо",
 "blockprints.place_tool": "Разместить",
