@@ -26,7 +26,9 @@ public class HomeScreen extends BaseSchematicScreen {
             Minecraft.getInstance().setScreen(new EnterCodeScreen());
         }));
         addRenderableWidget(new GuiImageButton(bookLeft + 41, bookTop + 137, 223, 47, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_navigation.png"), b -> {
-            Minecraft.getInstance().setScreen(ViewFavoritesScreen.getTransition());
+            requireTokenOrLogin(() -> {
+                Minecraft.getInstance().setScreen(ViewFavoritesScreen.getTransition());
+            });
         }));
     }
 

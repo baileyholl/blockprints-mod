@@ -1,10 +1,12 @@
 package com.hollingsworth.schematic.api.blockprints;
 
+import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.api.blockprints.auth.Auth;
 import com.hollingsworth.schematic.api.blockprints.auth.BlockprintsToken;
 import com.hollingsworth.schematic.api.blockprints.download.Download;
 import com.hollingsworth.schematic.api.blockprints.favorites.Favorites;
 import com.hollingsworth.schematic.api.blockprints.upload.Upload;
+import com.hollingsworth.schematic.oauth.TokenLoader;
 import net.minecraft.client.Minecraft;
 
 import java.net.http.HttpClient;
@@ -27,12 +29,18 @@ public class BlockprintsApi {
 
     private BlockprintsToken bpToken;
 
+    private static boolean loadedLocalToken = false;
+
     public BlockprintsApi() throws ApiError{
         this.CLIENT = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).connectTimeout(Duration.ofSeconds(30)).build();
         this.downloadApi = new Download(this);
         this.favoritesApi = new Favorites(this);
         this.uploadApi = new Upload(this);
         this.authApi = new Auth(this);
+        if(!loadedLocalToken){
+            this.bpToken = TokenLoader.loadToken();
+            loadedLocalToken = true;
+        }
     }
 
     public static BlockprintsApi getInstance() throws ApiError {
@@ -40,7 +48,7 @@ public class BlockprintsApi {
         if (INSTANCE == null) {
             INSTANCE = new BlockprintsApi();
         }
-        if(INSTANCE.tokenExpired() || !playerUuid.equals(INSTANCE.bpToken.requesterUUID())){
+        if(INSTANCE.tokenExpired() || (!playerUuid.equals(INSTANCE.bpToken.requesterUUID()) && !Constants.isDev)){
             INSTANCE.setToken(null);
         }
         return INSTANCE;
@@ -48,6 +56,9 @@ public class BlockprintsApi {
 
     public void setToken(BlockprintsToken token){
         this.bpToken = token;
+        if(token != null) {
+            TokenLoader.writeToken(token);
+        }
     }
 
     public HttpRequest.Builder getBuilder(boolean includeContentType){

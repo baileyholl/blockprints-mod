@@ -1,6 +1,7 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
+import com.hollingsworth.schematic.api.blockprints.BlockprintsApi;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -66,10 +67,10 @@ public class BaseSchematicScreen extends ModScreen {
     }
 
     public void requireTokenOrLogin(Runnable onSuccess){
-//        if(BlockprintsApi.getInstance().tokenExpired()){
+        if(BlockprintsApi.getInstance().tokenExpired()){
             Minecraft.getInstance().setScreen(new LoginScreen(onSuccess));
-//        }else{
-//            onSuccess.run();
-//        }
+        }else{
+            onSuccess.run();
+        }
     }
 }
