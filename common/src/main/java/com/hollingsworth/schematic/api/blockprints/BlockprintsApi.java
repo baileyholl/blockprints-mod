@@ -1,20 +1,15 @@
 package com.hollingsworth.schematic.api.blockprints;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.hollingsworth.schematic.api.blockprints.auth.Auth;
+import com.hollingsworth.schematic.api.blockprints.auth.BlockprintsToken;
 import com.hollingsworth.schematic.api.blockprints.download.Download;
 import com.hollingsworth.schematic.api.blockprints.favorites.Favorites;
 import com.hollingsworth.schematic.api.blockprints.upload.Upload;
 import net.minecraft.client.Minecraft;
-import org.apache.http.client.utils.URIBuilder;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.UUID;
 
 public class BlockprintsApi {
 
@@ -26,57 +21,40 @@ public class BlockprintsApi {
 
     private final Upload uploadApi;
 
+    private final Auth authApi;
+
     public final HttpClient CLIENT;
 
-    private String bpToken = null;
-    // NumericDate of when the token expires (seconds)
-    private int bpTokenExpires = 0;
-
-    private UUID requesterUUID = null;
+    private BlockprintsToken bpToken;
 
     public BlockprintsApi() throws ApiError{
         this.CLIENT = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).connectTimeout(Duration.ofSeconds(30)).build();
-        try {
-            URIBuilder uriBuilder = new URIBuilder(RequestUtil.getDomain() + "/api/v1/auth");
-            HttpRequest.Builder reqBuilder = null;
-            if (Minecraft.getInstance().getUser().getName().equals("Dev") || Minecraft.getInstance().getUser().getAccessToken().equals("FabricMC")) {
-                reqBuilder = HttpRequest.newBuilder();
-            }else{
-                reqBuilder = HttpRequest.newBuilder()
-                        .header("authorization", "Bearer " + Minecraft.getInstance().getUser().getAccessToken());
-            }
-            HttpRequest request = reqBuilder.header("Content-Type", "application/json")
-                    .uri(uriBuilder.build())
-                    .timeout(Duration.ofSeconds(8))
-                    .GET().build();
-            var res = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            var code = res.statusCode();
-            if (!RequestUtil.responseSuccessful(code)) {
-                throw new Error("Failed to authenticate with Blockprints API");
-            }
-            JsonObject responseObj = JsonParser.parseString(res.body()).getAsJsonObject();
-            this.bpToken = responseObj.get("token").getAsString();
-            this.bpTokenExpires = responseObj.get("expiresAt").getAsInt();
-            this.requesterUUID = Minecraft.getInstance().player.getUUID();
-        } catch (URISyntaxException | IOException | InterruptedException | Error e) {
-            e.printStackTrace();
-            throw new ApiError("Failed to authenticate with Blockprints API. Are you logged in to Minecraft?");
-        }
         this.downloadApi = new Download(this);
         this.favoritesApi = new Favorites(this);
         this.uploadApi = new Upload(this);
+        this.authApi = new Auth(this);
     }
 
     public static BlockprintsApi getInstance() throws ApiError {
         var playerUuid = Minecraft.getInstance().player.getUUID();
-        if (INSTANCE == null || INSTANCE.tokenExpired() || INSTANCE.requesterUUID == null || !playerUuid.equals(INSTANCE.requesterUUID)) {
+        if (INSTANCE == null) {
             INSTANCE = new BlockprintsApi();
+        }
+        if(INSTANCE.tokenExpired() || !playerUuid.equals(INSTANCE.bpToken.requesterUUID())){
+            INSTANCE.setToken(null);
         }
         return INSTANCE;
     }
 
+    public void setToken(BlockprintsToken token){
+        this.bpToken = token;
+    }
+
     public HttpRequest.Builder getBuilder(boolean includeContentType){
-        HttpRequest.Builder req = HttpRequest.newBuilder().header("authorization", this.bpToken);
+        HttpRequest.Builder req = HttpRequest.newBuilder();
+        if(bpToken != null){
+            req = req.header("authorization", this.bpToken.token());
+        }
 
         if(includeContentType){
             req.header("Content-Type", "application/json");
@@ -89,7 +67,7 @@ public class BlockprintsApi {
     }
 
     public boolean tokenExpired(){
-        return this.bpToken == null || this.bpTokenExpires < System.currentTimeMillis() / 1000;
+        return this.bpToken == null || this.bpToken.tokenExpired();
     }
 
     public Download download() {
@@ -102,5 +80,9 @@ public class BlockprintsApi {
 
     public Upload upload() {
         return uploadApi;
+    }
+
+    public Auth auth() {
+        return authApi;
     }
 }

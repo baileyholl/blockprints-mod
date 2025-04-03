@@ -72,5 +72,9 @@
   "blockprints.visualize_list_tooltip": "Manage, remove, and edit placed visualizations.",
   "blockprints.visualizations": "Visualizations",
   "blockprints.start_placing": "Right click to anchor to a position, use %s and %s to rotate. Press %s to confirm or %s to cancel. ",
-  "blockprints.invalid_upload": "Invalid build. Cannot be empty or contain only air blocks."
+  "blockprints.invalid_upload": "Invalid build. Cannot be empty or contain only air blocks.",
+  "blockprints.start_login": "Login",
+  "blockprints.login_desc": "Block Prints uses Microsoft OAuth to verify your Minecraft UUID and store uploads and downloads with it. Would you like to login?",
+  "blockprints.complete_login": "Complete the login through your web browser.",
+  "blockprints.login_success": "Successfully logged in."
 }

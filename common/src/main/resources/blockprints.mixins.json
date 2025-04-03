@@ -7,10 +7,10 @@
   "mixins": [
   ],
   "client": [
-    "EditBoxAccessor",
-    "NativeImageAccessor",
-    "ItemRendererAccessor",
     "BufferBuilderAccessor",
+    "EditBoxAccessor",
+    "ItemRendererAccessor",
+    "NativeImageAccessor",
     "StructureTemplateAccessor",
     "VertexFormatAccessor"
   ],

@@ -16,9 +16,11 @@ public class HomeScreen extends BaseSchematicScreen {
     public void init() {
         super.init();
         addRenderableWidget(new GuiImageButton(bookLeft + 41, bookTop + 41, 223, 47, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_navigation.png"), b -> {
-            ClientData.startBoundaryCapture();
-            Minecraft.getInstance().setScreen(null);
-            Minecraft.getInstance().player.sendSystemMessage(Component.translatable(Constants.MOD_ID + ".start_selecting"));
+            requireTokenOrLogin(() ->{
+                ClientData.startBoundaryCapture();
+                Minecraft.getInstance().setScreen(null);
+                Minecraft.getInstance().player.sendSystemMessage(Component.translatable(Constants.MOD_ID + ".start_selecting"));
+            });
         }));
         addRenderableWidget(new GuiImageButton(bookLeft + 41, bookTop + 89, 223, 47, new ResourceLocation(Constants.MOD_ID, "textures/gui/button_navigation.png"), b -> {
             Minecraft.getInstance().setScreen(new EnterCodeScreen());
