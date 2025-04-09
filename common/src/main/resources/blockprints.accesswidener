@@ -166,3 +166,4 @@ accessible class net/minecraft/client/gui/components/MultilineTextField$StringVi
 # extendable method com/mojang/blaze3d/vertex/BufferBuilder putSortedQuadIndices (Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;)V
 accessible method net/minecraft/client/gui/components/AbstractSliderButton getSprite ()Lnet/minecraft/resources/ResourceLocation;
 accessible method net/minecraft/client/gui/components/AbstractSliderButton getHandleSprite ()Lnet/minecraft/resources/ResourceLocation;
+accessible method net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplate$Palette <init> (Ljava/util/List;)V

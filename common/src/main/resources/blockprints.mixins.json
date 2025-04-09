@@ -5,11 +5,12 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "blockprints.refmap.json",
   "mixins": [
+    "PaletteAccessor"
   ],
   "client": [
     "EditBoxAccessor",
-    "NativeImageAccessor",
     "ItemRendererAccessor",
+    "NativeImageAccessor",
     "StructureTemplateAccessor",
     "VertexFormatAccessor"
   ],

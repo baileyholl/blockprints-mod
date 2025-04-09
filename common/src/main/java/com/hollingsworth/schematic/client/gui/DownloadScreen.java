@@ -1,26 +1,33 @@
 package com.hollingsworth.schematic.client.gui;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.api.blockprints.BlockprintsApi;
 import com.hollingsworth.schematic.api.blockprints.download.PreviewDownloadResult;
 import com.hollingsworth.schematic.client.ClientData;
+import com.hollingsworth.schematic.client.renderer.StatePos;
+import com.hollingsworth.schematic.common.util.BPStructureTemplate;
 import com.hollingsworth.schematic.common.util.ClientUtil;
-import com.hollingsworth.schematic.common.util.FileUtils;
-import com.hollingsworth.schematic.mixin.StructureTemplateAccessor;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.level.block.state.BlockState;
 import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
@@ -30,6 +37,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static com.hollingsworth.schematic.api.SceneExporter.STRUCTURE_FOLDER;
@@ -104,15 +112,179 @@ public class DownloadScreen extends BaseSchematicScreen {
         }));
         var visualizeButton = new GuiImageButton(bookLeft + 25, bookTop + 153 + 16, 143, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_9.png"), b -> {
             Consumer<Path> onPath = (templatePath) ->{
-                StructureTemplate structureTemplate = FileUtils.loadStructureTemplate(Minecraft.getInstance().level.holderLookup(Registries.BLOCK), templatePath);
-                var accessor = (StructureTemplateAccessor)structureTemplate;
-                var palettes = accessor.getPalettes();
-                if(palettes.isEmpty()){
-                    Minecraft.getInstance().player.sendSystemMessage(Component.translatable(Constants.MOD_ID + ".invalid_file"));
-                }else {
+
+                String structureJson = """
+{
+  "blocks": [
+    {
+      "command": "filled_circle",
+      "id": "minecraft:oak_planks",
+      "startingPos": [0, 0, 0],
+      "radius": 5,
+      "height": 1
+    },
+    {
+      "command": "hollow_circle",
+      "id": "minecraft:stone",
+      "startingPos": [0, 1, 0],
+      "radius": 5,
+      "height": 8
+    },
+    {
+      "command": "filled_circle",
+      "id": "minecraft:oak_planks",
+      "startingPos": [0, 8, 0],
+      "radius": 5,
+      "height": 1
+    },
+    {
+      "id": "minecraft:air",
+      "startingPos": [0, 1, -5],
+      "endingPos": [1, 3, -5]
+    },
+    {
+      "id": "minecraft:ladder",
+      "pos": [4, 1, 0]
+    },
+    {
+      "id": "minecraft:ladder",
+      "pos": [4, 2, 0]
+    },
+    {
+      "id": "minecraft:ladder",
+      "pos": [4, 3, 0]
+    },
+    {
+      "id": "minecraft:ladder",
+      "pos": [4, 4, 0]
+    },
+    {
+      "id": "minecraft:ladder",
+      "pos": [4, 5, 0]
+    },
+    {
+      "id": "minecraft:ladder",
+      "pos": [4, 6, 0]
+    },
+    {
+      "id": "minecraft:ladder",
+      "pos": [4, 7, 0]
+    },
+    {
+      "command": "hollow_circle",
+      "id": "minecraft:stone",
+      "startingPos": [0, 9, 0],
+      "radius": 3,
+      "height": 4
+    },
+    {
+      "id": "minecraft:air",
+      "pos": [3, 8, 0]
+    },
+    {
+      "id": "minecraft:ladder",
+      "pos": [3, 9, 0]
+    },
+    {
+      "id": "minecraft:ladder",
+      "pos": [3, 10, 0]
+    },
+    {
+      "id": "minecraft:ladder",
+      "pos": [3, 11, 0]
+    },
+    {
+      "command": "filled_circle",
+      "id": "minecraft:oak_planks",
+      "startingPos": [0, 12, 0],
+      "radius": 3,
+      "height": 1
+    },
+    {
+      "command": "filled_circle",
+      "id": "minecraft:stone",
+      "startingPos": [0, 13, 0],
+      "radius": 3,
+      "height": 1
+    },
+    {
+      "command": "filled_circle",
+      "id": "minecraft:stone",
+      "startingPos": [0, 14, 0],
+      "radius": 2,
+      "height": 1
+    },
+    {
+      "command": "filled_circle",
+      "id": "minecraft:stone",
+      "startingPos": [0, 15, 0],
+      "radius": 1,
+      "height": 1
+    }
+  ]
+}
+
+""";
+                try{
+                    JsonObject element = JsonParser.parseString(structureJson).getAsJsonObject();
+                    JsonArray blocks = element.getAsJsonArray("blocks");
+                    ArrayList<StatePos> posList = new ArrayList<>();
+                    for(JsonElement element1 : blocks){
+                        JsonObject object = element1.getAsJsonObject();
+                        ResourceLocation resourcelocation = ResourceLocation.parse(object.get("id").getAsString());
+                        Optional<? extends Holder<Block>> optional = BuiltInRegistries.BLOCK.asLookup().get(ResourceKey.create(Registries.BLOCK, resourcelocation));
+                        BlockState state = optional.orElseThrow().value().defaultBlockState();
+
+                        if(object.has("command")){
+                            JsonArray position = object.getAsJsonArray("startingPos");
+                            BlockPos pos = new BlockPos(position.get(0).getAsInt(), position.get(1).getAsInt(), position.get(2).getAsInt());
+                            if(object.get("command").getAsString().equals("hollow_circle")) {
+                                for (BlockPos pos1 : generateCircle(pos, object.get("radius").getAsInt(), object.get("height").getAsInt())) {
+                                    posList.add(new StatePos(state, pos1));
+                                }
+                            }else if(object.get("command").getAsString().equals("fill")){
+                                BlockPos start = new BlockPos(position.get(0).getAsInt(), position.get(1).getAsInt(), position.get(2).getAsInt());
+                                JsonArray endPos = object.getAsJsonArray("endingPos");
+                                BlockPos end = new BlockPos(endPos.get(0).getAsInt(), endPos.get(1).getAsInt(), endPos.get(2).getAsInt());
+                                for(BlockPos startPos : BlockPos.betweenClosed(start, end)){
+                                    posList.add(new StatePos(state, startPos.immutable()));
+                                }
+                            }else{
+                                for (BlockPos pos1 : generateFilledCircle(pos, object.get("radius").getAsInt(), object.get("height").getAsInt())) {
+                                    posList.add(new StatePos(state, pos1));
+                                }
+                            }
+                        } else if(object.has("startingPos")){
+                            JsonArray position = object.getAsJsonArray("startingPos");
+                            BlockPos start = new BlockPos(position.get(0).getAsInt(), position.get(1).getAsInt(), position.get(2).getAsInt());
+                            JsonArray endPos = object.getAsJsonArray("endingPos");
+                            BlockPos end = new BlockPos(endPos.get(0).getAsInt(), endPos.get(1).getAsInt(), endPos.get(2).getAsInt());
+                            BlockPos.betweenClosed(start, end).forEach(pos -> {
+                                posList.add(new StatePos(state, pos.immutable()));
+                            });
+                        }else {
+                            JsonArray position = object.getAsJsonArray("pos");
+                            BlockPos pos = new BlockPos(position.get(0).getAsInt(), position.get(1).getAsInt(), position.get(2).getAsInt());
+                            posList.add(new StatePos(state, pos));
+                            System.out.println(new StatePos(state, pos));
+                        }
+                    }
+                    System.out.println(element.get("blocks"));
+                    BPStructureTemplate structureTemplate = new BPStructureTemplate(posList);
                     ClientData.startStructureRenderer(structureTemplate, preview.downloadResponse.structureName, preview.downloadResponse.id);
+                    Minecraft.getInstance().setScreen(null);
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
-                Minecraft.getInstance().setScreen(null);
+//                StructureTemplate structureTemplate = FileUtils.loadStructureTemplate(Minecraft.getInstance().level.holderLookup(Registries.BLOCK), templatePath);
+//                var accessor = (StructureTemplateAccessor)structureTemplate;
+//                var palettes = accessor.getPalettes();
+//                if(palettes.isEmpty()){
+//                    Minecraft.getInstance().player.sendSystemMessage(Component.translatable(Constants.MOD_ID + ".invalid_file"));
+//                }else {
+//                    ClientData.startStructureRenderer(structureTemplate, preview.downloadResponse.structureName, preview.downloadResponse.id);
+//                }
+//                Minecraft.getInstance().setScreen(null);
             };
 
             if(!alreadyDownloaded){
@@ -136,6 +308,54 @@ public class DownloadScreen extends BaseSchematicScreen {
             Minecraft.getInstance().setScreen(previousScreen);
         }));
     }
+
+    public static List<BlockPos> generateCircle(BlockPos center, int radius, int height) {
+        List<BlockPos> positions = new ArrayList<>();
+
+        int cx = center.getX();
+        int cy = center.getY();
+        int cz = center.getZ();
+
+        float outer = radius + 0.5f;
+        float inner = radius - 0.5f;
+        float outerSq = outer * outer;
+        float innerSq = inner * inner;
+        for(int y = 0; y < height; y++){
+            for (int x = -radius; x <= radius; x++) {
+                for (int z = -radius; z <= radius; z++) {
+                    float distSq = x * x + z * z;
+
+                    if (distSq >= innerSq && distSq <= outerSq) {
+                        positions.add(new BlockPos(cx + x, cy + y, cz + z));
+                    }
+                }
+            }
+        }
+        return positions;
+    }
+
+
+    public static List<BlockPos> generateFilledCircle(BlockPos center, int radius, int height) {
+        List<BlockPos> positions = new ArrayList<>();
+
+        int cx = center.getX();
+        int cy = center.getY();
+        int cz = center.getZ();
+
+        int radiusSquared = radius * radius;
+        for(int y = 0; y < height; y++){
+            for (int x = -radius; x <= radius; x++) {
+                for (int z = -radius; z <= radius; z++) {
+                    if (x * x + z * z <= radiusSquared) {
+                        positions.add(new BlockPos(cx + x, cy + y, cz + z));
+                    }
+                }
+            }
+        }
+
+        return positions;
+    }
+
 
     public void startDownload(Consumer<Path> callback){
         Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> BlockprintsApi.getInstance().download().downloadSchematic(preview.downloadResponse.id, preview.downloadResponse.structureName), callback));
