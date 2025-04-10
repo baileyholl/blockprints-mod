@@ -6,6 +6,7 @@ import com.hollingsworth.schematic.api.blockprints.download.PreviewDownloadResul
 import com.hollingsworth.schematic.client.ClientData;
 import com.hollingsworth.schematic.common.util.ClientUtil;
 import com.hollingsworth.schematic.common.util.FileUtils;
+import com.hollingsworth.schematic.export.WrappedScene;
 import com.hollingsworth.schematic.mixin.StructureTemplateAccessor;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.ChatFormatting;
@@ -42,6 +43,8 @@ public class DownloadScreen extends BaseSchematicScreen {
     Screen previousScreen;
     List<BlockListEntry> entries = new ArrayList<>();
     boolean hasMissing = false;
+    PreviewImage previewImage;
+    Path templatePath;
 
     public DownloadScreen(Screen previousScreen, PreviewDownloadResult preview) {
         super();
@@ -78,27 +81,32 @@ public class DownloadScreen extends BaseSchematicScreen {
     @Override
     public void init() {
         super.init();
-        try {
-            dynamicTexture = getTexture(preview.image);
-            Minecraft.getInstance().getTextureManager().register(PREVIEW_TEXTURE, dynamicTexture);
-            addRenderableWidget(new PreviewImage(bookLeft + 25, bookTop + 41, 100, 100, dynamicTexture, PREVIEW_TEXTURE));
-        } catch (Exception e) {
-            e.printStackTrace();
+        var fileName = sanitize(preview.downloadResponse.structureName + "_" + preview.downloadResponse.id) +".nbt";
+        var path = Paths.get(STRUCTURE_FOLDER, fileName);
+        var alreadyDownloaded = Files.exists(path);
+        templatePath = path;
+        if(alreadyDownloaded){
+            initInteractiveComponents();
+        }else {
+            try {
+                dynamicTexture = getTexture(preview.image);
+                Minecraft.getInstance().getTextureManager().register(PREVIEW_TEXTURE, dynamicTexture);
+                previewImage = addRenderableWidget(new PreviewImage(bookLeft + 25, bookTop + 41, 100, 100, dynamicTexture, PREVIEW_TEXTURE));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         var downloadButton = new GuiImageButton(bookRight - 119, bookTop + 153, 95, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_6.png"), b -> {
-            startDownload(path ->{
+            startDownload(downloadedPath ->{
                 Minecraft.getInstance().setScreen(null);
-                if (path != null) {
+                if (downloadedPath != null) {
                     ClientUtil.sendMessage("blockprints.download_success");
                 } else {
                     ClientUtil.sendMessage("blockprints.download_failed");
                 }
             });
         });
-        var fileName = sanitize(preview.downloadResponse.structureName + "_" + preview.downloadResponse.id) +".nbt";
-        var path = Paths.get(STRUCTURE_FOLDER, fileName);
-        var alreadyDownloaded = Files.exists(path);
         addRenderableWidget(new GuiImageButton(bookLeft + 25, bookTop + 153, 143, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_9.png"), b -> {
             Minecraft.getInstance().setScreen(new BlockListScreen(this, entries));
         }));
@@ -136,6 +144,20 @@ public class DownloadScreen extends BaseSchematicScreen {
             Minecraft.getInstance().setScreen(previousScreen);
         }));
     }
+
+    public void initInteractiveComponents(){
+        StructureTemplate structureTemplate = FileUtils.loadStructureTemplate(Minecraft.getInstance().level.holderLookup(Registries.BLOCK), templatePath);
+        var accessor = (StructureTemplateAccessor)structureTemplate;
+        var palettes = accessor.getPalettes();
+        if(palettes.isEmpty())
+            return;
+        WrappedScene wrappedScene = new WrappedScene();
+        wrappedScene.placeStructure(structureTemplate);
+        ScenePreview scenePreview = new ScenePreview(bookLeft + 25, bookTop + 41, 100, 100, new WrappedScene(), structureTemplate);
+        addRenderableWidget(scenePreview);
+    }
+
+
 
     public void startDownload(Consumer<Path> callback){
         Minecraft.getInstance().setScreen(new LoadingScreen<>(() -> BlockprintsApi.getInstance().download().downloadSchematic(preview.downloadResponse.id, preview.downloadResponse.structureName), callback));

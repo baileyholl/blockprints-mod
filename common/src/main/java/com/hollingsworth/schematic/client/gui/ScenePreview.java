@@ -9,7 +9,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
@@ -27,62 +26,34 @@ import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-public class ScenePreview extends AbstractWidget {
+public class ScenePreview extends NestedWidget {
     private int yaw = 225;
     private int pitch = 30;
-    private int roll;
     public WrappedScene wrappedScene;
     public Scene scene;
     public OffScreenRenderer renderer;
-    StructureTemplate template;
     FakeRenderingWorld fakeRenderingWorld;
     StructureRenderData cachedRender;
-
+    HorizontalSlider yawSlider;
+    HorizontalSlider pitchSlider;
     boolean doSort;
     int sortDebounce;
 
-    public ScenePreview(int x, int y, int width, int height, Scene scene, WrappedScene wrappedScene, StructureTemplate template) {
+    public ScenePreview(int x, int y, int width, int height, WrappedScene wrappedScene, StructureTemplate template) {
         super(x, y, width, height, Component.empty());
         this.wrappedScene = wrappedScene;
-        this.scene = scene;
+        this.scene = wrappedScene.scene;
         cachedRender = new StructureRenderData(template, null, null);
         StructureRenderer.generateRender(cachedRender, Minecraft.getInstance().level, BlockPos.ZERO, 1f, new Vec3(0,0,0));
         scheduleSort();
+
+        this.yawSlider = new HorizontalSlider(x + 16, y + height + 12, Component.empty(), Component.empty(), 0, 360, 225, 5, 1, false, this::setYaw);
+        this.pitchSlider = new HorizontalSlider(x + 16, y + height + 28, Component.empty(), Component.empty(), 0, 90, 30, 5, 1, true, this::setPitch);
     }
 
-    public void updateSceneTexture() {
-        scene.getCameraSettings().setIsometricYawPitchRoll(yaw, pitch, roll);
-        scene.getCameraSettings().setRotationCenter(scene.getWorldCenter());
-
-        scene.getCameraSettings().setZoom(1.0f);
-        scene.centerScene();
-
-        // Lazily create the renderer using the preferred size of the scene
-        var prefSize = wrappedScene.getPreferredSize();
-        final float scale = (float) Minecraft.getInstance().getWindow().getGuiScale();
-        if (prefSize.width() > 0 && prefSize.height() > 0) {
-            // We only scale the viewport, not scaling the view matrix means the scene will still fill it
-            var renderWidth = (int) Math.max(1, prefSize.width() * scale);
-            var renderHeight = (int) Math.max(1, prefSize.height() * scale);
-
-            // Create/Re-Create Renderer if the desired render-size changed or if the renderer hasn't been created yet
-            if (renderer == null || renderer.width != renderWidth || renderer.height != renderHeight) {
-                if (renderer != null) {
-                    renderer.close();
-                }
-                renderer = new OffScreenRenderer(renderWidth, renderHeight);
-            }
-
-            // Render the scene to the renderer's off-screen surface
-            renderer.renderToTexture(this::renderTarget);
-        }
-    }
-
-    public void renderTarget() {
-        wrappedScene.renderToCurrentTarget(wrappedScene.getPreferredSize());
-    }
 
     public void removed() {
         if (renderer != null) {
@@ -109,29 +80,7 @@ public class ScenePreview extends AbstractWidget {
         int previewY = y;
         final float scale = (float) Minecraft.getInstance().getWindow().getGuiScale();
 
-        boolean doOldRender = false;
-        if(doOldRender){
-            updateSceneTexture();
-            if (renderer != null) {
-                int imageWidth = renderer.width;
-                int imageHeight = renderer.height;
-
-                // scale width and height to fit in the box of 100,100
-                LytSize origDim = new LytSize(imageWidth, imageHeight);
-                LytSize boundary = new LytSize(width, height);
-                LytSize newDim = getScaledDimension(origDim, boundary);
-                // Offset x and Y so the image is centered
-                // center x and y on point 50, 50
-                int x = previewX + 143 / 2;
-                int y = previewY + 111 / 2;
-                x -= newDim.width() / 2;
-                y -= newDim.height() / 2;
-
-                innerBlit(graphics.pose(), renderer, x, x + newDim.width(), y, y + newDim.height(), 0);
-            }
-            return;
-        }
-        scene.getCameraSettings().setIsometricYawPitchRoll(yaw, pitch, roll);
+        scene.getCameraSettings().setIsometricYawPitchRoll(yaw, pitch, 0);
         scene.getCameraSettings().setRotationCenter(scene.getWorldCenter());
 
         scene.getCameraSettings().setZoom(1.0f);
@@ -183,19 +132,6 @@ public class ScenePreview extends AbstractWidget {
         ModScreen.blitRect(graphics.pose(), x + 121, y + 3, 0, 0, 17, 17, 17, 17, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/gimbal/gimbal_cardinal.png"), 150);
     }
 
-    void innerBlit(PoseStack pose, OffScreenRenderer osr, int x1, int x2, int y1, int y2, int blitOffset) {
-        RenderSystem.setShaderTexture(0, osr.fb.getColorTextureId());
-        // Rest is same as GuiGraphics#
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        Matrix4f matrix4f = pose.last().pose();
-        BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferBuilder.addVertex(matrix4f, x1, y1, blitOffset).setUv(0, 1);
-        bufferBuilder.addVertex(matrix4f, x1, y2, blitOffset).setUv(0, 0);
-        bufferBuilder.addVertex(matrix4f, x2, y2, blitOffset).setUv(1, 0);
-        bufferBuilder.addVertex(matrix4f, x2, y1, blitOffset).setUv(1, 1);
-        BufferUploader.drawWithShader(bufferBuilder.build());
-    }
-
     public static LytSize getScaledDimension(LytSize imgSize, LytSize boundary) {
 
         int original_width = imgSize.width();
@@ -232,6 +168,30 @@ public class ScenePreview extends AbstractWidget {
     @Override
     public void playDownSound(SoundManager $$0) {
 
+    }
+
+    @Override
+    public List<AbstractWidget> getExtras() {
+        List<AbstractWidget> widgets = new ArrayList<>();
+        widgets.add(new GimbalButton(x + 130, y + 5, "northeast", b -> {
+            setYaw(225);
+            setPitch(30);
+        }));
+        widgets.add(new GimbalButton(x + 124, y + 5, "northwest", b -> {
+            setYaw(135);
+            setPitch(30);
+        }));
+        widgets.add(new GimbalButton(x + 124, y + 11, "southwest", b -> {
+            setYaw(45);
+            setPitch(30);
+        }));
+        widgets.add(new GimbalButton(x + 130, y + 11, "southeast", b -> {
+            setYaw(315);
+            setPitch(30);
+        }));
+        widgets.add(yawSlider);
+        widgets.add(pitchSlider);
+        return widgets;
     }
 
     public void drawRenderScreen(PoseStack matrix, Player player, ArrayList<StatePos> statePosCache){
@@ -324,30 +284,16 @@ public class ScenePreview extends AbstractWidget {
         return data.sortStates.get(renderType).buildSortedIndexBuffer(data.getByteBuffer(renderType), VertexSorting.byDistance(v -> -sortPos.distanceSquared(v)));
     }
 
-    public int getYaw() {
-        return yaw;
-    }
-
     public void setYaw(int yaw) {
         this.yaw = yaw;
+        yawSlider.setValue(yaw);
         scheduleSort();
     }
 
-    public int getPitch() {
-        return pitch;
-    }
 
     public void setPitch(int pitch) {
         this.pitch = pitch;
-        scheduleSort();
-    }
-
-    public int getRoll() {
-        return roll;
-    }
-
-    public void setRoll(int roll) {
-        this.roll = roll;
+        pitchSlider.setValue(pitch);
         scheduleSort();
     }
 

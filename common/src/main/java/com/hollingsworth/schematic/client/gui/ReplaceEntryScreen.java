@@ -4,35 +4,33 @@ import com.hollingsworth.schematic.Constants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.level.block.Block;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 
-public class BlockListScreen extends BaseSchematicScreen {
-    public Screen previousScreen;
-    List<DownloadScreen.BlockListEntry> entries;
+public class ReplaceEntryScreen extends BaseSchematicScreen{
+
+    public BaseSchematicScreen previousScreen;
+    public Block replacingBlock;
+    List<Block> allBlocks = new ArrayList<>();
     List<AbstractWidget> rows = new ArrayList<>();
     int scroll = 0;
     VerticalSlider slider;
+    Consumer<Block> onBlockSelected;
 
-
-    public BlockListScreen(Screen previousScreen, List<DownloadScreen.BlockListEntry> entries) {
+    public ReplaceEntryScreen(BaseSchematicScreen previousScreen, Block replaceBlock, Consumer<Block> onBlockSelected) {
         super();
         this.previousScreen = previousScreen;
-        this.entries = entries;
-        this.entries.sort((o1, o2) -> {
-            if (o1.isMissing && !o2.isMissing) {
-                return -1;
-            } else if (!o1.isMissing && o2.isMissing) {
-                return 1;
-            } else {
-                return Integer.compare(o2.count, o1.count);
-            }
-        });
+        replacingBlock = replaceBlock;
+        allBlocks = new ArrayList<>(Minecraft.getInstance().level.registryAccess().registryOrThrow(Registries.BLOCK).stream().toList());
+        allBlocks.sort(Comparator.comparing(a -> a.getName().getString()));
+        this.onBlockSelected = onBlockSelected;
     }
 
     @Override
@@ -42,7 +40,7 @@ public class BlockListScreen extends BaseSchematicScreen {
             Minecraft.getInstance().setScreen(previousScreen);
         }));
         updateList();
-        int maxScroll = Math.max(0, entries.size() - 10);
+        int maxScroll = Math.max(0, allBlocks.size() - 10);
         slider = addRenderableWidget(new VerticalSlider(bookLeft + 265, bookTop + 46, maxScroll, 1, 1, this::scrollChange));
     }
 
@@ -65,25 +63,29 @@ public class BlockListScreen extends BaseSchematicScreen {
             removeWidget(row);
         }
         rows = new ArrayList<>();
-        List<DownloadScreen.BlockListEntry> sliced = entries.subList(scroll, Math.min(scroll + 10, entries.size()));
+        List<Block> sliced = allBlocks.subList(scroll, Math.min(scroll + 10, allBlocks.size()));
         for (int i = 0; i < Math.min(sliced.size(), 10); i++) {
             var entry = sliced.get(i);
-            BlockEntryRow row = new BlockEntryRow(bookLeft + 25, bookTop + 43 + (i * 14), entry, (b) ->{
-                if(entry.renderStack.getItem() instanceof BlockItem blockItem) {
-                    Minecraft.getInstance().setScreen(new ReplaceEntryScreen(this, blockItem.getBlock(), block -> {}));
-                }
+            ReplaceBlockEntry row = new ReplaceBlockEntry(bookLeft + 25, bookTop + 43 + (i * 14), entry, (b) ->{
+                onBlockSelected.accept(entry);
             });
             rows.add(row);
             addRenderableWidget(row);
         }
     }
 
+
+    @Override
+    public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
+
+    }
+
     @Override
     public void drawBackgroundElements(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.drawBackgroundElements(graphics, mouseX, mouseY, partialTicks);
         graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container_list_blocks.png"), 25, 25, 0, 0, 239, 159, 239, 159);
-        graphics.drawString(font, Component.translatable("blockprints.block"), 30, 29, 0, false);
-        graphics.drawString(font, Component.translatable("blockprints.qty"), 235, 29, 0, false);
+        graphics.drawString(font, Component.translatable("blockprints.replacing", replacingBlock.getName().getString()), 30, 29, 0, false);
+//        graphics.drawString(font, Component.translatable("blockprints.qty"), 235, 29, 0, false);
     }
-
 }

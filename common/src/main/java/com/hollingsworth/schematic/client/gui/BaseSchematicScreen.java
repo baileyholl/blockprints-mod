@@ -41,12 +41,13 @@ public class BaseSchematicScreen extends ModScreen {
 
     @Override
     protected <T extends GuiEventListener & Renderable & NarratableEntry> T addRenderableWidget(T widget) {
+        var addedWidget = super.addRenderableWidget(widget);
         if (widget instanceof NestedRenderables nestedRenderables) {
             for (AbstractWidget renderable : nestedRenderables.getExtras()) {
                 super.addRenderableWidget(renderable);
             }
         }
-        return super.addRenderableWidget(widget);
+        return addedWidget;
     }
 
     @Override

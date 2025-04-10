@@ -1,16 +1,40 @@
 package com.hollingsworth.schematic.export;
 
 import com.hollingsworth.schematic.export.level.FakeForwardingServerLevel;
+import com.hollingsworth.schematic.export.level.GuidebookLevel;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.level.levelgen.SingleThreadedRandomSource;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.zip.GZIPInputStream;
+
 public class WrappedScene {
+
     @Nullable
     public Scene scene;
+    public final Viewport viewport = new Viewport();
+    private SavedCameraSettings initialCameraSettings = new SavedCameraSettings();
+
+    public WrappedScene(GuidebookLevel level, CameraSettings cameraSettings){
+        this.scene = new Scene(level, cameraSettings);
+        this.initialCameraSettings = cameraSettings.save();
+    }
+
+    public WrappedScene() {
+        this(new GuidebookLevel(), new CameraSettings());
+    }
 
     public void setScene(@Nullable Scene scene) {
         this.scene = scene;
@@ -21,22 +45,18 @@ public class WrappedScene {
         }
     }
 
-    public final Viewport viewport = new Viewport();
-
-    private SavedCameraSettings initialCameraSettings = new SavedCameraSettings();
-
-//    public void placeStructure(Path filePath){
-//        try (DataInputStream stream = new DataInputStream(new BufferedInputStream(
-//                new GZIPInputStream(Files.newInputStream(filePath, StandardOpenOption.READ))))) {
-//            CompoundTag compoundTag = NbtIo.read(stream, new NbtAccounter(0x20000000L));
-//            var template = new StructureTemplate();
-//            var blocks = scene.getLevel().registryAccess().registryOrThrow(Registries.BLOCK).asLookup();
-//            template.load(blocks, compoundTag);
-//            placeStructure(template);
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
-//    }
+    public void placeStructure(Path filePath){
+        try (DataInputStream stream = new DataInputStream(new BufferedInputStream(
+                new GZIPInputStream(Files.newInputStream(filePath, StandardOpenOption.READ))))) {
+            CompoundTag compoundTag = NbtIo.read(stream, NbtAccounter.create(0x20000000L));
+            var template = new StructureTemplate();
+            var blocks = scene.getLevel().registryAccess().registryOrThrow(Registries.BLOCK).asLookup();
+            template.load(blocks, compoundTag);
+            placeStructure(template);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     public void placeStructure(StructureTemplate structureTemplate){
         var random = new SingleThreadedRandomSource(0L);

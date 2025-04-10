@@ -8,6 +8,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -15,12 +16,13 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 
-public class BlockEntryRow extends AbstractWidget implements ITooltipProvider {
+public class BlockEntryRow extends NestedWidget implements ITooltipProvider{
     DownloadScreen.BlockListEntry entry;
-
-    public BlockEntryRow(int x, int y, DownloadScreen.BlockListEntry entry) {
+    Button.OnPress onReplacePress;
+    public BlockEntryRow(int x, int y, DownloadScreen.BlockListEntry entry, Button.OnPress onReplacePress) {
         super(x, y, 238, 15, Component.empty());
         this.entry = entry;
+        this.onReplacePress = onReplacePress;
     }
 
     @Override
@@ -34,7 +36,12 @@ public class BlockEntryRow extends AbstractWidget implements ITooltipProvider {
         guiGraphics.drawString(Minecraft.getInstance().font, entry.name, x + 17, y + 4, 0, false);
         MutableComponent component = Component.literal("" + entry.count);
         GuiUtils.drawCenteredStringNoShadow(Minecraft.getInstance().font, guiGraphics, component, x + 243 - 25, y + 4, 0);
+    }
 
+    @Override
+    public List<AbstractWidget> getExtras() {
+        GuiImageButton button = new GuiImageButton(x + 185, y, 15, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_delete.png"), b -> onReplacePress.onPress(b));
+        return List.of(button);
     }
 
     @Override
