@@ -20,9 +20,9 @@ import java.util.function.Consumer;
 public class Login {
 
     public static final String clientId = "874a3069-29ab-48a1-98d1-1d0c912e7b98";
-    public static final String redirectUri = "http://localhost:3001/ms";
     public static HttpServer server;
-
+    // Used later when we get a callback from the server
+    public static String redirectUri = "";
     public static void startOAuthFlow(Consumer<BlockprintsToken> onSuccess) throws IOException {
         if (server != null) {
             server.stop();
@@ -31,6 +31,7 @@ public class Login {
         for(int i = 0; i < 10; i++){
             try{
                 server = bootOnPort(3000 + i, onSuccess);
+                redirectUri = "http://localhost:" + (3000 + i) + "/ms";
                 break;
             }catch (Exception e){
                 server = null;
@@ -54,7 +55,6 @@ public class Login {
         server = ServerBootstrap.bootstrap()
                 .setListenerPort(port)
                 .registerHandler("/ms", (httpRequest, httpResponse, httpContext) -> {
-                    // log request
                     httpResponse.setEntity(new StringEntity("<script> javascript:window.close()</script>", ContentType.TEXT_HTML));
                     httpResponse.setStatusCode(200);
                     try {
