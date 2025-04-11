@@ -70,6 +70,9 @@ public class AreaCaptureHandler {
             return;
         BlockPos firstPos = AreaCaptureHandler.firstTarget;
         LocalPlayer player = Minecraft.getInstance().player;
+        if(player == null){
+            return;
+        }
         BlockHitResult trace = rayTraceRange(player.level(), player, 75);
         if (trace.getType() == HitResult.Type.BLOCK) {
 
