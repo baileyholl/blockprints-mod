@@ -85,7 +85,7 @@ public class DownloadScreen extends BaseSchematicScreen {
         var path = Paths.get(STRUCTURE_FOLDER, fileName);
         var alreadyDownloaded = Files.exists(path);
         templatePath = path;
-        if(alreadyDownloaded){
+        if(alreadyDownloaded && !hasMissing){
             initInteractiveComponents();
         }else {
             try {
@@ -130,11 +130,14 @@ public class DownloadScreen extends BaseSchematicScreen {
             }
         });
 
+        if(hasMissing){
+            downloadButton.withTooltip(Component.translatable("blockprints.blocks_missing_tooltip").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
+            visualizeButton.withTooltip(Component.translatable("blockprints.blocks_missing_tooltip").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
+        }
         if(alreadyDownloaded){
             downloadButton.withTooltip(Component.translatable("blockprints.already_downloaded_tooltip", STRUCTURE_FOLDER + fileName).withStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
         }else{
-            downloadButton.withTooltip(hasMissing ? Component.translatable("blockprints.blocks_missing_tooltip").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)) : null)
-                    .withTooltip(Component.translatable("blockprints.download_tooltip"));
+            downloadButton.withTooltip(Component.translatable("blockprints.download_tooltip"));
             visualizeButton.withTooltip(Component.translatable("blockprints.visualize_download"));
         }
 
@@ -146,6 +149,7 @@ public class DownloadScreen extends BaseSchematicScreen {
     }
 
     public void initInteractiveComponents(){
+        System.out.println("Loading structure template from " + templatePath);
         StructureTemplate structureTemplate = FileUtils.loadStructureTemplate(Minecraft.getInstance().level.holderLookup(Registries.BLOCK), templatePath);
         var accessor = (StructureTemplateAccessor)structureTemplate;
         var palettes = accessor.getPalettes();
@@ -153,7 +157,9 @@ public class DownloadScreen extends BaseSchematicScreen {
             return;
         WrappedScene wrappedScene = new WrappedScene();
         wrappedScene.placeStructure(structureTemplate);
-        ScenePreview scenePreview = new ScenePreview(bookLeft + 25, bookTop + 41, 100, 100, new WrappedScene(), structureTemplate);
+        ScenePreview scenePreview = new ScenePreview(bookLeft + 25, bookTop + 41, 100, 100, wrappedScene, structureTemplate);
+        scenePreview.setYaw(225);
+        scenePreview.setPitch(30);
         addRenderableWidget(scenePreview);
     }
 

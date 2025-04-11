@@ -39,7 +39,7 @@ public class BlockEntryRow extends NestedWidget implements ITooltipProvider{
     }
 
     @Override
-    public List<AbstractWidget> getExtras() {
+    public List<AbstractWidget> addBeforeParent() {
         GuiImageButton button = new GuiImageButton(x + 185, y, 15, 15, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_delete.png"), b -> onReplacePress.onPress(b));
         return List.of(button);
     }

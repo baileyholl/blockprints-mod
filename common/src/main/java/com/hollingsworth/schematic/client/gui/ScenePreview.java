@@ -171,8 +171,7 @@ public class ScenePreview extends NestedWidget {
     }
 
     @Override
-    public List<AbstractWidget> getExtras() {
-        List<AbstractWidget> widgets = new ArrayList<>();
+    public void addAfterParent(List<AbstractWidget> widgets) {
         widgets.add(new GimbalButton(x + 130, y + 5, "northeast", b -> {
             setYaw(225);
             setPitch(30);
@@ -191,7 +190,6 @@ public class ScenePreview extends NestedWidget {
         }));
         widgets.add(yawSlider);
         widgets.add(pitchSlider);
-        return widgets;
     }
 
     public void drawRenderScreen(PoseStack matrix, Player player, ArrayList<StatePos> statePosCache){

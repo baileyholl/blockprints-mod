@@ -17,7 +17,7 @@ public class NestedWidget extends AbstractWidget implements NestedRenderables {
     }
 
     @Override
-    public List<AbstractWidget> getExtras() {
+    public List<AbstractWidget> addBeforeParent() {
         return renderables;
     }
 

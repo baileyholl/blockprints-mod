@@ -11,6 +11,8 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BaseSchematicScreen extends ModScreen {
     public static ResourceLocation background = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/background.png");
@@ -41,19 +43,25 @@ public class BaseSchematicScreen extends ModScreen {
 
     @Override
     protected <T extends GuiEventListener & Renderable & NarratableEntry> T addRenderableWidget(T widget) {
-        var addedWidget = super.addRenderableWidget(widget);
+        List<AbstractWidget> afterParent = new ArrayList<>();
         if (widget instanceof NestedRenderables nestedRenderables) {
-            for (AbstractWidget renderable : nestedRenderables.getExtras()) {
+            for (AbstractWidget renderable : nestedRenderables.addBeforeParent()) {
                 super.addRenderableWidget(renderable);
             }
+
+            nestedRenderables.addAfterParent(afterParent);
         }
-        return addedWidget;
+        T added = super.addRenderableWidget(widget);
+        for(AbstractWidget renderable : afterParent) {
+            super.addRenderableWidget(renderable);
+        }
+        return added;
     }
 
     @Override
     protected void removeWidget(GuiEventListener $$0) {
         if ($$0 instanceof NestedRenderables nestedRenderables) {
-            for (AbstractWidget renderable : nestedRenderables.getExtras()) {
+            for (AbstractWidget renderable : nestedRenderables.addBeforeParent()) {
                 super.removeWidget(renderable);
             }
         }

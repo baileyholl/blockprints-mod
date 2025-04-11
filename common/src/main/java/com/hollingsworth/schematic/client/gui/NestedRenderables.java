@@ -6,7 +6,11 @@ import java.util.List;
 
 public interface NestedRenderables {
 
-    List<AbstractWidget> getExtras();
+    List<AbstractWidget> addBeforeParent();
+
+    default void addAfterParent(List<AbstractWidget> widgets){
+
+    }
 
 
 }
