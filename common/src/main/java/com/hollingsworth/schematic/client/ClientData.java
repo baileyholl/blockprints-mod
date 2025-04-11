@@ -88,6 +88,9 @@ public class ClientData {
     }
 
     public static void tickEvent(){
+        if(Minecraft.getInstance().player == null || Minecraft.getInstance().level == null){
+            return;
+        }
         RenderStructureHandler.tick();
         AreaCaptureHandler.tick();
     }
