@@ -63,6 +63,9 @@ public class ApiResponse<T> {
 
     public static <F> ApiResponse<F> parseServerError(HttpResponse<String> error) {
         try {
+            if(error.statusCode() == 401){
+                BlockprintsApi.getInstance().setToken(null);
+            }
             JsonObject responseObj = JsonParser.parseString(error.body()).getAsJsonObject();
             String errorString = responseObj.get("error").getAsString();
             Component component = Component.translatable("blockprints.error_received", errorString);

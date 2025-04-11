@@ -17,4 +17,5 @@ public class RequestUtil {
     public static URI getRoute(String route) {
         return URI.create(getDomain() + route);
     }
+
 }

@@ -94,5 +94,9 @@
   "blockprints.mirror_tool": "Mirror",
   "blockprints.mirror_description": "Hold Control + Scroll to mirror the structure.",
   "blockprints.dimensions": "Size: %s x %s x %s",
-  "blockprints.expand_box": "Hold Control + Scroll to adjust the boundary"
+  "blockprints.expand_box": "Hold Control + Scroll to adjust the boundary",
+  "blockprints.start_login": "Login",
+  "blockprints.login_desc": "Block Prints uses Microsoft OAuth to verify your Minecraft UUID and store uploads and downloads with it. Would you like to login?",
+  "blockprints.complete_login": "Complete the login through your web browser.",
+  "blockprints.login_success": "Successfully logged in."
 }
