@@ -9,7 +9,6 @@ public class Constants {
 	public static final Logger LOG = LoggerFactory.getLogger(MOD_NAME);
 
 	public static final int WHITE = 16777215;
-	// TODO: link on fabric
 	public static boolean isDev;
 	public static boolean isCreateLoaded;
 }
