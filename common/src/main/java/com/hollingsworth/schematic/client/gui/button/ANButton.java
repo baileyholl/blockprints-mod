@@ -1,4 +1,4 @@
-package com.hollingsworth.schematic.client.gui;
+package com.hollingsworth.schematic.client.gui.button;
 
 import com.hollingsworth.schematic.common.util.ITooltipProvider;
 import net.minecraft.client.gui.components.Button;

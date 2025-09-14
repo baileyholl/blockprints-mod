@@ -2,6 +2,8 @@ package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.client.ClientData;
+import com.hollingsworth.schematic.client.gui.button.ShortTitleButton;
+import com.hollingsworth.schematic.client.renderer.StructureRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -32,6 +34,12 @@ public class HomeScreen extends BaseSchematicScreen {
                 Minecraft.getInstance().setScreen(ViewFavoritesScreen.getTransition());
             });
         }));
+
+        if(!StructureRenderer.structures.isEmpty()) {
+            addRenderableWidget(new ShortTitleButton(bookLeft + 9, bookBottom - 23, Component.translatable("blockprints.visual_list"), Component.translatable("blockprints.visualize_list_tooltip"), ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_visualize.png"), (b) -> {
+                Minecraft.getInstance().setScreen(new ManageVisualScreen());
+            }));
+        }
     }
 
     @Override

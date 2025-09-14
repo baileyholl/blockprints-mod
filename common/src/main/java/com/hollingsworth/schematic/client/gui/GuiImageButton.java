@@ -2,6 +2,7 @@ package com.hollingsworth.schematic.client.gui;
 
 
 import com.hollingsworth.schematic.Constants;
+import com.hollingsworth.schematic.client.gui.button.ANButton;
 import com.hollingsworth.schematic.common.util.ITooltipProvider;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.sounds.SoundManager;

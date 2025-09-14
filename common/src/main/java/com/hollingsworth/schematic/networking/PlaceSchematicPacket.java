@@ -1,6 +1,7 @@
 package com.hollingsworth.schematic.networking;
 
 import com.hollingsworth.schematic.SchematicMod;
+import com.hollingsworth.schematic.common.lib.BPStructureTemplate;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -34,7 +35,7 @@ public class PlaceSchematicPacket extends AbstractPacket{
     }
 
     public PlaceSchematicPacket(RegistryFriendlyByteBuf pb) {
-        templateTag = ByteBufCodecs.COMPOUND_TAG.decode(pb);
+        templateTag = ByteBufCodecs.TRUSTED_COMPOUND_TAG.decode(pb);
         pos = pb.readBlockPos();
         structurePlaceSettings = new StructurePlaceSettings();
         structurePlaceSettings.setMirror(pb.readEnum(Mirror.class));
@@ -42,7 +43,7 @@ public class PlaceSchematicPacket extends AbstractPacket{
     }
 
     public void toBytes(RegistryFriendlyByteBuf pb) {
-        ByteBufCodecs.COMPOUND_TAG.encode(pb, template.save(new CompoundTag()));
+        ByteBufCodecs.TRUSTED_COMPOUND_TAG.encode(pb, template.save(new CompoundTag()));
         pb.writeBlockPos(pos);
         pb.writeEnum(structurePlaceSettings.getMirror());
         pb.writeEnum(structurePlaceSettings.getRotation());
@@ -56,8 +57,10 @@ public class PlaceSchematicPacket extends AbstractPacket{
 
     @Override
     public void onServerReceived(MinecraftServer minecraftServer, ServerPlayer player) {
-        template = new StructureTemplate();
-        template.load(player.level.registryAccess().lookupOrThrow(BuiltInRegistries.BLOCK.key()), templateTag);
-        template.placeInWorld(player.serverLevel(), pos, pos, structurePlaceSettings,  RandomSource.create(Util.getMillis()), 3);
+        if(player.isCreative() || player.hasInfiniteMaterials()) {
+            template = new BPStructureTemplate();
+            template.load(player.level.registryAccess().lookupOrThrow(BuiltInRegistries.BLOCK.key()), templateTag);
+            template.placeInWorld(player.serverLevel(), pos, pos, structurePlaceSettings, RandomSource.create(Util.getMillis()), 3);
+        }
     }
 }

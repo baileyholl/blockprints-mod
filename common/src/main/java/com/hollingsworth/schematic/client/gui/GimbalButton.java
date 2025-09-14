@@ -1,11 +1,12 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
+import com.hollingsworth.schematic.client.gui.button.ANButton;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-public class GimbalButton extends ANButton{
+public class GimbalButton extends ANButton {
     String direction;
 
     public GimbalButton(int x, int y, String direction, OnPress onPress) {
