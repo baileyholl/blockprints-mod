@@ -1,5 +1,7 @@
 package com.hollingsworth.schematic.client.renderer;
 
+import com.hollingsworth.nuggets.client.rendering.FakeRenderingWorld;
+import com.hollingsworth.nuggets.client.rendering.StatePos;
 import com.hollingsworth.nuggets.common.util.RaycastHelper;
 import com.hollingsworth.schematic.common.util.Color;
 import com.hollingsworth.schematic.common.util.DimPos;
@@ -28,13 +30,14 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class StructureRenderer {
-    public static ArrayList<StructureRenderData> structures = new ArrayList<>();
+    public static ArrayList<BlockPrintsStructureData> structures = new ArrayList<>();
 
     //Start rendering - this is the most expensive part, so we render it, then cache it, and draw it over and over (much cheaper)
-    public static void buildRender(StructureRenderData data, PoseStack poseStack, Player player) {
+    public static void buildRender(BlockPrintsStructureData data, PoseStack poseStack, Player player) {
         BlockHitResult lookingAt = RaycastHelper.getLookingAt(data.distanceFromCameraCast, player, true);
         BlockPos renderPos = data.anchorPos == null ? lookingAt.getBlockPos() : data.anchorPos;
         if(renderPos == null){
@@ -55,10 +58,10 @@ public class StructureRenderer {
         }
     }
 
-    public static boolean shouldUpdateRender(StructureRenderData data, BlockPos renderPos) {
+    public static boolean shouldUpdateRender(BlockPrintsStructureData data, BlockPos renderPos) {
         return data.lastRenderPos == null || !data.lastRenderPos.equals(renderPos);
     }
-    public static void clearByteBuffers(StructureRenderData data) { //Prevents leaks - Unused?
+    public static void clearByteBuffers(BlockPrintsStructureData data) { //Prevents leaks - Unused?
         for (Map.Entry<RenderType, ByteBufferBuilder> entry : data.builders.entrySet()) {
             entry.getValue().clear();
         }
@@ -66,14 +69,14 @@ public class StructureRenderer {
         data.sortStates.clear();
         data.meshDatas.clear();
     }
-    public static void generateRender(StructureRenderData data, Level level, BlockPos renderPos, float transparency) {
+    public static void generateRender(BlockPrintsStructureData data, Level level, BlockPos renderPos, float transparency) {
         generateRender(data, level, renderPos, transparency, Minecraft.getInstance().gameRenderer.getMainCamera().getPosition());
     }
     /**
      * This method creates a Map<RenderType, VertexBuffer> when given an ArrayList<StatePos> statePosCache - its used both here to draw in-game AND in the TemplateManagerGUI.java class
      */
-    public static void generateRender(StructureRenderData data, Level level, BlockPos renderPos, float transparency, Vec3 cameraPosition) {
-        ArrayList<StatePos> statePosCache = data.statePosCache;
+    public static void generateRender(BlockPrintsStructureData data, Level level, BlockPos renderPos, float transparency, Vec3 cameraPosition) {
+        List<StatePos> statePosCache = data.statePosCache;
         Map<RenderType, VertexBuffer> vertexBuffers = data.vertexBuffers;
         if (statePosCache == null || statePosCache.isEmpty()) return;
         data.fakeRenderingWorld = new FakeRenderingWorld(level, statePosCache, renderPos);
@@ -137,7 +140,7 @@ public class StructureRenderer {
         }
     }
 
-    public static void drawBoundBox(StructureRenderData data, PoseStack matrix, BlockPos blockPos) {
+    public static void drawBoundBox(BlockPrintsStructureData data, PoseStack matrix, BlockPos blockPos) {
         Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         matrix.pushPose();
         matrix.translate(-projectedView.x(), -projectedView.y(), -projectedView.z());
@@ -168,7 +171,7 @@ public class StructureRenderer {
     }
 
     //Draw what we've cached
-    public static void drawRender(StructureRenderData data, PoseStack poseStack, Matrix4f projectionMatrix, Matrix4f modelViewMatrix, Player player) {
+    public static void drawRender(BlockPrintsStructureData data, PoseStack poseStack, Matrix4f projectionMatrix, Matrix4f modelViewMatrix, Player player) {
         if (data.vertexBuffers == null) {
             return;
         }
@@ -226,7 +229,7 @@ public class StructureRenderer {
         BlockRenderDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
         DireRenderMethods.MultiplyAlphaRenderTypeBuffer multiplyAlphaRenderTypeBuffer = new DireRenderMethods.MultiplyAlphaRenderTypeBuffer(buffersource, 0.5f);
         //If any of the blocks in the render didn't have a model (like chests) we draw them here. This renders AND draws them, so more expensive than caching, but I don't think we have a choice
-        data.fakeRenderingWorld = new FakeRenderingWorld(player.level(), data.statePosCache, renderPos);
+        data.fakeRenderingWorld = new com.hollingsworth.nuggets.client.rendering.FakeRenderingWorld(player.level(), data.statePosCache, renderPos);
         for (StatePos pos : data.statePosCache) {
             if (pos.state.isAir() || isModelRender(pos.state))
                 continue;
@@ -246,7 +249,7 @@ public class StructureRenderer {
     }
 
     //Sort all the RenderTypes
-    public static void sortAll(StructureRenderData data, BlockPos lookingAt) {
+    public static void sortAll(BlockPrintsStructureData data, BlockPos lookingAt) {
         for (Map.Entry<RenderType, MeshData.SortState> entry : data.sortStates.entrySet()) {
             RenderType renderType = entry.getKey();
             var renderedBuffer = sort(data, lookingAt, renderType);
@@ -258,7 +261,7 @@ public class StructureRenderer {
     }
 
     //Sort the render type we pass in - using DireBufferBuilder because we want to sort in the opposite direction from normal
-    public static ByteBufferBuilder.Result sort(StructureRenderData data, BlockPos lookingAt, RenderType renderType) {
+    public static ByteBufferBuilder.Result sort(BlockPrintsStructureData data, BlockPos lookingAt, RenderType renderType) {
         Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         Vec3 subtracted = projectedView.subtract(lookingAt.getX(), lookingAt.getY(), lookingAt.getZ());
         Vector3f sortPos = new Vector3f((float) subtracted.x, (float) subtracted.y, (float) subtracted.z);

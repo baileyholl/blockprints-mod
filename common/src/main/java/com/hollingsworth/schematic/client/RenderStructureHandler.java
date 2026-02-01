@@ -2,7 +2,7 @@ package com.hollingsworth.schematic.client;
 
 import com.hollingsworth.nuggets.common.util.RaycastHelper;
 import com.hollingsworth.schematic.client.gui.PlaceSchematicScreen;
-import com.hollingsworth.schematic.client.renderer.StructureRenderData;
+import com.hollingsworth.schematic.client.renderer.BlockPrintsStructureData;
 import com.hollingsworth.schematic.client.renderer.StructureRenderer;
 import com.hollingsworth.schematic.networking.PlaceSchematicPacket;
 import com.hollingsworth.schematic.platform.Services;
@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 public class RenderStructureHandler {
-    private static StructureRenderData placingData;
+    private static BlockPrintsStructureData placingData;
     private static PlaceSchematicScreen schematicTools = new PlaceSchematicScreen();
 
     public static void tick(){
@@ -28,7 +28,7 @@ public class RenderStructureHandler {
         if(placingData != null){
             cancelRender();
         }
-        placingData = new StructureRenderData(structureTemplate, name, bpId);
+        placingData = new BlockPrintsStructureData(structureTemplate, name, bpId);
         schematicTools = new PlaceSchematicScreen();
         StructureRenderer.structures.add(placingData);
     }

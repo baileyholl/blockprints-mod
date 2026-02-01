@@ -2,7 +2,7 @@ package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.nuggets.client.gui.GuiHelpers;
 import com.hollingsworth.schematic.Constants;
-import com.hollingsworth.schematic.client.renderer.StructureRenderData;
+import com.hollingsworth.schematic.client.renderer.BlockPrintsStructureData;
 import com.hollingsworth.schematic.client.renderer.StructureRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ManageVisualScreen extends BaseSchematicScreen{
     List<VisualEntryRow> rows = new ArrayList<>();
-    ArrayList<StructureRenderData> structures;
+    ArrayList<BlockPrintsStructureData> structures;
     int scroll = 0;
     VerticalSlider slider;
     public ManageVisualScreen() {
@@ -51,7 +51,7 @@ public class ManageVisualScreen extends BaseSchematicScreen{
             removeWidget(row);
         }
         rows = new ArrayList<>();
-        List<StructureRenderData> sliced = structures.subList(scroll, Math.min(scroll + 10, structures.size()));
+        List<BlockPrintsStructureData> sliced = structures.subList(scroll, Math.min(scroll + 10, structures.size()));
         for (int i = 0; i < Math.min(sliced.size(), 10); i++) {
             var entry = sliced.get(i);
             VisualEntryRow row = new VisualEntryRow(bookLeft + 26, bookTop + 44 + (i * 14), entry, this);

@@ -1,7 +1,11 @@
 package com.hollingsworth.schematic.client.gui;
 
+import com.hollingsworth.nuggets.client.rendering.FakeRenderingWorld;
+import com.hollingsworth.nuggets.client.rendering.StatePos;
 import com.hollingsworth.schematic.Constants;
-import com.hollingsworth.schematic.client.renderer.*;
+import com.hollingsworth.schematic.client.renderer.BlockPrintsStructureData;
+import com.hollingsworth.schematic.client.renderer.DireRenderMethods;
+import com.hollingsworth.schematic.client.renderer.StructureRenderer;
 import com.hollingsworth.schematic.export.*;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -27,6 +31,7 @@ import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class ScenePreview extends AbstractWidget {
@@ -36,9 +41,8 @@ public class ScenePreview extends AbstractWidget {
     public WrappedScene wrappedScene;
     public Scene scene;
     public OffScreenRenderer renderer;
-    StructureTemplate template;
     FakeRenderingWorld fakeRenderingWorld;
-    StructureRenderData cachedRender;
+    BlockPrintsStructureData cachedRender;
 
     boolean doSort;
     int sortDebounce;
@@ -47,7 +51,7 @@ public class ScenePreview extends AbstractWidget {
         super(x, y, width, height, Component.empty());
         this.wrappedScene = wrappedScene;
         this.scene = scene;
-        cachedRender = new StructureRenderData(template, null, null);
+        cachedRender = new BlockPrintsStructureData(template, null, null);
         StructureRenderer.generateRender(cachedRender, Minecraft.getInstance().level, BlockPos.ZERO, 1f, new Vec3(0,0,0));
         scheduleSort();
     }
@@ -234,7 +238,7 @@ public class ScenePreview extends AbstractWidget {
 
     }
 
-    public void drawRenderScreen(PoseStack matrix, Player player, ArrayList<StatePos> statePosCache){
+    public void drawRenderScreen(PoseStack matrix, Player player, List<StatePos> statePosCache){
         MultiBufferSource.BufferSource buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
         //Draw the renders in the specified order
         ArrayList<RenderType> drawSet = new ArrayList<>();
@@ -303,7 +307,7 @@ public class ScenePreview extends AbstractWidget {
     }
 
     //Sort all the RenderTypes
-    public static void sortAll(StructureRenderData data, Vec3 projectedView) {
+    public static void sortAll(BlockPrintsStructureData data, Vec3 projectedView) {
         for (Map.Entry<RenderType, MeshData.SortState> entry : data.sortStates.entrySet()) {
             RenderType renderType = entry.getKey();
             var renderedBuffer = sort(data, projectedView, renderType);
@@ -315,7 +319,7 @@ public class ScenePreview extends AbstractWidget {
     }
 
     //Sort the render type we pass in - using DireBufferBuilder because we want to sort in the opposite direction from normal
-    public static ByteBufferBuilder.Result sort(StructureRenderData data, Vec3 projectedView, RenderType renderType) {
+    public static ByteBufferBuilder.Result sort(BlockPrintsStructureData data, Vec3 projectedView, RenderType renderType) {
         // Move our projected view in the direction of 0,0,0 by a tiny amount, accounting for negative values
         Vec3 inverted = projectedView.scale(-1);
         Vec3 subtracted = projectedView.add(inverted.normalize().scale(0.1));

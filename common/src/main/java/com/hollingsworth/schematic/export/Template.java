@@ -3,18 +3,15 @@ package com.hollingsworth.schematic.export;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.hollingsworth.schematic.client.renderer.StatePos;
+import com.hollingsworth.nuggets.client.rendering.StatePos;
+import com.hollingsworth.nuggets.common.util.ItemStackKey;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastBufferedInputStream;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoublePlantBlock;
@@ -28,8 +25,8 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
@@ -78,7 +75,7 @@ public class Template {
 
     public static CompoundTag statePosListToNBTMapArray(ArrayList<StatePos> list) {
         CompoundTag tag = new CompoundTag();
-        ArrayList<BlockState> blockStateMap = StatePos.getBlockStateMap(list);
+        List<BlockState> blockStateMap = StatePos.getBlockStateMap(list);
         ListTag blockStateMapList = StatePos.getBlockStateNBT(blockStateMap);
         int[] blocklist = new int[list.size()];
         final int[] counter = {0};
@@ -120,10 +117,10 @@ public class Template {
         return true;
     }
 
-    public static ArrayList<StatePos> statePosListFromNBTMapArray(CompoundTag tag) {
+    public static List<StatePos> statePosListFromNBTMapArray(CompoundTag tag) {
         ArrayList<StatePos> statePosList = new ArrayList<>();
         if (!tag.contains("blockstatemap") || !tag.contains("statelist")) return statePosList;
-        ArrayList<BlockState> blockStateMap = StatePos.getBlockStateMapFromNBT(tag.getList("blockstatemap", Tag.TAG_COMPOUND));
+        List<BlockState> blockStateMap = StatePos.getBlockStateMapFromNBT(tag.getList("blockstatemap", Tag.TAG_COMPOUND));
         BlockPos start = readBlockPos(tag, "startpos");
         BlockPos end = readBlockPos(tag, "endpos");
         AABB aabb = aabbFromBlockPos(start, end);
@@ -159,39 +156,5 @@ public class Template {
         }
 
         return compoundtag;
-    }
-
-    public static class ItemStackKey {
-        public final Holder<Item> item;
-        public final DataComponentPatch dataComponents;
-        private final int hash;
-
-
-        public ItemStackKey(ItemStack stack, boolean compareNBT) {
-            this.item = stack.getItemHolder();
-            this.dataComponents = compareNBT ? stack.getComponentsPatch() : DataComponentPatch.EMPTY;
-            this.hash = Objects.hash(item, dataComponents);
-        }
-
-        public ItemStack getStack() {
-            return new ItemStack(item, 1, dataComponents);
-        }
-
-        public ItemStack getStack(int amt) {
-            return new ItemStack(item, amt, dataComponents);
-        }
-
-        @Override
-        public int hashCode() {
-            return hash;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof ItemStackKey) {
-                return (((ItemStackKey) obj).item == this.item) && Objects.equals(((ItemStackKey) obj).dataComponents, this.dataComponents);
-            }
-            return false;
-        }
     }
 }
