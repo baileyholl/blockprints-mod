@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.client;
 
+import com.hollingsworth.nuggets.common.util.RaycastHelper;
 import com.hollingsworth.schematic.client.gui.PlaceSchematicScreen;
 import com.hollingsworth.schematic.client.renderer.StructureRenderData;
 import com.hollingsworth.schematic.client.renderer.StructureRenderer;

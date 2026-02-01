@@ -1,8 +1,8 @@
 package com.hollingsworth.schematic.client.gui.button;
 
+import com.hollingsworth.nuggets.client.gui.GuiHelpers;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.client.gui.GuiImageButton;
-import com.hollingsworth.schematic.client.gui.GuiUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -24,6 +24,6 @@ public class ShortTitleButton extends GuiImageButton {
         super.renderWidget(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         Font font = Minecraft.getInstance().font;
         pGuiGraphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_visualize.png"), x + 3, y + 4, 0, 0, 9, 7, 9, 7);
-        GuiUtils.drawCenteredOutlinedText(font, pGuiGraphics, title.getVisualOrderText(), x + 45, y + 4);
+        GuiHelpers.drawCenteredOutlinedText(font, pGuiGraphics, title.getVisualOrderText(), x + 45, y + 4);
     }
 }

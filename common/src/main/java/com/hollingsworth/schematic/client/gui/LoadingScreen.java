@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
+import com.hollingsworth.nuggets.client.gui.GuiHelpers;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.api.blockprints.ApiError;
 import com.hollingsworth.schematic.api.blockprints.ApiResponse;
@@ -140,7 +141,7 @@ public class LoadingScreen<T> extends BaseSchematicScreen {
 
         if (addHomeButton) {
             graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_home.png"), bookLeft + 108, bookTop + 140, 0, 0, 9, 8, 9, 8);
-            GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.home").getVisualOrderText(), bookLeft + 128, bookTop + 141);
+            GuiHelpers.drawOutlinedText(font, graphics, Component.translatable("blockprints.home").getVisualOrderText(), bookLeft + 128, bookTop + 141);
         }
     }
 

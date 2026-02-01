@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
+import com.hollingsworth.nuggets.client.gui.GuiHelpers;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.client.renderer.StructureRenderData;
 import com.hollingsworth.schematic.client.renderer.StructureRenderer;
@@ -63,6 +64,6 @@ public class ManageVisualScreen extends BaseSchematicScreen{
     public void drawBackgroundElements(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.drawBackgroundElements(graphics, mouseX, mouseY, partialTicks);
         graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container_list_visualizer.png"), 25, 25, 0, 0, 239, 159, 239, 159);
-        GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.visualizations").getVisualOrderText(), 30, 29);
+        GuiHelpers.drawOutlinedText(font, graphics, Component.translatable("blockprints.visualizations").getVisualOrderText(), 30, 29);
     }
 }

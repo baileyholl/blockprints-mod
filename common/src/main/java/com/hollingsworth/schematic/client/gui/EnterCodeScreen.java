@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
+import com.hollingsworth.nuggets.client.gui.GuiHelpers;
 import com.hollingsworth.schematic.Constants;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -50,10 +51,10 @@ public class EnterCodeScreen extends BaseSchematicScreen {
         super.render(graphics, mouseX, mouseY, partialTicks);
         graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_preview.png"), bookLeft + 59, bookTop + 156, 0, 0, 11, 9, 11, 9);
         graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_website.png"), bookLeft + 155, bookTop + 155, 0, 0, 11, 11, 11, 11);
-        GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.preview").getVisualOrderText(), bookLeft + 92, bookTop + 157);
-        GuiUtils.drawOutlinedText(font, graphics, Component.literal("BlockPrints.io").getVisualOrderText(), bookLeft + 176, bookTop + 157);
+        GuiHelpers.drawOutlinedText(font, graphics, Component.translatable("blockprints.preview").getVisualOrderText(), bookLeft + 92, bookTop + 157);
+        GuiHelpers.drawOutlinedText(font, graphics, Component.literal("BlockPrints.io").getVisualOrderText(), bookLeft + 176, bookTop + 157);
 
-        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.enter_code").getVisualOrderText(), width / 2, bookTop + 61);
+        GuiHelpers.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.enter_code").getVisualOrderText(), width / 2, bookTop + 61);
         graphics.drawWordWrap(font, Component.translatable("blockprints.download_desc"), bookLeft + 44, bookTop + 75, 225, 0);
     }
 

@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
+import com.hollingsworth.nuggets.client.gui.GuiHelpers;
 import com.hollingsworth.schematic.common.util.ITooltipProvider;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -67,7 +68,7 @@ public abstract class ModScreen extends Screen {
     public void collectTooltips(GuiGraphics stack, int mouseX, int mouseY, List<Component> tooltip) {
         for (Renderable renderable : renderables) {
             if (renderable instanceof AbstractWidget widget && renderable instanceof ITooltipProvider tooltipProvider) {
-                if (GuiUtils.isMouseInRelativeRange(mouseX, mouseY, widget)) {
+                if (GuiHelpers.isMouseInRelativeRange(mouseX, mouseY, widget)) {
                     tooltipProvider.getTooltip(tooltip);
                     break;
                 }
@@ -78,7 +79,7 @@ public abstract class ModScreen extends Screen {
     public @Nullable Renderable getHoveredRenderable(int mouseX, int mouseY) {
         for (Renderable renderable : renderables) {
             if (renderable instanceof AbstractWidget widget) {
-                if (GuiUtils.isMouseInRelativeRange(mouseX, mouseY, widget)) {
+                if (GuiHelpers.isMouseInRelativeRange(mouseX, mouseY, widget)) {
                     return renderable;
                 }
             }

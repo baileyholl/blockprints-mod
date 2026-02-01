@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
+import com.hollingsworth.nuggets.client.gui.GuiHelpers;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.api.SceneExporter;
 import com.hollingsworth.schematic.common.util.ClientUtil;
@@ -194,14 +195,14 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.render(graphics, pMouseX, pMouseY, pPartialTick);
         graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_upload.png"), bookRight - 116, bookTop + 171, 0, 0, 9, 11, 9, 11);
-        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.make_public").getVisualOrderText(), bookRight - 67, bookTop + 157);
-        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.upload").getVisualOrderText(), bookRight - 67, bookTop + 173);
+        GuiHelpers.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.make_public").getVisualOrderText(), bookRight - 67, bookTop + 157);
+        GuiHelpers.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.upload").getVisualOrderText(), bookRight - 67, bookTop + 173);
     }
 
     @Override
     public void collectTooltips(GuiGraphics stack, int mouseX, int mouseY, List<Component> tooltip) {
         super.collectTooltips(stack, mouseX, mouseY, tooltip);
-        if (GuiUtils.isMouseInRelativeRange(mouseX, mouseY, uploadButton)) {
+        if (GuiHelpers.isMouseInRelativeRange(mouseX, mouseY, uploadButton)) {
             var name = nameField.getValue().trim();
             var desc = descriptionField.getValue().trim();
             if (name.length() > MAX_NAME_LENGTH) {
@@ -221,9 +222,9 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
 
     @Override
     public boolean mouseScrolled(double pMouseX, double pMouseY, double pScrollX, double pScrollY) {
-        if(GuiUtils.isMouseInRelativeRange(pMouseX, pMouseY, yawSlider)) {
+        if(GuiHelpers.isMouseInRelativeRange(pMouseX, pMouseY, yawSlider)) {
             return yawSlider.mouseScrolled(pMouseX, pMouseY, pScrollX, pScrollY);
-        }else if(GuiUtils.isMouseInRelativeRange(pMouseX, pMouseY, pitchSlider)){
+        }else if(GuiHelpers.isMouseInRelativeRange(pMouseX, pMouseY, pitchSlider)){
             return pitchSlider.mouseScrolled(pMouseX, pMouseY, pScrollX, pScrollY);
         }
         return super.mouseScrolled(pMouseX, pMouseY, pScrollX, pScrollY);
@@ -235,8 +236,8 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/diologue_preview.png"), 25, 25, 0, 0, 143, 127, 143, 127);
         graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/diologue_title.png"), 185, 25, 0, 0, 95, 14, 95, 14);
         graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/diologue_title.png"), 185, 57, 0, 0, 95, 14, 95, 14);
-        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.set_preview").getVisualOrderText(), 25 + 143 / 2, 29);
-        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.name").getVisualOrderText(), 185 + 48, 29);
-        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.description").getVisualOrderText(), 185 + 48, 61);
+        GuiHelpers.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.set_preview").getVisualOrderText(), 25 + 143 / 2, 29);
+        GuiHelpers.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.name").getVisualOrderText(), 185 + 48, 29);
+        GuiHelpers.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.description").getVisualOrderText(), 185 + 48, 61);
     }
 }

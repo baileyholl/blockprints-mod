@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
+import com.hollingsworth.nuggets.client.gui.GuiHelpers;
 import com.hollingsworth.schematic.ClientConstants;
 import com.hollingsworth.schematic.SchematicMod;
 import com.hollingsworth.schematic.client.ClientData;
@@ -99,21 +100,21 @@ public class PlaceSchematicScreen extends Screen {
         if (toolTipAlpha > 0.25f) {
             graphics.blit(SchematicMod.prefix("textures/gui/hud_background.png"), x - 15, y + 16, 0, 0, w, h, 16, 16);
             if (!toolTip.isEmpty())
-                GuiUtils.drawOutlinedText(minecraft.font, graphics, toolTip.get(0), x - 10, y + 38);
+                GuiHelpers.drawOutlinedText(minecraft.font, graphics, toolTip.get(0), x - 10, y + 38);
             if (toolTip.size() > 1)
-                GuiUtils.drawOutlinedText(minecraft.font, graphics, toolTip.get(1), x - 10, y + 50);
+                GuiHelpers.drawOutlinedText(minecraft.font, graphics, toolTip.get(1), x - 10, y + 50);
         }
 
         if (tools.size() > 1) {
             String keyName = ClientData.TOOL_MENU.getTranslatedKeyMessage().getString();
             int width = minecraft.getWindow().getGuiScaledWidth();
             if (!focused)
-                GuiUtils.drawCenteredOutlinedText(minecraft.font, graphics, Component.translatable(holdToFocus, keyName), width / 2, y - 10);
+                GuiHelpers.drawCenteredOutlinedText(minecraft.font, graphics, Component.translatable(holdToFocus, keyName), width / 2, y - 10);
             else {
-                GuiUtils.drawCenteredOutlinedText(minecraft.font, graphics, Component.translatable("blockprints.scroll"), width / 2, y - 10);
+                GuiHelpers.drawCenteredOutlinedText(minecraft.font, graphics, Component.translatable("blockprints.scroll"), width / 2, y - 10);
             }
         } else {
-            GuiUtils.drawCenteredOutlinedText(minecraft.font, graphics, Component.translatable("blockprints.place_description"), width / 2, y - 10);
+            GuiHelpers.drawCenteredOutlinedText(minecraft.font, graphics, Component.translatable("blockprints.place_description"), width / 2, y - 10);
             x += 65;
         }
 
@@ -124,7 +125,7 @@ public class PlaceSchematicScreen extends Screen {
             if (i == selection) {
                 matrixStack.translate(0, -10, 0);
 
-                GuiUtils.drawCenteredOutlinedText(minecraft.font, graphics, tools.get(i)
+                GuiHelpers.drawCenteredOutlinedText(minecraft.font, graphics, tools.get(i)
                         .getDisplayName(), x + i * 50 + 26, y + 28);
             }
             ResourceLocation icon = tools.get(i)

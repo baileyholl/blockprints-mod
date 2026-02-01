@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
+import com.hollingsworth.nuggets.client.gui.GuiHelpers;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.client.ClientData;
 import com.hollingsworth.schematic.client.gui.button.ShortTitleButton;
@@ -53,9 +54,9 @@ public class HomeScreen extends BaseSchematicScreen {
 
         graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_download_large.png"), bookLeft + 51, bookTop + 96, 0, 0, 27, 33, 27, 33);
         graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_build_list_large.png"), bookLeft + 49, bookTop + 144, 0, 0, 33, 33, 33, 33);
-        GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.upload").getVisualOrderText(), bookLeft + 91, bookTop + 45);
-        GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.download").getVisualOrderText(), bookLeft + 91, bookTop + 93);
-        GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.build_list").getVisualOrderText(), bookLeft + 91, bookTop + 141);
+        GuiHelpers.drawOutlinedText(font, graphics, Component.translatable("blockprints.upload").getVisualOrderText(), bookLeft + 91, bookTop + 45);
+        GuiHelpers.drawOutlinedText(font, graphics, Component.translatable("blockprints.download").getVisualOrderText(), bookLeft + 91, bookTop + 93);
+        GuiHelpers.drawOutlinedText(font, graphics, Component.translatable("blockprints.build_list").getVisualOrderText(), bookLeft + 91, bookTop + 141);
 
         graphics.drawWordWrap(font, Component.translatable("blockprints.upload_desc"), bookLeft + 91, bookTop + 61, 150, 0);
         graphics.drawWordWrap(font, Component.translatable("blockprints.download_desc"), bookLeft + 91, bookTop + 108, 150, 0);

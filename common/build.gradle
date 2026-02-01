@@ -21,6 +21,11 @@ dependencies {
     compileOnly("org.bytedeco:ffmpeg-platform:6.0-1.5.9")
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     compileOnly "io.github.llamalad7:mixinextras-common:0.2.0-beta.11"
+    compileOnly("com.hollingsworth.nuggets:nuggets-common-1.21.1:${nuggets_version}")
+}
+
+repositories {
+    mavenLocal()
 }
 
 configurations {

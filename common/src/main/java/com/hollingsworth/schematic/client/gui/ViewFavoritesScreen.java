@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
+import com.hollingsworth.nuggets.client.gui.GuiHelpers;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.api.blockprints.BlockprintsApi;
 import com.hollingsworth.schematic.api.blockprints.favorites.Favorite;
@@ -142,7 +143,7 @@ public class ViewFavoritesScreen extends BaseSchematicScreen {
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.render(graphics, mouseX, mouseY, partialTicks);
         graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_visualize.png"), bookLeft + 28, bookTop + 13, 0, 0, 9, 7, 9, 7);
-        GuiUtils.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.visual_list").getVisualOrderText(), bookLeft + 70, bookTop + 13);
+        GuiHelpers.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.visual_list").getVisualOrderText(), bookLeft + 70, bookTop + 13);
     }
 
     @Override
@@ -154,6 +155,6 @@ public class ViewFavoritesScreen extends BaseSchematicScreen {
         graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_favorite_builds.png"), 232, 29, 0, 0, 7, 7, 7, 7);
 
         graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_recent_builds.png"), 252, 29, 0, 0, 7, 7, 7, 7);
-        GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.builds").getVisualOrderText(), 30, 29);
+        GuiHelpers.drawOutlinedText(font, graphics, Component.translatable("blockprints.builds").getVisualOrderText(), 30, 29);
     }
 }

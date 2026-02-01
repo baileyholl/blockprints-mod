@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
+import com.hollingsworth.nuggets.client.gui.GuiHelpers;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.api.blockprints.BlockprintsApi;
 import com.hollingsworth.schematic.api.blockprints.download.PreviewDownloadResult;
@@ -39,7 +40,7 @@ public class ConfirmDeleteScreen extends BaseSchematicScreen{
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.render(graphics, mouseX, mouseY, partialTicks);
         graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_delete.png"), bookLeft + 108, bookTop + 140, 0, 0, 9, 8, 9, 8);
-        GuiUtils.drawOutlinedText(font, graphics, Component.translatable("blockprints.delete_confirm").getVisualOrderText(), bookLeft + 128, bookTop + 141);
+        GuiHelpers.drawOutlinedText(font, graphics, Component.translatable("blockprints.delete_confirm").getVisualOrderText(), bookLeft + 128, bookTop + 141);
 
     }
 

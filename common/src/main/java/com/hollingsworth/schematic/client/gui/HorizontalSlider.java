@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
+import com.hollingsworth.nuggets.client.gui.GuiHelpers;
 import com.hollingsworth.schematic.Constants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -45,6 +46,6 @@ public class HorizontalSlider extends BaseSlider {
         String image = isPitch ? "textures/gui/container_scroll_pitch.png" : "textures/gui/container_scroll_yaw.png";
         guiGraphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, image), x - 16, y, 0, 0, 143, 15, 143, 15);
         guiGraphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/scroll_bar_horizontal.png"), x + 1 + (int) (this.value * (double) (this.width - 9)), getY() + 3, 0, 0, 15, 9, 15, 9);
-        GuiUtils.drawCenteredOutlinedText(mc.font, guiGraphics, Component.literal(String.valueOf(this.getValueInt())).getVisualOrderText(), x + 116, y + 4);
+        GuiHelpers.drawCenteredOutlinedText(mc.font, guiGraphics, Component.literal(String.valueOf(this.getValueInt())).getVisualOrderText(), x + 116, y + 4);
     }
 }

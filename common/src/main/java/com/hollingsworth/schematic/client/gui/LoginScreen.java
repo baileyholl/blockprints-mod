@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
+import com.hollingsworth.nuggets.client.gui.GuiHelpers;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.api.blockprints.BlockprintsApi;
 import com.hollingsworth.schematic.oauth.Login;
@@ -35,7 +36,7 @@ public class LoginScreen extends BaseSchematicScreen {
     public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
         super.render(matrixStack, mouseX, mouseY, partialTicks);
         matrixStack.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_website.png"), bookLeft + 107, bookTop + 139, 0, 0, 11, 11, 11, 11);
-        GuiUtils.drawOutlinedText(font, matrixStack, Component.translatable("blockprints.start_login").getVisualOrderText(), bookLeft + 128, bookTop + 141);
+        GuiHelpers.drawOutlinedText(font, matrixStack, Component.translatable("blockprints.start_login").getVisualOrderText(), bookLeft + 128, bookTop + 141);
     }
 
     @Override

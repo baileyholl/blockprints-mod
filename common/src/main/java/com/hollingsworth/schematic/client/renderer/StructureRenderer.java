@@ -1,6 +1,6 @@
 package com.hollingsworth.schematic.client.renderer;
 
-import com.hollingsworth.schematic.client.RaycastHelper;
+import com.hollingsworth.nuggets.common.util.RaycastHelper;
 import com.hollingsworth.schematic.common.util.Color;
 import com.hollingsworth.schematic.common.util.DimPos;
 import com.hollingsworth.schematic.platform.Services;

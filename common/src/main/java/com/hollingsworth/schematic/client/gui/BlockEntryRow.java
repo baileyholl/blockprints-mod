@@ -1,5 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
+import com.hollingsworth.nuggets.client.gui.GuiHelpers;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.client.RenderUtils;
 import com.hollingsworth.schematic.common.util.ITooltipProvider;
@@ -33,7 +34,7 @@ public class BlockEntryRow extends AbstractWidget implements ITooltipProvider {
         }
         guiGraphics.drawString(Minecraft.getInstance().font, entry.name, x + 17, y + 4, 0, false);
         MutableComponent component = Component.literal("" + entry.count);
-        GuiUtils.drawCenteredStringNoShadow(Minecraft.getInstance().font, guiGraphics, component, x + 243 - 25, y + 4, 0);
+        GuiHelpers.drawCenteredStringNoShadow(Minecraft.getInstance().font, guiGraphics, component, x + 243 - 25, y + 4, 0);
 
     }
 
