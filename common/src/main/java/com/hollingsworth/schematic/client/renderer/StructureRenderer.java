@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 public class StructureRenderer {
-    public static ArrayList<BlockPrintsStructureData> structures = new ArrayList<>();
+    public static List<BlockPrintsStructureData> structures = new ArrayList<>();
 
     //Start rendering - this is the most expensive part, so we render it, then cache it, and draw it over and over (much cheaper)
     public static void buildRender(BlockPrintsStructureData data, PoseStack poseStack, Player player) {

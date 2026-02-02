@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ManageVisualScreen extends BaseSchematicScreen{
     List<VisualEntryRow> rows = new ArrayList<>();
-    ArrayList<BlockPrintsStructureData> structures;
+    List<BlockPrintsStructureData> structures;
     int scroll = 0;
     VerticalSlider slider;
     public ManageVisualScreen() {

@@ -1,11 +1,16 @@
 package com.hollingsworth.schematic.client;
 
 import com.hollingsworth.nuggets.client.area_capture.AreaCaptureHandler;
+import com.hollingsworth.nuggets.client.area_capture.RenderStructureHandler;
 import com.hollingsworth.nuggets.client.gui.GuiHelpers;
+import com.hollingsworth.schematic.ClientConstants;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.client.gui.HomeScreen;
 import com.hollingsworth.schematic.client.gui.UploadPreviewScreen;
+import com.hollingsworth.schematic.client.renderer.BlockPrintsStructureData;
 import com.hollingsworth.schematic.client.renderer.StructureRenderer;
+import com.hollingsworth.schematic.networking.PlaceSchematicPacket;
+import com.hollingsworth.schematic.platform.Services;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.KeyMapping;
@@ -25,6 +30,7 @@ public class ClientData {
     public static final KeyMapping CONFIRM = new KeyMapping("key." + Constants.MOD_ID + ".confirm_selection", GLFW.GLFW_KEY_ENTER, CATEGORY);
     public static final KeyMapping CANCEL = new KeyMapping("key." + Constants.MOD_ID + ".cancel_selection", GLFW.GLFW_KEY_BACKSPACE, CATEGORY);
     public static final KeyMapping TOOL_MENU = new KeyMapping("key." + Constants.MOD_ID + ".tool_menu", GLFW.GLFW_KEY_LEFT_ALT, CATEGORY);
+
     public static AreaCaptureHandler areaCaptureHandler = new AreaCaptureHandler((graphics, window, areaCaptureHandler) ->{
         boolean showBoundary = areaCaptureHandler.showBoundary;
         if (!showBoundary || Minecraft.getInstance().options.hideGui)
@@ -49,16 +55,45 @@ public class ClientData {
         GuiHelpers.drawCenteredOutlinedText(Minecraft.getInstance().font, graphics, Component.translatable(Constants.MOD_ID + ".cancel_selection", CANCEL.getTranslatedKeyMessage()).getVisualOrderText(), 0, 0);
         graphics.pose().popPose();
     }, (structureTemplate, areaCaptureHandler) -> {
+        if(structureTemplate == null){
+            return;
+        }
         Minecraft.getInstance().setScreen(new UploadPreviewScreen(structureTemplate, areaCaptureHandler.firstTarget, areaCaptureHandler.secondTarget));
     });
+
+    public static RenderStructureHandler<BlockPrintsStructureData> renderStructureHandler = createRenderHandler();
 
     public static final KeyFunction[] KEY_FUNCTIONS = new KeyFunction[]{
             new KeyFunction(OPEN_MENU, ClientData::openMenu),
             new KeyFunction(CONFIRM, ClientData::onConfirmHit),
             new KeyFunction(CANCEL, ClientData::onCancelHit),
-            new KeyFunction(TOOL_MENU, RenderStructureHandler::toolKeyHit)
+            new KeyFunction(TOOL_MENU, (keyEvent) -> {
+                renderStructureHandler.toolKeyHit(keyEvent.isDown());
+            })
 
     };
+
+    private static RenderStructureHandler<BlockPrintsStructureData> createRenderHandler(){
+        Consumer<RenderStructureHandler<BlockPrintsStructureData>> onPrint = null;
+        if(Minecraft.getInstance().player != null && Minecraft.getInstance().player.isCreative() && ClientConstants.blockprintsServerside) {
+            onPrint = (handler) -> {
+                if(handler.placingData != null){
+                    Services.PLATFORM.sendClientToServerPacket(new PlaceSchematicPacket(handler.placingData.structureTemplate, handler.placingData.structurePlaceSettings, handler.placingData.anchorPos.above(1)));
+                }
+            };
+
+        }
+        return new RenderStructureHandler<>(Constants.MOD_ID, TOOL_MENU, null, (handler) ->{
+            // On confirmed placement, reset handler to dismiss it
+            ClientData.renderStructureHandler = createRenderHandler();
+        }, (handler) -> {
+            // On Delete
+            if(handler.placingData != null){
+                StructureRenderer.structures.remove(handler.placingData);
+                handler.placingData = null;
+            }
+        }, onPrint);
+    }
 
     public static void openMenu(KeyEvent event) {
         if(event.isDown()) {
@@ -68,12 +103,19 @@ public class ClientData {
 
     public static void startBoundaryCapture(){
         areaCaptureHandler.startCapture();
-        RenderStructureHandler.cancelRender();
+        renderStructureHandler = createRenderHandler();
     }
 
     public static void startStructureRenderer(StructureTemplate structureTemplate, String name, String blockprintsId){
-        RenderStructureHandler.startRender(structureTemplate, name, blockprintsId);
         areaCaptureHandler.cancelCapture();
+        renderStructureHandler = createRenderHandler();
+        BlockPrintsStructureData placingData = renderStructureHandler.placingData;
+        if(placingData != null){
+            StructureRenderer.structures.remove(renderStructureHandler.placingData);
+            renderStructureHandler.placingData = null;
+        }
+        renderStructureHandler.placingData = new BlockPrintsStructureData(structureTemplate, name, blockprintsId);
+        StructureRenderer.structures.add(renderStructureHandler.placingData);
     }
 
     public static void onConfirmHit(KeyEvent event) {
@@ -104,25 +146,27 @@ public class ClientData {
    }
 
    public static boolean mouseScrolled(double delta){
-        return RenderStructureHandler.mouseScrolled(delta) || areaCaptureHandler.mouseScrolled(delta);
+        return renderStructureHandler.mouseScrolled(delta) || areaCaptureHandler.mouseScrolled(delta);
    }
 
 
     public static void rightClickEvent() {
         areaCaptureHandler.positionClicked();
-        RenderStructureHandler.positionClicked();
+        if(renderStructureHandler.placingData != null) {
+            renderStructureHandler.rightClickEvent();
+        }
     }
 
     public static void renderGUIOverlayEvent(GuiGraphics graphics, Window window) {
         areaCaptureHandler.renderBoundaryUI(graphics, window);
-        RenderStructureHandler.renderInstructions(graphics, window);
+        renderStructureHandler.renderInstructions(graphics, window);
     }
 
     public static void tickEvent(){
         if(Minecraft.getInstance().player == null || Minecraft.getInstance().level == null){
             return;
         }
-        RenderStructureHandler.tick();
+        renderStructureHandler.tick();
         areaCaptureHandler.tick();
     }
 
