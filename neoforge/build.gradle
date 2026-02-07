@@ -113,13 +113,13 @@ dependencies {
     compileOnly("com.tterrag.registrate:Registrate:${registrate_version}")
 //    runtimeOnly "com.hollingsworth.ars_nouveau:ars_nouveau-1.21.1:${project.ars_version}"
 //    runtimeOnly "software.bernie.geckolib:geckolib-neoforge-${project.minecraft_version}:${project.gecko_version}"
-    implementation('com.hollingsworth.nuggets:nuggets-neoforge-1.21.1:1.0.11')
-//    jarJar(implementation('com.hollingsworth.nuggets:nuggets-neoforge-1.21.1') {
-//        version {
-//            strictly '[1.0.11,)'
-//            prefer '1.0.11'
-//        }
-//    })
+//    implementation('com.hollingsworth.nuggets:nuggets-neoforge-1.21.1:1.0.11')
+    jarJar(implementation('com.hollingsworth.nuggets:nuggets-neoforge-1.21.1') {
+        version {
+            strictly "[${nuggets_version},)"
+            prefer "${nuggets_version}"
+        }
+    })
 }
 
 

@@ -33,6 +33,7 @@
       "fabricloader": ">=0.14",
       "fabric": "*",
       "minecraft": ">=1.21.1",
+      "nuggets": ">=1.1.0",
       "java": ">=21"
     },
     "suggests": {
