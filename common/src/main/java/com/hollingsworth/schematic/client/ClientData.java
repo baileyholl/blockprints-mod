@@ -2,13 +2,13 @@ package com.hollingsworth.schematic.client;
 
 import com.hollingsworth.nuggets.client.area_capture.AreaCaptureHandler;
 import com.hollingsworth.nuggets.client.area_capture.RenderStructureHandler;
+import com.hollingsworth.nuggets.client.rendering.StructureRenderer;
 import com.hollingsworth.nuggets.common.util.WorldHelpers;
 import com.hollingsworth.schematic.ClientConstants;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.client.gui.HomeScreen;
 import com.hollingsworth.schematic.client.gui.UploadPreviewScreen;
 import com.hollingsworth.schematic.client.renderer.BlockPrintsStructureData;
-import com.hollingsworth.schematic.client.renderer.StructureRenderer;
 import com.hollingsworth.schematic.networking.PlaceSchematicPacket;
 import com.hollingsworth.schematic.platform.Services;
 import com.mojang.blaze3d.platform.Window;
@@ -20,6 +20,8 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class ClientData {
@@ -33,6 +35,8 @@ public class ClientData {
         }
         Minecraft.getInstance().setScreen(new UploadPreviewScreen(WorldHelpers.getStructure(Minecraft.getInstance().level, areaCaptureHandler.firstTarget, areaCaptureHandler.secondTarget), areaCaptureHandler.firstTarget, areaCaptureHandler.secondTarget));
     });
+
+    public static List<BlockPrintsStructureData> structures = new ArrayList<>();
 
     public static RenderStructureHandler<BlockPrintsStructureData> renderStructureHandler = createRenderHandler();
 
@@ -61,7 +65,7 @@ public class ClientData {
         }, (handler) -> {
             // On Delete
             if(handler.placingData != null){
-                StructureRenderer.structures.remove(handler.placingData);
+                structures.remove(handler.placingData);
                 handler.placingData = null;
             }
         }, onPrint);
@@ -76,7 +80,7 @@ public class ClientData {
     public static void startBoundaryCapture(){
         areaCaptureHandler.startCapture();
         if(renderStructureHandler.placingData != null){
-            StructureRenderer.structures.remove(renderStructureHandler.placingData);
+            structures.remove(renderStructureHandler.placingData);
             renderStructureHandler.placingData = null;
         }
         renderStructureHandler = createRenderHandler();
@@ -87,11 +91,11 @@ public class ClientData {
         renderStructureHandler = createRenderHandler();
         BlockPrintsStructureData placingData = renderStructureHandler.placingData;
         if(placingData != null){
-            StructureRenderer.structures.remove(renderStructureHandler.placingData);
+            structures.remove(renderStructureHandler.placingData);
             renderStructureHandler.placingData = null;
         }
         renderStructureHandler.placingData = new BlockPrintsStructureData(structureTemplate, name, blockprintsId);
-        StructureRenderer.structures.add(renderStructureHandler.placingData);
+        structures.add(renderStructureHandler.placingData);
     }
 
     public static void renderAfterSky(PoseStack poseStack, Matrix4f modelViewMatrix) {
@@ -99,10 +103,10 @@ public class ClientData {
     }
 
     public static void renderAfterTransparentBlocks(PoseStack poseStack, Matrix4f projectionMatrix, Matrix4f modelViewMatrix){
-        for(var data : StructureRenderer.structures){
+        for(var data : structures){
             StructureRenderer.buildRender(data, poseStack, Minecraft.getInstance().player);
         }
-        for(var data : StructureRenderer.structures){
+        for(var data : structures){
             StructureRenderer.drawRender(data, poseStack, projectionMatrix, modelViewMatrix, Minecraft.getInstance().player);
         }
    }

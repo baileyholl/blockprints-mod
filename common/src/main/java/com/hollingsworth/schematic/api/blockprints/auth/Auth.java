@@ -32,6 +32,7 @@ public class Auth {
             var res = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
             var statusCode = res.statusCode();
             if (!RequestUtil.responseSuccessful(statusCode)) {
+                System.out.println("Failed to authenticate with Blockprints API: " + res.body());
                 throw new Error("Failed to authenticate with Blockprints API");
             }
             JsonObject responseObj = JsonParser.parseString(res.body()).getAsJsonObject();

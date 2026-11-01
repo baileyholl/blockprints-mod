@@ -1,11 +1,11 @@
 package com.hollingsworth.schematic.api;
 
+import com.hollingsworth.nuggets.client.scene.PerspectivePreset;
 import com.hollingsworth.schematic.api.blockprints.ApiError;
 import com.hollingsworth.schematic.api.blockprints.ApiResponse;
 import com.hollingsworth.schematic.api.blockprints.BlockprintsApi;
 import com.hollingsworth.schematic.api.blockprints.GoogleCloudStorage;
 import com.hollingsworth.schematic.common.util.SchematicExport;
-import com.hollingsworth.schematic.export.PerspectivePreset;
 import com.hollingsworth.schematic.export.Template;
 import com.hollingsworth.schematic.export.WrappedScene;
 import net.minecraft.core.BlockPos;

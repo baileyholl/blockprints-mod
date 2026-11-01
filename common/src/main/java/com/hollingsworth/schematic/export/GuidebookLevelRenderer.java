@@ -1,6 +1,7 @@
 package com.hollingsworth.schematic.export;
 
 
+import com.hollingsworth.nuggets.client.scene.CameraSettings;
 import com.hollingsworth.schematic.export.level.GuidebookLevel;
 import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.platform.Lighting;

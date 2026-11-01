@@ -5,17 +5,12 @@ import com.hollingsworth.schematic.compat.CreateCompat;
 import com.hollingsworth.schematic.networking.AbstractPacket;
 import com.hollingsworth.schematic.networking.Networking;
 import com.hollingsworth.schematic.platform.services.IPlatformHelper;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
-import net.neoforged.neoforge.client.model.data.ModelData;
 
 import java.nio.file.Path;
 
@@ -39,11 +34,6 @@ public class ForgePlatformHelper implements IPlatformHelper {
     @Override
     public boolean isDevelopmentEnvironment() {
         return !FMLLoader.isProduction();
-    }
-
-    @Override
-    public Iterable<RenderType> getRenderTypes(BakedModel bakedModel, BlockState blockstate, RandomSource rand) {
-        return bakedModel.getRenderTypes(blockstate, rand, ModelData.EMPTY);
     }
 
     @Override

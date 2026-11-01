@@ -1,11 +1,11 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.nuggets.client.gui.GuiHelpers;
+import com.hollingsworth.nuggets.client.gui.ScenePreview;
+import com.hollingsworth.nuggets.client.scene.CameraSettings;
 import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.api.SceneExporter;
 import com.hollingsworth.schematic.common.util.ClientUtil;
-import com.hollingsworth.schematic.export.CameraSettings;
-import com.hollingsworth.schematic.export.Scene;
 import com.hollingsworth.schematic.export.WrappedScene;
 import com.hollingsworth.schematic.export.level.GuidebookLevel;
 import net.minecraft.ChatFormatting;
@@ -56,9 +56,7 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     @Override
     public void init() {
         super.init();
-        wrappedScene = new WrappedScene();
-        Scene scene = new Scene(new GuidebookLevel(), new CameraSettings());
-        wrappedScene.setScene(scene);
+        wrappedScene = new WrappedScene(new GuidebookLevel(), new CameraSettings());
         wrappedScene.placeStructure(structureTemplate);
         nameField = new ShortTextField(font, bookLeft + 185, bookTop + 39, Component.empty());
         descriptionField = new NoScrollMultiText(font, bookLeft + 185, bookTop + 71, 95, 81, Component.empty(), Component.empty());
@@ -96,7 +94,10 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
         this.previewImage = new PreviewImage(bookLeft + 25, bookTop + 41, 100, 100, dynamicTexture, PREVIEW_TEXTURE);
         this.useRealtimeRender = true;
         if(useRealtimeRender){
-            this.scenePreview = new ScenePreview(bookLeft + 25, bookTop + 41, 100, 100, scene, wrappedScene, structureTemplate);
+            if(scenePreview != null){
+                scenePreview.close();
+            }
+            this.scenePreview = new ScenePreview(bookLeft + 46, bookTop + 62, 100, 100, wrappedScene.scene, structureTemplate);
 
             scenePreview.setYaw(225);
             scenePreview.setPitch(30);
@@ -137,7 +138,7 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     @Override
     public void removed() {
         super.removed();
-        scenePreview.removed();
+        scenePreview.close();
         if(this.dynamicTexture != null){
             this.dynamicTexture.close();
         }
@@ -194,6 +195,10 @@ public class UploadPreviewScreen extends BaseSchematicScreen {
     @Override
     public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.render(graphics, pMouseX, pMouseY, pPartialTick);
+        if(scenePreview != null){
+            var rect = scenePreview.getImageRect();
+            ModScreen.blitRect(graphics.pose(), rect.left() + 121, rect.top() + 3, 0, 0, 17, 17, 17, 17, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/gimbal/gimbal_cardinal.png"), 150);
+        }
         graphics.blit(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/icon_upload.png"), bookRight - 116, bookTop + 171, 0, 0, 9, 11, 9, 11);
         GuiHelpers.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.make_public").getVisualOrderText(), bookRight - 67, bookTop + 157);
         GuiHelpers.drawCenteredOutlinedText(font, graphics, Component.translatable("blockprints.upload").getVisualOrderText(), bookRight - 67, bookTop + 173);

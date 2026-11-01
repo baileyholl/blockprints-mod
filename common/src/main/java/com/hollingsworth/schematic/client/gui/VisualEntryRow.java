@@ -1,8 +1,8 @@
 package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.schematic.Constants;
+import com.hollingsworth.schematic.client.ClientData;
 import com.hollingsworth.schematic.client.renderer.BlockPrintsStructureData;
-import com.hollingsworth.schematic.client.renderer.StructureRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -16,7 +16,7 @@ public class VisualEntryRow extends NestedWidget{
         this.data = data;
         this.screen = visualScreen;
         renderables.add(new GuiImageButton(x + 224, y + 1, 11, 11, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_remove_favorite.png"), button -> {
-            StructureRenderer.structures.remove(data);
+            ClientData.structures.remove(data);
             screen.updateList();
         }).withTooltip(Component.translatable("blockprints.remove_visual")));
     }

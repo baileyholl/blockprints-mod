@@ -2,8 +2,8 @@ package com.hollingsworth.schematic.client.gui;
 
 import com.hollingsworth.nuggets.client.gui.GuiHelpers;
 import com.hollingsworth.schematic.Constants;
+import com.hollingsworth.schematic.client.ClientData;
 import com.hollingsworth.schematic.client.renderer.BlockPrintsStructureData;
-import com.hollingsworth.schematic.client.renderer.StructureRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -19,7 +19,7 @@ public class ManageVisualScreen extends BaseSchematicScreen{
     VerticalSlider slider;
     public ManageVisualScreen() {
         super();
-        structures = StructureRenderer.structures;
+        structures = ClientData.structures;
     }
 
     @Override

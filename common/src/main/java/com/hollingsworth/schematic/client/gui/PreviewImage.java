@@ -1,6 +1,6 @@
 package com.hollingsworth.schematic.client.gui;
 
-import com.hollingsworth.schematic.export.LytSize;
+import com.hollingsworth.nuggets.client.scene.LytSize;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -8,8 +8,6 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-
-import static com.hollingsworth.schematic.client.gui.ScenePreview.getScaledDimension;
 
 public class PreviewImage extends AbstractWidget {
     DynamicTexture dynamicTexture;
@@ -32,7 +30,7 @@ public class PreviewImage extends AbstractWidget {
         // scale width and height to fit in the box of 100,100
         LytSize origDim = new LytSize(imageWidth, imageHeight);
         LytSize boundary = new LytSize(width, height);
-        LytSize newDim = getScaledDimension(origDim, boundary);
+        LytSize newDim = origDim.scaledToFit(boundary);
         // Offset x and Y so the image is centered
         // center x and y on point 50, 50
         int x = this.x + 143 / 2;
