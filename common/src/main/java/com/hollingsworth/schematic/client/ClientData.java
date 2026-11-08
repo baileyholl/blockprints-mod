@@ -88,12 +88,11 @@ public class ClientData {
 
     public static void startStructureRenderer(StructureTemplate structureTemplate, String name, String blockprintsId){
         areaCaptureHandler.cancelCapture();
-        renderStructureHandler = createRenderHandler();
-        BlockPrintsStructureData placingData = renderStructureHandler.placingData;
-        if(placingData != null){
+        if(renderStructureHandler.placingData != null){
             structures.remove(renderStructureHandler.placingData);
             renderStructureHandler.placingData = null;
         }
+        renderStructureHandler = createRenderHandler();
         renderStructureHandler.placingData = new BlockPrintsStructureData(structureTemplate, name, blockprintsId);
         structures.add(renderStructureHandler.placingData);
     }
