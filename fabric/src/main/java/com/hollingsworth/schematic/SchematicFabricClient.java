@@ -7,6 +7,7 @@ import com.hollingsworth.schematic.platform.Services;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
@@ -28,6 +29,8 @@ public class SchematicFabricClient implements ClientModInitializer {
             }
             ClientData.tickEvent();
         });
+
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ClientData.onLogout());
 
         WorldRenderEvents.LAST.register((context) -> {
             ClientData.renderAfterTransparentBlocks(context.matrixStack(), context.projectionMatrix(), context.positionMatrix());

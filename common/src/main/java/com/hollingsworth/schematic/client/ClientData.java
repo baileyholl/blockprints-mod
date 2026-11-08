@@ -12,6 +12,7 @@ import com.hollingsworth.schematic.client.renderer.BlockPrintsStructureData;
 import com.hollingsworth.schematic.networking.PlaceSchematicPacket;
 import com.hollingsworth.schematic.platform.Services;
 import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -64,11 +65,33 @@ public class ClientData {
             ClientData.renderStructureHandler = createRenderHandler();
         }, (handler) -> {
             // On Delete
-            if(handler.placingData != null){
-                structures.remove(handler.placingData);
-                handler.placingData = null;
-            }
+            removeStructure(handler.placingData);
         }, onPrint);
+    }
+
+    public static void removeStructure(BlockPrintsStructureData data){
+        if(data == null){
+            return;
+        }
+        structures.remove(data);
+        if(renderStructureHandler.placingData == data){
+            renderStructureHandler.placingData = null;
+        }
+        data.close();
+    }
+
+    public static void onLogout(){
+        if(!RenderSystem.isOnRenderThread()){
+            RenderSystem.recordRenderCall(ClientData::onLogout);
+            return;
+        }
+        for(BlockPrintsStructureData data : structures){
+            data.close();
+        }
+        structures.clear();
+        ClientConstants.blockprintsServerside = false;
+        renderStructureHandler = createRenderHandler();
+        areaCaptureHandler.cancelCapture();
     }
 
     public static void openMenu(KeyEvent event) {
@@ -79,19 +102,13 @@ public class ClientData {
 
     public static void startBoundaryCapture(){
         areaCaptureHandler.startCapture();
-        if(renderStructureHandler.placingData != null){
-            structures.remove(renderStructureHandler.placingData);
-            renderStructureHandler.placingData = null;
-        }
+        removeStructure(renderStructureHandler.placingData);
         renderStructureHandler = createRenderHandler();
     }
 
     public static void startStructureRenderer(StructureTemplate structureTemplate, String name, String blockprintsId){
         areaCaptureHandler.cancelCapture();
-        if(renderStructureHandler.placingData != null){
-            structures.remove(renderStructureHandler.placingData);
-            renderStructureHandler.placingData = null;
-        }
+        removeStructure(renderStructureHandler.placingData);
         renderStructureHandler = createRenderHandler();
         renderStructureHandler.placingData = new BlockPrintsStructureData(structureTemplate, name, blockprintsId);
         structures.add(renderStructureHandler.placingData);

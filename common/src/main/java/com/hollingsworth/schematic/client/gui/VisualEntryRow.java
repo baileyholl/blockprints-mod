@@ -16,7 +16,7 @@ public class VisualEntryRow extends NestedWidget{
         this.data = data;
         this.screen = visualScreen;
         renderables.add(new GuiImageButton(x + 224, y + 1, 11, 11, ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/button_remove_favorite.png"), button -> {
-            ClientData.structures.remove(data);
+            ClientData.removeStructure(data);
             screen.updateList();
         }).withTooltip(Component.translatable("blockprints.remove_visual")));
     }
