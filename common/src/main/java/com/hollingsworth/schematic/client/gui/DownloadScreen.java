@@ -22,10 +22,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import org.lwjgl.system.MemoryUtil;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -70,10 +69,7 @@ public class DownloadScreen extends BaseSchematicScreen {
     }
 
     public static DynamicTexture getTexture(byte[] img) throws IOException {
-        ByteBuffer buffer = MemoryUtil.memAlloc(img.length);
-        buffer.put(img);
-        NativeImage nativeImage = NativeImage.read(buffer.flip());
-        return new DynamicTexture(nativeImage);
+        return new DynamicTexture(NativeImage.read(new ByteArrayInputStream(img)));
     }
 
     @Override
