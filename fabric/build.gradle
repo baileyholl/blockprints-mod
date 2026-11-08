@@ -20,7 +20,6 @@ repositories {
     maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // Forge Config API Port
     maven { url = "https://maven.jamieswhiteshirt.com/libs-release" } // Reach Entity Attributes
     maven { url = "https://jitpack.io/" } // Mixin Extras, Fabric ASM
-    maven { url = "https://maven.tterrag.com/" } // Flywheel
 }
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
@@ -29,8 +28,9 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     implementation project(":common")
-    // Create - dependencies are added transitively
-    modImplementation("com.simibubi.create:create-fabric-${minecraft_version}:0.5.1-f-build.1335+mc1.20.1")
+    modCompileOnly("com.simibubi.create:create-fabric-${minecraft_version}:0.5.1-f-build.1335+mc1.20.1") {
+        exclude group: "com.jozufozu.flywheel"
+    }
     compileOnlyApi("org.bytedeco:ffmpeg-platform:6.0-1.5.9")
 
     include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.2.0-beta.11")))

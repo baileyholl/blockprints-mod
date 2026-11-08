@@ -38,7 +38,7 @@ public class RenderStructureHandler {
     }
 
     public static void onConfirmHit() {
-        if (placingData == null) {
+        if (placingData == null || placingData.anchorPos == null) {
             return;
         }
         placingData = null;

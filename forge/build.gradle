@@ -34,11 +34,13 @@ repositories {
             includeGroup "curse.maven"
         }
     }
-    repositories {
-        maven {
-            name = 'tterrag maven'
-            url = 'https://maven.tterrag.com/'
-        }
+    maven {
+        name = 'Create maven'
+        url = 'https://maven.createmod.net'
+    }
+    maven {
+        name = 'ithundxr mirror'
+        url = 'https://maven.ithundxr.dev/mirror'
     }
 }
 minecraft {
@@ -120,12 +122,13 @@ dependencies {
     implementation("org.bytedeco:ffmpeg-platform:6.0-1.5.9")
     implementation fg.deobf("curse.maven:oauth-513857:4575495")
 
-    implementation fg.deobf("com.simibubi.create:create-1.20.1:0.5.1.d-9:slim"){ transitive = false }
-    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-1.20:${flywheel_version}")
+    implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim"){ transitive = false }
+    implementation fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
+    compileOnly fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}")
+    runtimeOnly fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
     implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
     implementation fg.deobf("curse.maven:building-gadgets-298187:5144161")
 
-    implementation fg.deobf("curse.maven:ad-astra-635042:5116766")
     implementation fg.deobf("curse.maven:resourceful-config-714059:5020441")
     implementation fg.deobf("curse.maven:botarium-704113:5118353")
     implementation fg.deobf("curse.maven:resourceful-lib-570073:5361260")
