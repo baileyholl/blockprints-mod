@@ -13,6 +13,7 @@ import java.io.IOException;
 public class LoginScreen extends BaseSchematicScreen {
     Runnable onLogin;
     Component message;
+    boolean loggedIn;
 
     public LoginScreen(Runnable onLogin) {
         this.onLogin = onLogin;
@@ -50,6 +51,7 @@ public class LoginScreen extends BaseSchematicScreen {
         message = Component.translatable("blockprints.complete_login");
         try {
             Login.startOAuthFlow((token) -> {
+                loggedIn = true;
                 BlockprintsApi.getInstance().setToken(token);
                 onLogin.run();
                 Minecraft.getInstance().player.sendSystemMessage(Component.translatable("blockprints.login_success"));
@@ -60,8 +62,10 @@ public class LoginScreen extends BaseSchematicScreen {
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
-        Login.abortAuth();
+    public void removed() {
+        super.removed();
+        if(!loggedIn){
+            Login.abortAuth();
+        }
     }
 }

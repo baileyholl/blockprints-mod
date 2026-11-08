@@ -4,6 +4,7 @@ import com.hollingsworth.schematic.Constants;
 import com.hollingsworth.schematic.client.gui.HomeScreen;
 import com.hollingsworth.schematic.client.renderer.StructureRenderer;
 import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -40,6 +41,16 @@ public class ClientData {
 
     public static void startStructureRenderer(StructureTemplate structureTemplate, String name, String blockprintsId){
         RenderStructureHandler.startRender(structureTemplate, name, blockprintsId);
+        AreaCaptureHandler.cancelCapture();
+    }
+
+    public static void onLogout(){
+        if(!RenderSystem.isOnRenderThread()){
+            RenderSystem.recordRenderCall(ClientData::onLogout);
+            return;
+        }
+        RenderStructureHandler.cancelRender();
+        StructureRenderer.structures.clear();
         AreaCaptureHandler.cancelCapture();
     }
 

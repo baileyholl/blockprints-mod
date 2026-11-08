@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
@@ -55,5 +56,10 @@ public class ClientEvents {
         if (event.getOverlay() != VanillaGuiOverlay.CROSSHAIR.type())
             return;
         ClientData.renderGUIOverlayEvent(event.getGuiGraphics(), event.getWindow());
+    }
+
+    @SubscribeEvent
+    public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
+        ClientData.onLogout();
     }
 }
